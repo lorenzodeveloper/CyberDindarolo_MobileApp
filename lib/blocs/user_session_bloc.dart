@@ -44,7 +44,19 @@ class UserSessionBloc extends BlocBase {
     try {
       UserSessionModel us =
       await _userSessionRepository.fetchUserSession();
-      print("prova");
+      userListSink.add(Response.completed(us));
+      _lastValidData = us;
+    } catch (e) {
+      userListSink.add(Response.error(e.toString()));
+      print(e);
+    }
+  }
+
+  logout() async {
+    userListSink.add(Response.loading('Loggin out.'));
+    try {
+      UserSessionModel us =
+      await _userSessionRepository.logout();
       userListSink.add(Response.completed(us));
       _lastValidData = us;
     } catch (e) {
@@ -56,4 +68,6 @@ class UserSessionBloc extends BlocBase {
   dispose() {
     _userSessionListController?.close();
   }
+
+
 }

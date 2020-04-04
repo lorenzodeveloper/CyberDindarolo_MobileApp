@@ -5,6 +5,9 @@ class UserSessionModel {
   UserProfileModel user_data;
   String token;
 
+
+	UserSessionModel({this.user_data, this.token});
+
 	UserSessionModel.fromJson(Map<String, dynamic> map):
 		user_data = UserProfileModel.fromJson(map["user_data"]),
 		token = map["token"];

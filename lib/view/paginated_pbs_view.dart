@@ -12,22 +12,20 @@ import '../bloc_provider.dart';
 enum Choice { PIGGYBANKS, INVITATIONS, MOVEMENTS }
 
 class PiggyBanksPage extends StatefulWidget {
-  Choice selectedChoice;
-
-  PiggyBanksPage({Key key, this.selectedChoice}) : super(key: key);
+  PiggyBanksPage({Key key}) : super(key: key);
 
   @override
   _PiggyBanksPageState createState() => _PiggyBanksPageState();
 }
 
 class _PiggyBanksPageState extends State<PiggyBanksPage> {
-  
   PaginatedPiggyBanksBloc _bloc;
+  Choice selectedChoice;
 
   @override
   void initState() {
     _bloc = PaginatedPiggyBanksBloc();
-    widget.selectedChoice = Choice.PIGGYBANKS;
+    selectedChoice = Choice.PIGGYBANKS;
     super.initState();
   }
 
@@ -38,11 +36,11 @@ class _PiggyBanksPageState extends State<PiggyBanksPage> {
   }
 
   Widget _chosenWidget() {
-    switch (widget.selectedChoice) {
+    switch (selectedChoice) {
       case Choice.PIGGYBANKS:
         return BlocProvider(
           bloc: _bloc,
-          child: InfiniteListView(),
+          child: PiggyBankListView(),
         );
         break;
       case Choice.INVITATIONS:
@@ -51,7 +49,7 @@ class _PiggyBanksPageState extends State<PiggyBanksPage> {
       case Choice.MOVEMENTS:
         // TODO: Handle this case.
         break;
-  }
+    }
   }
 
   @override
@@ -62,17 +60,25 @@ class _PiggyBanksPageState extends State<PiggyBanksPage> {
           actions: <Widget>[
             IconButton(
               icon: Icon(Icons.android),
-              color: widget.selectedChoice == Choice.PIGGYBANKS ? Colors.lightBlueAccent : Colors.white,
+              color: selectedChoice == Choice.PIGGYBANKS
+                  ? Colors.lightBlueAccent
+                  : Colors.white,
               onPressed: () => _showPiggyBanks(),
             ),
             IconButton(
-              icon: widget.selectedChoice == Choice.INVITATIONS ? Icon(Icons.notifications) : Icon(Icons.notifications_none),
-              color: widget.selectedChoice == Choice.INVITATIONS ? Colors.lightBlueAccent : Colors.white,
+              icon: selectedChoice == Choice.INVITATIONS
+                  ? Icon(Icons.notifications)
+                  : Icon(Icons.notifications_none),
+              color: selectedChoice == Choice.INVITATIONS
+                  ? Colors.lightBlueAccent
+                  : Colors.white,
               onPressed: () => _showNotifications(),
             ),
             IconButton(
               icon: Icon(Icons.history),
-              color: widget.selectedChoice == Choice.MOVEMENTS ? Colors.lightBlueAccent : Colors.white,
+              color: selectedChoice == Choice.MOVEMENTS
+                  ? Colors.lightBlueAccent
+                  : Colors.white,
               onPressed: () => _showMovementsHistory(),
             ),
           ],
@@ -86,31 +92,31 @@ class _PiggyBanksPageState extends State<PiggyBanksPage> {
 
   _showNotifications() {
     setState(() {
-      widget.selectedChoice = Choice.INVITATIONS;
+      selectedChoice = Choice.INVITATIONS;
     });
   }
 
   _showPiggyBanks() {
     setState(() {
-      widget.selectedChoice = Choice.PIGGYBANKS;
+      selectedChoice = Choice.PIGGYBANKS;
     });
   }
 
   _showMovementsHistory() {
     setState(() {
-      widget.selectedChoice = Choice.MOVEMENTS;
+      selectedChoice = Choice.MOVEMENTS;
     });
   }
 }
 
-class InfiniteListView extends StatefulWidget {
-  const InfiniteListView({Key key}) : super(key: key);
+class PiggyBankListView extends StatefulWidget {
+  const PiggyBankListView({Key key}) : super(key: key);
 
   @override
-  _InfiniteListViewState createState() => _InfiniteListViewState();
+  _PiggyBankListViewState createState() => _PiggyBankListViewState();
 }
 
-class _InfiniteListViewState extends State<InfiniteListView> {
+class _PiggyBankListViewState extends State<PiggyBankListView> {
   StreamSubscription _dataStreamSubscription;
 
   PaginatedPiggyBanksBloc _piggyBankBloc;
@@ -141,8 +147,7 @@ class _InfiniteListViewState extends State<InfiniteListView> {
   @override
   void initState() {
     _piggyBankBloc = BlocProvider.of<PaginatedPiggyBanksBloc>(context);
-    if (_piggyBankBloc.isClosed)
-      _piggyBankBloc = new PaginatedPiggyBanksBloc();
+    if (_piggyBankBloc.isClosed) _piggyBankBloc = new PaginatedPiggyBanksBloc();
     _listen();
     this._getMoreData();
     super.initState();
@@ -197,7 +202,10 @@ class _InfiniteListViewState extends State<InfiniteListView> {
   }
 
   Widget _buildList() {
-    return ListView.builder(
+    return ListView.separated(
+      separatorBuilder: (context, index) => Divider(
+        color: Colors.black12,
+      ),
       //+1 for progressbar
       itemCount: piggybanks.length + 1,
       itemBuilder: (BuildContext context, int index) {
@@ -205,7 +213,15 @@ class _InfiniteListViewState extends State<InfiniteListView> {
           return _buildProgressIndicator();
         } else {
           return new ListTile(
-            title: Text((piggybanks[index].pbName)),
+            title: Text(piggybanks[index].pbName, style: TextStyle(fontWeight: FontWeight.bold),),
+            subtitle: Text(piggybanks[index].pbDescription == null
+                ? 'No description.'
+                : piggybanks[index].pbDescription),
+            leading: Image(
+              image: AssetImage('assets/images/pink_pig.png'),
+              width: 30,
+              height: 30,
+            ),
             onTap: () async {
               print('Clicked ${piggybanks[index]}');
               var result = await Navigator.of(context).push(MaterialPageRoute(
@@ -233,24 +249,24 @@ class _InfiniteListViewState extends State<InfiniteListView> {
   Widget build(BuildContext context) {
     return Container(
         child: Column(children: [
-          NotificationListener<ScrollNotification>(
-            onNotification: (scrollNotification) {
-              if (scrollNotification is ScrollEndNotification) {
-                _onEndScroll(scrollNotification.metrics);
-                return true;
-              }
-              return false;
-            },
-            child: Expanded(child: _buildList()),
-          ),
-          Center(
-              child: Padding(
-                child: Text(dataFetchComplete
-                    ? "Alla data is shown"
-                    : "Scroll down to fetch more data"),
-                padding: new EdgeInsets.all(8),
-              )),
-        ]));
+      NotificationListener<ScrollNotification>(
+        onNotification: (scrollNotification) {
+          if (scrollNotification is ScrollEndNotification) {
+            _onEndScroll(scrollNotification.metrics);
+            return true;
+          }
+          return false;
+        },
+        child: Expanded(child: _buildList()),
+      ),
+      Center(
+          child: Padding(
+        child: Text(dataFetchComplete
+            ? "Alla data is shown"
+            : "Scroll down to fetch more data"),
+        padding: new EdgeInsets.all(8),
+      )),
+    ]));
   }
 }
 

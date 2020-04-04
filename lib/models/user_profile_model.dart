@@ -7,6 +7,10 @@ class UserProfileModel {
   String first_name;
   String last_name;
 
+
+  UserProfileModel({this.auth_user_id, this.username, this.email,
+      this.first_name, this.last_name});
+
   UserProfileModel.fromJson(Map<String, dynamic> map):
         auth_user_id = map["auth_user_id"],
         username = map["username"],

@@ -2,7 +2,9 @@ import 'package:cyberdindaroloapp/bloc_provider.dart';
 import 'package:cyberdindaroloapp/blocs/user_session_bloc.dart';
 import 'package:cyberdindaroloapp/models/user_session_model.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
+import 'package:cyberdindaroloapp/view/login_view.dart';
 import 'package:flutter/material.dart';
+import 'package:cyberdindaroloapp/widgets/error_widget.dart';
 
 class DefaultDrawer extends StatefulWidget {
   final int highlitedVoice;
@@ -35,7 +37,12 @@ class _DefaultDrawerState extends State<DefaultDrawer> {
       @required String route}) {
     if (widget.highlitedVoice != current) {
       Navigator.of(context).popUntil((route) => route.isFirst);
-      Navigator.of(context).pushReplacementNamed(route);
+      if (route != '/') {
+        Navigator.of(context).pushReplacementNamed(route);
+      } else {
+        Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => LoginPage(autoLogin: false,)));
+      }
     }
   }
 
@@ -67,27 +74,50 @@ class _DefaultDrawerState extends State<DefaultDrawer> {
                   ListTile(
                       selected: widget.highlitedVoice == 1,
                       title: Text('PiggyBanks'),
-                      leading: Icon(Icons.view_quilt,),
+                      leading: Icon(Icons.home,),
                       onTap: () =>  this.pushIfCan(context: context, current: 1, route: '/home')
                   ),
 
-                  // UserInfo
+                  // Users
                   ListTile(
                       selected: widget.highlitedVoice == 2,
-                      title: Text('Profile'),
-                      leading: Icon(Icons.email,),
-                      onTap: () =>  this.pushIfCan(context: context, current: 2, route: '/profile')
+                      title: Text('Users'),
+                      leading: Icon(Icons.account_circle,),
+                      onTap: () =>  this.pushIfCan(context: context, current: 2, route: '/users')
                   ),
+
+                  // Products
+                  ListTile(
+                      selected: widget.highlitedVoice == 3,
+                      title: Text('Products'),
+                      leading: Icon(Icons.local_grocery_store,),
+                      onTap: () =>  this.pushIfCan(context: context, current: 3, route: '/products')
+                  ),
+
+                  Divider(),
+
+                  // Logout
+                  ListTile(
+                      selected: widget.highlitedVoice == 4,
+                      title: Text('Logout'),
+                      leading: Icon(Icons.exit_to_app,),
+                      onTap: () {
+                        _userSessionBloc.logout();
+                        this.pushIfCan(context: context, current: 4, route: '/');
+                      }
+                  ),
+
 
                 ]),
               );
               break;
             case Status.ERROR:
-              /*return Error(
+              return Error(
                 errorMessage: snapshot.data.message,
-                onRetryPressed: () =>
-                    _bloc.fetchPiggyBank(widget.selectedPiggybank),
-              );*/
+                onRetryPressed: () {
+
+                }
+              );
               break;
           }
         }

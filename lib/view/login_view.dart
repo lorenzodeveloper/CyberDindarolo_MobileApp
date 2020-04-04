@@ -59,8 +59,9 @@ class LoginFormState extends State<LoginForm> {
     _userSessionbloc = BlocProvider.of<UserSessionBloc>(context);
     _listen();
     // Try login with stored credential (if stored)
-    if (widget.autoLogin)
+    if (widget.autoLogin) {
       _userSessionbloc.login();
+    }
   }
 
   void _listen() {
@@ -76,8 +77,9 @@ class LoginFormState extends State<LoginForm> {
           //Navigator.of(context).pushReplacementNamed('/home');
           break;
         case Status.ERROR:
-          if (data.message != "Exception: Credentials not stored")
+          if (data.message != "Exception: Credentials not stored") {
             showAlertDialog(context, "Error", data.message);
+          }
           //print("Error: " + data.message);
           break;
       }

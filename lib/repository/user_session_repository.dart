@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cyberdindaroloapp/models/user_profile_model.dart';
 import 'package:cyberdindaroloapp/models/user_session_model.dart';
 import 'package:cyberdindaroloapp/networking/ApiProvider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -60,5 +61,14 @@ class UserSessionRepository {
       throw Exception("Credentials not stored");
 
     return UserSessionModel.fromJson(json.decode(sessionJson));
+  }
+
+  Future<UserSessionModel> logout() async {
+     await _secure_storage
+        .delete(key: 'token')
+        .timeout(const Duration(seconds: 5));
+
+    return UserSessionModel(user_data: UserProfileModel(username:'unauth',
+    email: 'unauth@email.com'), token: '');
   }
 }
