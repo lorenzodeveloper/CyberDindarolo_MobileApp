@@ -6,8 +6,10 @@ import 'package:cyberdindaroloapp/view/login_view.dart';
 import 'package:flutter/material.dart';
 import 'package:cyberdindaroloapp/widgets/error_widget.dart';
 
+enum Voice { PIGGYBANKS, USERS, PRODUCTS, LOGOUT }
+
 class DefaultDrawer extends StatefulWidget {
-  final int highlitedVoice;
+  final Voice highlitedVoice;
 
   const DefaultDrawer({Key key, this.highlitedVoice}) : super(key: key);
 
@@ -33,15 +35,17 @@ class _DefaultDrawerState extends State<DefaultDrawer> {
 
   void pushIfCan(
       {@required BuildContext context,
-      @required int current,
+      @required Voice current,
       @required String route}) {
     if (widget.highlitedVoice != current) {
       Navigator.of(context).popUntil((route) => route.isFirst);
       if (route != '/') {
         Navigator.of(context).pushReplacementNamed(route);
       } else {
-        Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => LoginPage(autoLogin: false,)));
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+            builder: (context) => LoginPage(
+                  autoLogin: false,
+                )));
       }
     }
   }
@@ -72,52 +76,62 @@ class _DefaultDrawerState extends State<DefaultDrawer> {
 
                   // PiggyBanks
                   ListTile(
-                      selected: widget.highlitedVoice == 1,
+                      selected: widget.highlitedVoice == Voice.PIGGYBANKS,
                       title: Text('PiggyBanks'),
-                      leading: Icon(Icons.home,),
-                      onTap: () =>  this.pushIfCan(context: context, current: 1, route: '/home')
-                  ),
+                      leading: Icon(
+                        Icons.home,
+                      ),
+                      onTap: () => this.pushIfCan(
+                          context: context,
+                          current: Voice.PIGGYBANKS,
+                          route: '/home')),
 
                   // Users
                   ListTile(
-                      selected: widget.highlitedVoice == 2,
+                      selected: widget.highlitedVoice == Voice.USERS,
                       title: Text('Users'),
-                      leading: Icon(Icons.account_circle,),
-                      onTap: () =>  this.pushIfCan(context: context, current: 2, route: '/users')
-                  ),
+                      leading: Icon(
+                        Icons.account_circle,
+                      ),
+                      onTap: () => this.pushIfCan(
+                          context: context,
+                          current: Voice.USERS,
+                          route: '/users')),
 
                   // Products
                   ListTile(
-                      selected: widget.highlitedVoice == 3,
+                      selected: widget.highlitedVoice == Voice.PRODUCTS,
                       title: Text('Products'),
-                      leading: Icon(Icons.local_grocery_store,),
-                      onTap: () =>  this.pushIfCan(context: context, current: 3, route: '/products')
-                  ),
+                      leading: Icon(
+                        Icons.local_grocery_store,
+                      ),
+                      onTap: () => this.pushIfCan(
+                          context: context,
+                          current: Voice.PRODUCTS,
+                          route: '/products')),
 
                   Divider(),
 
                   // Logout
                   ListTile(
-                      selected: widget.highlitedVoice == 4,
+                      selected: widget.highlitedVoice == Voice.LOGOUT,
                       title: Text('Logout'),
-                      leading: Icon(Icons.exit_to_app,),
+                      leading: Icon(
+                        Icons.exit_to_app,
+                      ),
                       onTap: () {
                         _userSessionBloc.logout();
-                        this.pushIfCan(context: context, current: 4, route: '/');
-                      }
-                  ),
-
-
+                        this.pushIfCan(
+                            context: context,
+                            current: Voice.LOGOUT,
+                            route: '/');
+                      }),
                 ]),
               );
               break;
             case Status.ERROR:
               return Error(
-                errorMessage: snapshot.data.message,
-                onRetryPressed: () {
-
-                }
-              );
+                  errorMessage: snapshot.data.message, onRetryPressed: () {});
               break;
           }
         }

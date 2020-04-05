@@ -15,7 +15,7 @@ class PiggyBankRepository {
       'Authorization': 'Token $stored_token'
     };
 
-    print(stored_token);
+    //print(stored_token);
 
     final response = await _provider.get("piggybanks/$id/", headers: headers);
     return PiggyBankModel.fromJson(response);

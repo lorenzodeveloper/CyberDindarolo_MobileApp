@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 
 import '../bloc_provider.dart';
 
-enum Choice { PIGGYBANKS, INVITATIONS, MOVEMENTS }
+enum Choice { PIGGYBANKS, NOTIFICATIONS, HISTORY }
 
 class PiggyBanksPage extends StatefulWidget {
   PiggyBanksPage({Key key}) : super(key: key);
@@ -43,10 +43,10 @@ class _PiggyBanksPageState extends State<PiggyBanksPage> {
           child: PiggyBankListView(),
         );
         break;
-      case Choice.INVITATIONS:
+      case Choice.NOTIFICATIONS:
         // TODO: Handle this case.
         break;
-      case Choice.MOVEMENTS:
+      case Choice.HISTORY:
         // TODO: Handle this case.
         break;
     }
@@ -66,17 +66,17 @@ class _PiggyBanksPageState extends State<PiggyBanksPage> {
               onPressed: () => _showPiggyBanks(),
             ),
             IconButton(
-              icon: selectedChoice == Choice.INVITATIONS
+              icon: selectedChoice == Choice.NOTIFICATIONS
                   ? Icon(Icons.notifications)
                   : Icon(Icons.notifications_none),
-              color: selectedChoice == Choice.INVITATIONS
+              color: selectedChoice == Choice.NOTIFICATIONS
                   ? Colors.lightBlueAccent
                   : Colors.white,
               onPressed: () => _showNotifications(),
             ),
             IconButton(
               icon: Icon(Icons.history),
-              color: selectedChoice == Choice.MOVEMENTS
+              color: selectedChoice == Choice.HISTORY
                   ? Colors.lightBlueAccent
                   : Colors.white,
               onPressed: () => _showMovementsHistory(),
@@ -84,7 +84,7 @@ class _PiggyBanksPageState extends State<PiggyBanksPage> {
           ],
         ),
         drawer: DefaultDrawer(
-          highlitedVoice: 1,
+          highlitedVoice: Voice.PIGGYBANKS,
         ),
         body: _chosenWidget(),
         resizeToAvoidBottomInset: false);
@@ -92,7 +92,7 @@ class _PiggyBanksPageState extends State<PiggyBanksPage> {
 
   _showNotifications() {
     setState(() {
-      selectedChoice = Choice.INVITATIONS;
+      selectedChoice = Choice.NOTIFICATIONS;
     });
   }
 
@@ -104,7 +104,7 @@ class _PiggyBanksPageState extends State<PiggyBanksPage> {
 
   _showMovementsHistory() {
     setState(() {
-      selectedChoice = Choice.MOVEMENTS;
+      selectedChoice = Choice.HISTORY;
     });
   }
 }
@@ -129,27 +129,12 @@ class _PiggyBankListViewState extends State<PiggyBankListView> {
 
   bool dataFetchComplete = false;
 
-  void _getMoreData() async {
-    if (dataFetchComplete) {
-      print("Already fetched all data, exiting.");
-      return;
-    }
-
-    if (!isLoading) {
-      setState(() {
-        isLoading = true;
-      });
-
-      _piggyBankBloc.fetchPiggyBanks(page: nextPage);
-    }
-  }
-
   @override
   void initState() {
     _piggyBankBloc = BlocProvider.of<PaginatedPiggyBanksBloc>(context);
     if (_piggyBankBloc.isClosed) _piggyBankBloc = new PaginatedPiggyBanksBloc();
     _listen();
-    this._getMoreData();
+    _getMoreData();
     super.initState();
   }
 
@@ -160,26 +145,51 @@ class _PiggyBankListViewState extends State<PiggyBankListView> {
     super.dispose();
   }
 
+  // Fetch piggybanks and set state to "loading"
+  // while fetching
+  Future<void> _getMoreData() async {
+    if (dataFetchComplete) {
+      print("Already fetched all data, exiting.");
+      return;
+    }
+
+    // Set state to loading
+    if (!isLoading) {
+      setState(() {
+        isLoading = true;
+      });
+
+      _piggyBankBloc.fetchPiggyBanks(page: nextPage);
+    }
+  }
+
+  // Listen for piggybanks changes and set state to "complete"
   _listen() {
+    // Subscribe to datas_tream
     _dataStreamSubscription = _piggyBankBloc.pbListStream.listen((event) {
       switch (event.status) {
         case Status.LOADING:
           break;
 
         case Status.COMPLETED:
+          // Add data to piggybanks list
           piggybanks.addAll(event.data.results);
-          print(piggybanks[0].pbName);
+          //print(piggybanks[0].pbName);
+          // If there is a next page, then set nextPage += 1
           if (event.data.next != null)
             nextPage++;
           else
             dataFetchComplete = true;
 
+          // Fetch is now complete
           setState(() {
             isLoading = false;
           });
           break;
 
         case Status.ERROR:
+          // If an error occured and if it is token related
+          // redirect to login (with autologin : true)
           if (event.message.toLowerCase().contains('token')) {
             showAlertDialog(context, 'Error', event.message,
                 redirectRoute: '/');
@@ -189,6 +199,32 @@ class _PiggyBankListViewState extends State<PiggyBankListView> {
     });
   }
 
+  // Callback of scrollNotification listener
+  // If scroll reached the bottom, try to fetch more data
+  _onEndScroll(ScrollNotification scrollNotification) {
+    {
+      if (scrollNotification is ScrollEndNotification) {
+        var metrics = scrollNotification.metrics;
+        if (metrics.pixels >= metrics.maxScrollExtent && !metrics.outOfRange) {
+          _getMoreData();
+        }
+      }
+      return false;
+    }
+  }
+
+  // If refresh triggered, fetch data from page 1
+  _handleRefresh() async {
+    dataFetchComplete = false;
+    nextPage = 1;
+
+    piggybanks = new List();
+
+    // Need await to handle refresh indicator ending callback
+    await _getMoreData();
+  }
+
+  // Build the circular progress indicator in listview
   Widget _buildProgressIndicator() {
     return new Padding(
       padding: const EdgeInsets.all(8.0),
@@ -201,63 +237,42 @@ class _PiggyBankListViewState extends State<PiggyBankListView> {
     );
   }
 
+  // ListView builder of piggybanks
   Widget _buildList() {
     return ListView.separated(
-      separatorBuilder: (context, index) => Divider(
-        color: Colors.black12,
-      ),
+      separatorBuilder: (context, index) {
+        return Divider(
+          indent: 60,
+          endIndent: 60,
+        );
+      },
       //+1 for progressbar
       itemCount: piggybanks.length + 1,
       itemBuilder: (BuildContext context, int index) {
         if (index == piggybanks.length) {
           return _buildProgressIndicator();
         } else {
-          return new ListTile(
-            title: Text(piggybanks[index].pbName, style: TextStyle(fontWeight: FontWeight.bold),),
-            subtitle: Text(piggybanks[index].pbDescription == null
-                ? 'No description.'
-                : piggybanks[index].pbDescription),
-            leading: Image(
-              image: AssetImage('assets/images/pink_pig.png'),
-              width: 30,
-              height: 30,
-            ),
-            onTap: () async {
-              print('Clicked ${piggybanks[index]}');
-              var result = await Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) =>
-                      PiggyBankInfoPage(piggybanks[index].id)));
-            },
-          );
+          return PiggyBankTile(piggybanks: piggybanks, index: index);
         }
       },
       physics: const AlwaysScrollableScrollPhysics(),
     );
   }
 
-  _onEndScroll(ScrollMetrics metrics) {
-    setState(() {
-      if (metrics.pixels >= metrics.maxScrollExtent && !metrics.outOfRange) {
-        setState(() {
-          _getMoreData();
-        });
-      }
-    });
-  }
-
+  // Build widget:
+  // LIST AND INFO LABEL
   @override
   Widget build(BuildContext context) {
     return Container(
         child: Column(children: [
       NotificationListener<ScrollNotification>(
-        onNotification: (scrollNotification) {
-          if (scrollNotification is ScrollEndNotification) {
-            _onEndScroll(scrollNotification.metrics);
-            return true;
-          }
-          return false;
-        },
-        child: Expanded(child: _buildList()),
+        onNotification: (scrollNotification) =>
+            _onEndScroll(scrollNotification),
+        child: Expanded(
+            child: RefreshIndicator(
+          child: _buildList(),
+          onRefresh: () => _handleRefresh(),
+        )),
       ),
       Center(
           child: Padding(
@@ -270,103 +285,34 @@ class _PiggyBankListViewState extends State<PiggyBankListView> {
   }
 }
 
-/*
-class PiggyBankList extends StatefulWidget {
-  final PaginatedPiggyBanksModel pbList;
-  final void Function() callback;
+class PiggyBankTile extends StatelessWidget {
+  const PiggyBankTile(
+      {Key key, @required this.piggybanks, @required this.index})
+      : super(key: key);
 
-  const PiggyBankList({Key key, this.pbList, this.callback}) : super(key: key);
-
-  @override
-  _PiggyBankListState createState() => _PiggyBankListState();
-}
-
-class _PiggyBankListState extends State<PiggyBankList> {
-  ScrollController _controller;
-
-  Widget _buildList() {
-    return ListView.builder(
-      itemBuilder: (context, index) {
-        return Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: 0.0,
-              vertical: 1.0,
-            ),
-            child: InkWell(
-                onTap: () async {
-                  var result = await Navigator.of(context).push(
-                      MaterialPageRoute(
-                          builder: (context) => PiggyBankInfoPage(
-                              widget.pbList.results[index].id)));
-                },
-                child: SizedBox(
-                  height: 65,
-                  child: Container(
-                    color: Color(0xFF333333),
-                    alignment: Alignment.center,
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(4, 0, 0, 0),
-                      child: Text(
-                        widget.pbList.results[index].pbName,
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w100,
-                            fontFamily: 'Roboto'),
-                        textAlign: TextAlign.left,
-                      ),
-                    ),
-                  ),
-                )));
-      },
-      itemCount: widget.pbList.results.length,
-      shrinkWrap: true,
-      physics: AlwaysScrollableScrollPhysics(),
-      controller: _controller,
-    );
-  }
-
-  _onEndScroll(ScrollMetrics metrics) {
-    if (metrics.pixels >= metrics.maxScrollExtent && !metrics.outOfRange) {
-      print("reached bottom");
-      if (widget.pbList.next != null) {
-        print(widget.pbList.next);
-        widget.callback();
-        //_controller.jumpTo(widget.pbList.count - 2 * 65.0);
-      }
-    }
-  }
-
-  @override
-  void initState() {
-    _controller = ScrollController();
-
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+  final List piggybanks;
+  final int index;
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-        backgroundColor: Color(0xFF202020),
-        body: new Container(
-            child: Column(children: [
-          NotificationListener<ScrollNotification>(
-            onNotification: (scrollNotification) {
-              if (scrollNotification is ScrollEndNotification) {
-                _onEndScroll(scrollNotification.metrics);
-                return true;
-              }
-              return false;
-            },
-            child: Expanded(child: _buildList()),
-          ),
-        ])));
+    return new ListTile(
+      title: Text(
+        piggybanks[index].pbName,
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ),
+      subtitle: Text(piggybanks[index].pbDescription == null
+          ? 'No description.'
+          : piggybanks[index].pbDescription),
+      leading: Image(
+        image: AssetImage('assets/images/pink_pig.png'),
+        width: 30,
+        height: 30,
+      ),
+      onTap: () async {
+        //print('Clicked ${piggybanks[index]}');
+        var result = await Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => PiggyBankInfoPage(piggybanks[index].id)));
+      },
+    );
   }
 }
-*/

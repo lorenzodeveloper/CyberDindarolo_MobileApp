@@ -11,7 +11,7 @@ import '../bloc_provider.dart';
 class LoginPage extends StatelessWidget {
   final bool autoLogin;
 
-  LoginPage({this.autoLogin : true});
+  LoginPage({this.autoLogin: true});
 
   @override
   Widget build(BuildContext context) {
@@ -26,10 +26,9 @@ class LoginPage extends StatelessWidget {
 
 // Define a custom Form widget.
 class LoginForm extends StatefulWidget {
-
   final bool autoLogin;
 
-  LoginForm({this.autoLogin : true});
+  LoginForm({this.autoLogin: true});
 
   @override
   LoginFormState createState() {
@@ -64,6 +63,16 @@ class LoginFormState extends State<LoginForm> {
     }
   }
 
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    unameController.dispose();
+    pwdController.dispose();
+    _userSessionStreamSubscription.cancel();
+    //_userSessionbloc.dispose();
+    super.dispose();
+  }
+
   void _listen() {
     _userSessionStreamSubscription =
         _userSessionbloc.userListStream.listen((data) {
@@ -77,24 +86,35 @@ class LoginFormState extends State<LoginForm> {
           //Navigator.of(context).pushReplacementNamed('/home');
           break;
         case Status.ERROR:
-          if (data.message != "Exception: Credentials not stored") {
-            showAlertDialog(context, "Error", data.message);
-          }
+          //if (data.message != "Exception: Credentials not stored") {
+          showAlertDialog(context, "Error", data.message);
+          //}
           //print("Error: " + data.message);
           break;
       }
     });
   }
 
-  @override
-  void dispose() {
-    // Clean up the controller when the widget is disposed.
-    unameController.dispose();
-    pwdController.dispose();
-    _userSessionStreamSubscription.cancel();
-    //_userSessionbloc.dispose();
-    super.dispose();
-  }
+  Function(String) _usernameValidator = (String value) {
+    if (value.isEmpty) {
+      return 'Please enter some text';
+    }
+    if (!value.contains(new RegExp(r'^[-a-zA-Z0-9_@.]+$'))) {
+      return 'Invalid characters';
+    }
+    if (value.length < 3) {
+      return 'At least 3 chars';
+    }
+    return null;
+  };
+
+  Function(String) _passwordValidator = (String value) {
+    if (value.isEmpty) {
+      return 'Please enter some text';
+    }
+    if (value.length < 8) return 'At least 8 chars';
+    return null;
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -107,29 +127,14 @@ class LoginFormState extends State<LoginForm> {
               // Username field
               TextFormField(
                 // The validator receives the text that the user has entered.
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Please enter some text';
-                  }
-                  if (!value.contains(new RegExp(r'^[-a-zA-Z0-9_@.]+$'))) {
-                    return 'Invalid characters';
-                  }
-                  if (value.length < 3) return 'At least 3 chars';
-                  return null;
-                },
+                validator: _usernameValidator,
                 decoration: InputDecoration(labelText: 'Enter your username'),
                 controller: unameController,
               ),
               // Pwd field
               TextFormField(
                 // The validator receives the text that the user has entered.
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Please enter some text';
-                  }
-                  if (value.length < 8) return 'At least 8 chars';
-                  return null;
-                },
+                validator: _passwordValidator,
                 decoration: InputDecoration(labelText: 'Enter your password'),
                 obscureText: true,
                 controller: pwdController,

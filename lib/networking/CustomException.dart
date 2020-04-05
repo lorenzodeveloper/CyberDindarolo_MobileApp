@@ -22,6 +22,10 @@ class UnauthorisedException extends CustomException {
   UnauthorisedException([message]) : super(message, "Unauthorised: ");
 }
 
+class NotFoundException extends CustomException {
+  NotFoundException([message]) : super(message, "Not Found: ");
+}
+
 class InvalidInputException extends CustomException {
   InvalidInputException([String message]) : super(message, "Invalid Input: ");
 }
