@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 
 import '../alerts.dart';
 import '../bloc_provider.dart';
+import 'package:cyberdindaroloapp/validators.dart';
+
 
 class LoginPage extends StatelessWidget {
   final bool autoLogin;
@@ -95,27 +97,6 @@ class LoginFormState extends State<LoginForm> {
     });
   }
 
-  Function(String) _usernameValidator = (String value) {
-    if (value.isEmpty) {
-      return 'Please enter some text';
-    }
-    if (!value.contains(new RegExp(r'^[-a-zA-Z0-9_@.]+$'))) {
-      return 'Invalid characters';
-    }
-    if (value.length < 3) {
-      return 'At least 3 chars';
-    }
-    return null;
-  };
-
-  Function(String) _passwordValidator = (String value) {
-    if (value.isEmpty) {
-      return 'Please enter some text';
-    }
-    if (value.length < 8) return 'At least 8 chars';
-    return null;
-  };
-
   @override
   Widget build(BuildContext context) {
     // Build a Form widget using the _formKey created above.
@@ -127,14 +108,14 @@ class LoginFormState extends State<LoginForm> {
               // Username field
               TextFormField(
                 // The validator receives the text that the user has entered.
-                validator: _usernameValidator,
+                validator: usernameValidator,
                 decoration: InputDecoration(labelText: 'Enter your username'),
                 controller: unameController,
               ),
               // Pwd field
               TextFormField(
                 // The validator receives the text that the user has entered.
-                validator: _passwordValidator,
+                validator: passwordValidator,
                 decoration: InputDecoration(labelText: 'Enter your password'),
                 obscureText: true,
                 controller: pwdController,

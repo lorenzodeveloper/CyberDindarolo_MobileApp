@@ -31,6 +31,32 @@ class CyberDindaroloAPIv1Provider {
     return responseJson;
   }
 
+  Future<dynamic> patch(String url, {Map headers, Map body, encoding}) async {
+    var responseJson;
+    try {
+      final response = await http
+          .patch(_baseUrl + url, body: body, headers: headers, encoding: encoding)
+          .timeout(const Duration(seconds: 5));
+      responseJson = _response(response);
+    } on SocketException {
+      throw FetchDataException('No Internet connection');
+    }
+    return responseJson;
+  }
+
+  Future<dynamic> delete(String url, {Map headers}) async {
+    var responseJson;
+    try {
+      final response = await http
+          .delete(_baseUrl + url, headers: headers)
+          .timeout(const Duration(seconds: 5));
+      responseJson = _response(response);
+    } on SocketException {
+      throw FetchDataException('No Internet connection');
+    }
+    return responseJson;
+  }
+
   dynamic _response(http.Response response) {
     switch (response.statusCode) {
       case 200:
@@ -48,6 +74,8 @@ class CyberDindaroloAPIv1Provider {
         throw UnauthorisedException(response.body.toString());
       case 404:
         throw NotFoundException(response.body.toString());
+      case 409:
+        throw ConflictException(response.body.toString());
       case 500:
 
       default:

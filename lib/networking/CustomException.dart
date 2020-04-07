@@ -26,6 +26,10 @@ class NotFoundException extends CustomException {
   NotFoundException([message]) : super(message, "Not Found: ");
 }
 
+class ConflictException extends CustomException {
+  ConflictException([message]) : super(message, "Operational Conflict: ");
+}
+
 class InvalidInputException extends CustomException {
   InvalidInputException([String message]) : super(message, "Invalid Input: ");
 }

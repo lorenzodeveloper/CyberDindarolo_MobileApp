@@ -8,6 +8,8 @@
 .buildlog/
 .history
 .svn/
+lib/backup.zip
+lib/home_page.dart.old
 
 # IntelliJ related
 *.iml

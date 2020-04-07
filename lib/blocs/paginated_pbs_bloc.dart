@@ -24,10 +24,7 @@ class PaginatedPiggyBanksBloc extends BlocBase {
     _piggybankListController = StreamController<Response<PaginatedPiggyBanksModel>>.broadcast();
     _piggybankRepository = PaginatedPiggyBanksRepository();
     _lastValidData = null;
-    //fetchPiggyBanks(token, page: page);
   }
-
-
 
   fetchPiggyBanks({int page: 1}) async {
     pbListSink.add(Response.loading('Getting piggybanks.'));
