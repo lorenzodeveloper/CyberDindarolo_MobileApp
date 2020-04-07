@@ -7,7 +7,7 @@ import 'package:cyberdindaroloapp/repository/paginated_stock_repository.dart';
 import 'package:flutter/material.dart';
 
 
-class PaginatedParticipantsBloc extends BlocBase {
+class PaginatedStockBloc extends BlocBase {
   PaginatedStockRepository _pagStockRepository;
   StreamController _pagStockListController;
 
@@ -19,7 +19,7 @@ class PaginatedParticipantsBloc extends BlocBase {
 
   bool get isClosed => _pagStockListController.isClosed;
 
-  PaginatedParticipantsBloc() {
+  PaginatedStockBloc() {
     _pagStockListController = StreamController<Response<PaginatedStockModel>>.broadcast();
     _pagStockRepository = PaginatedStockRepository();
   }

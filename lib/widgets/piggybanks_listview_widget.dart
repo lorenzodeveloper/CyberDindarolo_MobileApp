@@ -176,7 +176,7 @@ class _PiggyBankListViewState extends State<PiggyBankListView> {
           Center(
               child: Padding(
                 child: Text(dataFetchComplete
-                    ? "Alla data is shown"
+                    ? "All data is shown"
                     : "Scroll down to fetch more data"),
                 padding: new EdgeInsets.all(8),
               )),

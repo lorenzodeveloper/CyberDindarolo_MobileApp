@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:cyberdindaroloapp/blocs/credit_bloc.dart';
 import 'package:cyberdindaroloapp/blocs/paginated_participants_bloc.dart';
+import 'package:cyberdindaroloapp/blocs/paginated_stock_bloc.dart';
 import 'package:cyberdindaroloapp/blocs/pb_bloc.dart';
 import 'package:cyberdindaroloapp/models/paginated_participants_model.dart';
 import 'package:cyberdindaroloapp/models/piggybank_model.dart';
+import 'package:cyberdindaroloapp/models/stock_model.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
 import 'package:cyberdindaroloapp/widgets/universal_drawer_widget.dart';
 import 'package:decimal/decimal.dart';
@@ -104,6 +108,8 @@ class _PiggyBankWidgetState extends State<PiggyBankWidget> {
   PaginatedParticipantsBloc _paginatedParticipantsBloc;
   CreditBloc _creditBloc;
 
+  //PaginatedStockBloc _paginatedStockBloc;
+
   @override
   void initState() {
     super.initState();
@@ -121,10 +127,14 @@ class _PiggyBankWidgetState extends State<PiggyBankWidget> {
     unameController.dispose();
     pwdController.dispose();
 
+    _creditBloc.dispose();
+    _paginatedParticipantsBloc.dispose();
+
     super.dispose();
   }
 
   Widget _buildForm() {
+    // TODO
     return Form(
         key: _formKey,
         child: Padding(
@@ -149,7 +159,13 @@ class _PiggyBankWidgetState extends State<PiggyBankWidget> {
               RaisedButton(
                 onPressed: () async {
                   // Validate returns true if the form is valid, otherwise false.
-                  if (_formKey.currentState.validate()) {}
+                  //if (_formKey.currentState.validate()) {}
+                  setState(() {
+                    _operation = Operation.INFO_VIEW;
+                    _creditBloc.getCredit(piggybank: widget.piggyBank.id);
+                    _paginatedParticipantsBloc.fetchUsersData(
+                        piggybank: widget.piggyBank.id);
+                  });
                 },
                 child: Text('Ciao bell'),
               ),
@@ -161,47 +177,51 @@ class _PiggyBankWidgetState extends State<PiggyBankWidget> {
       padding: EdgeInsets.all(10),
       children: <Widget>[
         // PiggyBank Header: Name, Desc, Credit
-        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: <
-            Widget>[
-          Expanded(
-            flex: 2,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                CircleAvatar(
-                  child: Image(
-                    image: AssetImage('assets/images/pink_pig.png'),
-                  ),
-                )
-              ],
-            ),
-          ),
-          Expanded(
-            flex: 6,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  widget.piggyBank.pbName,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+        Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Expanded(
+                flex: 2,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    CircleAvatar(
+                      child: Image(
+                        image: AssetImage('assets/images/pink_pig.png'),
+                      ),
+                    )
+                  ],
                 ),
-                Text(
-                    widget.piggyBank.pbDescription == null
-                        ? 'No Description'
-                        : widget.piggyBank.pbDescription,
-                    style: TextStyle(fontStyle: FontStyle.italic)),
-              ],
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Column(
-              children: <Widget>[
-                _getCreditWidget(),
-              ],
-            ),
-          ),
-        ]),
+              ),
+              Expanded(
+                flex: 6,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      widget.piggyBank.pbName,
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                    ),
+                    Text(
+                        widget.piggyBank.pbDescription == null
+                            ? 'No Description'
+                            : widget.piggyBank.pbDescription,
+                        style: TextStyle(
+                            fontStyle: FontStyle.italic,
+                            color: Colors.black45)),
+                  ],
+                ),
+              ),
+              Expanded(
+                flex: 2,
+                child: Column(
+                  children: <Widget>[
+                    _getCreditWidget(),
+                  ],
+                ),
+              ),
+            ]),
         Divider(),
         // Participants overview
         Row(
@@ -223,6 +243,55 @@ class _PiggyBankWidgetState extends State<PiggyBankWidget> {
           ],
         ),
         Divider(),
+        // Edit button
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            RaisedButton(
+              child: Text('Edit PG'),
+              // TODO: EDIT PG
+              onPressed: () {
+                print('TODO');
+                setState(() {
+                  _operation = Operation.EDIT_VIEW;
+                });
+              },
+            ),
+            RaisedButton(
+              child: Text('CLOSE PG'),
+              // TODO: CLOSE PG
+              onPressed: () {
+                print('TODO');
+
+              },
+            ),/*
+            RaisedButton(
+              child: Text('INVITE USER'),
+              // TODO: CLOSE PG
+              onPressed: () {
+                print('TODO');
+
+              },
+            ),
+            RaisedButton(
+              child: Text('INSERT PRODUCT'),
+              // TODO: CLOSE PG
+              onPressed: () {
+                print('TODO');
+
+              },
+            )*/
+          ],
+        ),
+        Divider(),
+        // STOCK LIST
+        Row(
+          children: <Widget>[
+            StockListViewWidget(
+                piggybank_id: widget.piggyBank.id,
+                onPurchase: () => print('purchase')),
+          ],
+        )
       ],
     );
   }
@@ -262,8 +331,8 @@ class _PiggyBankWidgetState extends State<PiggyBankWidget> {
             case Status.ERROR:
               return Error(
                 errorMessage: snapshot.data.message,
-                onRetryPressed: () => _creditBloc.getCredit(
-                    piggybank: widget.piggyBank.id),
+                onRetryPressed: () =>
+                    _creditBloc.getCredit(piggybank: widget.piggyBank.id),
               );
               break;
           }
@@ -290,8 +359,8 @@ class _PiggyBankWidgetState extends State<PiggyBankWidget> {
               print(snapshot.data.message);
               return Error(
                 errorMessage: snapshot.data.message,
-                onRetryPressed: () => _paginatedParticipantsBloc
-                    .fetchUsersData(piggybank: widget.piggyBank.id),
+                onRetryPressed: () => _paginatedParticipantsBloc.fetchUsersData(
+                    piggybank: widget.piggyBank.id),
               );
               break;
           }
@@ -302,100 +371,270 @@ class _PiggyBankWidgetState extends State<PiggyBankWidget> {
   }
 }
 
-/*
-class PiggyBankWidget extends StatelessWidget {
-  final PiggyBankModel piggyBank;
+class StockListViewWidget extends StatefulWidget {
+  final int piggybank_id;
+  final void Function() onPurchase;
 
-  const PiggyBankWidget({Key key, this.piggyBank}) : super(key: key);
+  StockListViewWidget({@required this.piggybank_id, @required this.onPurchase});
+
+  @override
+  _StockListViewWidgetState createState() {
+    return _StockListViewWidgetState();
+  }
+}
+
+/*class _StockWidgetState extends State<StockWidget> {
+
+  PaginatedStockBloc _paginatedStockBloc;
+
+  @override
+  void initState() {
+    _paginatedStockBloc = new PaginatedStockBloc();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _paginatedStockBloc.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      body: new Container(
-        constraints: new BoxConstraints.expand(),
-        color: Colors.lightBlueAccent, //new Color(0xFF736AB7),
-        child: new Stack(
-          children: <Widget>[
-            _getBackground(),
-            _getGradient(context),
-            _getContent(),
-          ],
+    return Text('Ciao bellissimi');
+  }
+
+}*/
+
+class _StockListViewWidgetState extends State<StockListViewWidget> {
+  StreamSubscription _dataStreamSubscription;
+
+  PaginatedStockBloc _paginatedStockBloc;
+
+  int nextPage = 1;
+
+  bool isLoading = false;
+
+  List stockList = new List();
+
+  bool dataFetchComplete = false;
+
+  @override
+  void initState() {
+    _paginatedStockBloc = new PaginatedStockBloc();
+    _listen();
+    _getMoreData();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _dataStreamSubscription.cancel();
+    _paginatedStockBloc.dispose();
+    super.dispose();
+  }
+
+  // Fetch stock and set state to "loading"
+  // while fetching
+  Future<void> _getMoreData() async {
+    if (dataFetchComplete) {
+      print("Already fetched all data, exiting.");
+      return;
+    }
+
+    // Set state to loading
+    if (!isLoading) {
+      setState(() {
+        isLoading = true;
+      });
+
+      _paginatedStockBloc.fetchPiggyBankStock(
+          page: nextPage, piggybank: widget.piggybank_id);
+    }
+  }
+
+  // Listen for piggybanks changes and set state to "complete"
+  _listen() {
+    // Subscribe to datas_tream
+    _dataStreamSubscription =
+        _paginatedStockBloc.pagStockListStream.listen((event) {
+      switch (event.status) {
+        case Status.LOADING:
+          break;
+
+        case Status.COMPLETED:
+          // Add data to piggybanks list
+          stockList.addAll(event.data.results);
+          //print(piggybanks[0].pbName);
+          // If there is a next page, then set nextPage += 1
+          if (event.data.next != null)
+            nextPage++;
+          else
+            dataFetchComplete = true;
+
+          // Fetch is now complete
+          setState(() {
+            isLoading = false;
+          });
+          break;
+
+        case Status.ERROR:
+          // If an error occured and if it is token related
+          // redirect to login (with autologin : true)
+          if (event.message.toLowerCase().contains('token')) {
+            showAlertDialog(context, 'Error', event.message,
+                redirectRoute: '/');
+          }
+          break;
+      }
+    });
+  }
+
+  // If refresh triggered, fetch data from page 1
+  _handleRefresh() async {
+    dataFetchComplete = false;
+    nextPage = 1;
+
+    stockList = new List();
+
+    // Need await to handle refresh indicator ending callback
+    await _getMoreData();
+  }
+
+  // Callback of scrollNotification listener
+  // If scroll reached the bottom, try to fetch more data
+  _onEndScroll(ScrollNotification scrollNotification) {
+    {
+      if (scrollNotification is ScrollEndNotification) {
+        var metrics = scrollNotification.metrics;
+        if (metrics.pixels >= metrics.maxScrollExtent && !metrics.outOfRange) {
+          _getMoreData();
+        }
+      }
+      return false;
+    }
+  }
+
+  // Build the circular progress indicator in listview
+  Widget _buildProgressIndicator() {
+    return new Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: new Center(
+        child: new Opacity(
+          opacity: isLoading ? 1.0 : 00,
+          child: new CircularProgressIndicator(),
         ),
       ),
     );
   }
 
-  Container _getBackground() {
-    return new Container(
-      child: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("assets/images/pink_pig.png"),
-            fit: BoxFit.cover,
+  // ListView builder of piggybanks
+  Widget _buildList() {
+    return ListView.separated(
+      separatorBuilder: (context, index) {
+        return Divider(
+          indent: 60,
+          endIndent: 60,
+        );
+      },
+      //+1 for progressbar
+      itemCount: stockList.length + 1,
+      itemBuilder: (BuildContext context, int index) {
+        if (index == stockList.length) {
+          return _buildProgressIndicator();
+        } else {
+          return _getStockTile(stockList[index]);
+        }
+      },
+      physics: AlwaysScrollableScrollPhysics(),
+      shrinkWrap: true,
+    );
+  }
+
+  // Build widget:
+  // LIST AND INFO LABEL
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Column(
+          children: [
+            NotificationListener<ScrollNotification>(
+              onNotification: (scrollNotification) =>
+                  _onEndScroll(scrollNotification),
+              child: RefreshIndicator(
+                child: ConstrainedBox(
+                    constraints: new BoxConstraints(
+                      minHeight: 300.0,
+                    ),
+                    child: _buildList()),
+                onRefresh: () => _handleRefresh(),
+              ),
+            ),
+            Center(
+                child: Padding(
+                  child: Text(dataFetchComplete
+                      ? "All data is shown"
+                      : "Scroll down to fetch more data"),
+                  padding: new EdgeInsets.all(8),
+                )),
+          ]),
+    );
+  }
+
+  Widget _getStockTile(StockModel stockModel) {
+    return Row(
+      children: <Widget>[
+        // PRODUCT NAME
+        Expanded(
+          flex: 2,
+          child: Column(
+            children: <Widget>[
+              Text(stockModel.product_name),
+            ],
           ),
         ),
-        child: null */
-/* add child content here */ /*
-,
-      ),
-    );
-  }
-
-  Container _getGradient(BuildContext context) {
-    return new Container(
-      margin: new EdgeInsets.only(top: 90.0),
-      height: MediaQuery.of(context).size.height,
-      decoration: new BoxDecoration(
-        gradient: new LinearGradient(
-          colors: <Color>[new Color(0x00736AB7), new Color(0xFF333333)],
-          stops: [0.0, 0.9],
-          begin: const FractionalOffset(0.0, 0.0),
-          end: const FractionalOffset(0.0, 1.0),
-        ),
-      ),
-    );
-  }
-
-  Widget _getContent() {
-    return new ListView(
-      padding: new EdgeInsets.fromLTRB(0.0, 280, 0.0, 32.0),
-      children: <Widget>[
-        new Container(
-          margin: EdgeInsets.all(70.0),
-          decoration: BoxDecoration(
-              color: Color(0xFFFFFFFF),
-              shape: BoxShape.rectangle,
-              borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(25.0),
-                  bottomRight: Radius.circular(25.0))),
-          padding: new EdgeInsets.symmetric(horizontal: 32.0),
-          child: new Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        // PRODUCT NAME
+        Expanded(
+          flex: 2,
+          child: Column(
             children: <Widget>[
-              */
-/*new Container(
-                margin: EdgeInsets.fromLTRB(5, 15, 0.0, 0.0),
-                child: new Image.network(
-                  piggyBank.icon_url,
-                  fit: BoxFit.cover,
-                ),
-              ),*/ /*
-
-              new Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Text(
-                  piggyBank.pbName,
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      fontFamily: 'Roboto'),
-                ),
+              Text(stockModel.entered_by_username),
+            ],
+          ),
+        ),
+        // pieces
+        Expanded(
+          flex: 1,
+          child: Column(
+            children: <Widget>[
+              Text(stockModel.pieces.toString()),
+            ],
+          ),
+        ),
+        // unitary_price
+        Expanded(
+          flex: 1,
+          child: Column(
+            children: <Widget>[
+              Text(stockModel.unitary_price.toString()),
+            ],
+          ),
+        ),
+        // PRODUCT NAME
+        Expanded(
+          flex: 1,
+          child: Column(
+            children: <Widget>[
+              InkWell(
+                child: Text('BUY'),
+                //TODO: BUY
+                onTap: () => print('TODO'),
               ),
             ],
           ),
         ),
+
       ],
     );
   }
-}*/
+}
