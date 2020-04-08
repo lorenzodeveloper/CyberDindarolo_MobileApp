@@ -37,21 +37,18 @@ class PaginatedPurchasesBloc extends BlocBase {
     }
   }
 
-  // TODO: INSERT THIS IN A SEPARATED BLOC (GETTER -> FETCH, SETTER -> BUY, etc...)
-  // OR HANDLE PAGINATED RESPONSE
-  buyProductFromStock(
+  Future<Response<PurchaseModel>> buyProductFromStock(
       {@required int product,
       @required int piggybank,
       @required int pieces}) async {
-    pagPurchasesListSink.add(Response.loading('Buying product.'));
     try {
       PurchaseModel purchaseModel =
           await _pagPurchasesRepository.buyProductFromStock(
               product: product, piggybank: piggybank, pieces: pieces);
-      pagPurchasesListSink.add(Response.completed(null));
+
+      return Response.completed(purchaseModel);
     } catch (e) {
-      pagPurchasesListSink.add(Response.error(e.toString()));
-      print(e);
+      return Response.error(e.toString());
     }
   }
 

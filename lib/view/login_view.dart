@@ -38,14 +38,8 @@ class LoginForm extends StatefulWidget {
   }
 }
 
-// Define a corresponding State class.
-// This class holds data related to the form.
 class LoginFormState extends State<LoginForm> {
-  // Create a global key that uniquely identifies the Form widget
-  // and allows validation of the form.
-  //
-  // Note: This is a `GlobalKey<FormState>`,
-  // not a GlobalKey<MyCustomFormState>.
+
   final _formKey = GlobalKey<FormState>();
 
   final unameController = TextEditingController(text: "lorenzo_lamas123");
@@ -71,7 +65,6 @@ class LoginFormState extends State<LoginForm> {
     unameController.dispose();
     pwdController.dispose();
     _userSessionStreamSubscription.cancel();
-    //_userSessionbloc.dispose();
     super.dispose();
   }
 
@@ -88,10 +81,9 @@ class LoginFormState extends State<LoginForm> {
           //Navigator.of(context).pushReplacementNamed('/home');
           break;
         case Status.ERROR:
-          //if (data.message != "Exception: Credentials not stored") {
-          showAlertDialog(context, "Error", data.message);
-          //}
-          //print("Error: " + data.message);
+          if (data.message != "Exception: Credentials not stored") {
+            showAlertDialog(context, "Error", data.message);
+          }
           break;
       }
     });

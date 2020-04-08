@@ -21,7 +21,6 @@ class UserSessionModel {
 
 	@override
   String toString() {
-    // TODO: implement toString
-    return user_data.toString() + " " + token;
+		return "User: ${user_data.toString()}, with token: $token";
   }
 }

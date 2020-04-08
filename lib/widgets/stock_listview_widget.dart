@@ -22,7 +22,7 @@ class StockListViewWidget extends StatefulWidget {
 // Returns an "infinite" List View of stock in a certain piggybank
 class _StockListViewWidgetState extends State<StockListViewWidget> {
   // Stock stream listener
-  StreamSubscription _dataStreamSubscription;
+  StreamSubscription _stockDataStreamSubscription;
 
   // Blocs
   PaginatedStockBloc _paginatedStockBloc;
@@ -37,18 +37,26 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
 
   bool dataFetchComplete = false;
 
+  // This field is used inside purchase listener to retrieve
+  // the current selected item from stock
+  StockModel _purchasedItem;
+
+  int _purchasedQty;
+
   @override
   void initState() {
     _paginatedStockBloc = new PaginatedStockBloc();
     _paginatedPurchasesBloc = new PaginatedPurchasesBloc();
-    _listen();
+
+    _listenStockStream();
+
     _getMoreData();
     super.initState();
   }
 
   @override
   void dispose() {
-    _dataStreamSubscription.cancel();
+    _stockDataStreamSubscription.cancel();
     _paginatedStockBloc.dispose();
     _paginatedPurchasesBloc.dispose();
     super.dispose();
@@ -74,9 +82,9 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
   }
 
   // Listen for stock changes and set state to "complete"
-  _listen() {
+  _listenStockStream() {
     // Subscribe to datas_tream
-    _dataStreamSubscription =
+    _stockDataStreamSubscription =
         _paginatedStockBloc.pagStockListStream.listen((event) {
       switch (event.status) {
         case Status.LOADING:
@@ -172,15 +180,18 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
   }
 
   Expanded _textInExpColumn(
-      {@required String text, @required int flex, TextStyle style}) {
+      {@required String text, @required int flex, TextStyle style, Function() onTap}) {
     // returns a Text widget inside an expanded column
     return Expanded(
       flex: flex,
       child: Column(
         children: <Widget>[
-          Text(
-            text,
-            style: style,
+          InkWell(
+            child: Text(
+              text,
+              style: style,
+            ),
+            onTap: onTap,
           ),
         ],
       ),
@@ -188,14 +199,23 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
   }
 
   Widget _getStockTile(StockModel stockModel) {
-    // TODO: When user clicks on product, show info
     return Row(
       children: <Widget>[
         // PRODUCT NAME
         _textInExpColumn(
             text: stockModel.product_name,
-            flex: 1,
-            style: TextStyle(fontWeight: FontWeight.bold)),
+            flex: 2,
+            style: TextStyle(fontWeight: FontWeight.bold),
+            onTap: () {
+              // TODO: When user clicks on product, show info
+              // TODO: Make request to products and also snackbar product info
+              Scaffold.of(context).showSnackBar(SnackBar(
+                content: Text("Originally inserted by ${stockModel
+                    .entered_by_username} in date ${stockModel.entry_date
+                    .toString()}"),
+              ));
+            }
+        ),
 
         // pieces
         _textInExpColumn(
@@ -208,8 +228,8 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
 
         // unitary_price
         _textInExpColumn(
-            text: stockModel.unitary_price.toString(),
-            flex: 1,
+            text: stockModel.unitary_price.toString() + ' PGM',
+            flex: 2,
             style: TextStyle(fontWeight: FontWeight.bold)),
 
         // PRODUCT NAME
@@ -219,7 +239,6 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
             children: <Widget>[
               IconButton(
                 icon: Icon(Icons.shopping_basket),
-                //TODO: BUY
                 onPressed: (stockModel.pieces <= 0)
                     ? null
                     : () async {
@@ -234,16 +253,40 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
   }
 
   Future _onPurchase(StockModel stockModel) async {
-    print('TODO');
-    //TODO: SHOW DIALOG TO ASK QTY
-    // PURCHASE BLOC NEEDED
-    print(stockModel.product);
-    setState(() {
-      stockModel.pieces--;
-    });
-    await _paginatedPurchasesBloc.buyProductFromStock(
-        product: stockModel.product, piggybank: widget.piggybank_id, pieces: 1);
-    widget.onPurchase();
+    final int quantity = await asyncInputDialog(context,
+        title: 'Quantity:', min: 1, max: stockModel.pieces);
+
+    if (quantity != null) {
+      final response =
+        await _paginatedPurchasesBloc.buyProductFromStock(
+          product: stockModel.product,
+          piggybank: widget.piggybank_id,
+          pieces: quantity);
+
+      switch (response.status) {
+        case Status.LOADING:
+          break;
+
+        case Status.COMPLETED:
+          setState(() {
+            stockModel.pieces -= quantity;
+          });
+          // Parent callback -> for credit update
+          widget.onPurchase();
+          break;
+
+        case Status.ERROR:
+        // If an error occured and if it is token related
+        // redirect to login (with autologin : true)
+          if (response.message.toLowerCase().contains('token')) {
+            showAlertDialog(context, 'Error', response.message,
+                redirectRoute: '/');
+          } else {
+            showAlertDialog(context, 'Error', response.message);
+          }
+          break;
+      }
+    }
   }
 
   @override
