@@ -1,7 +1,9 @@
 import 'dart:async';
 
+import 'package:cyberdindaroloapp/blocs/paginated_products_bloc.dart';
 import 'package:cyberdindaroloapp/blocs/paginated_purchases_bloc.dart';
 import 'package:cyberdindaroloapp/blocs/paginated_stock_bloc.dart';
+import 'package:cyberdindaroloapp/models/product_model.dart';
 import 'package:cyberdindaroloapp/models/stock_model.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
 import 'package:flutter/material.dart';
@@ -27,6 +29,7 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
   // Blocs
   PaginatedStockBloc _paginatedStockBloc;
   PaginatedPurchasesBloc _paginatedPurchasesBloc;
+  PaginatedProductsBloc _paginatedProductsBloc;
 
   // State vars
   int nextPage = 1;
@@ -37,16 +40,11 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
 
   bool dataFetchComplete = false;
 
-  // This field is used inside purchase listener to retrieve
-  // the current selected item from stock
-  StockModel _purchasedItem;
-
-  int _purchasedQty;
-
   @override
   void initState() {
     _paginatedStockBloc = new PaginatedStockBloc();
     _paginatedPurchasesBloc = new PaginatedPurchasesBloc();
+    _paginatedProductsBloc = new PaginatedProductsBloc();
 
     _listenStockStream();
 
@@ -57,8 +55,11 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
   @override
   void dispose() {
     _stockDataStreamSubscription.cancel();
+
     _paginatedStockBloc.dispose();
     _paginatedPurchasesBloc.dispose();
+    _paginatedProductsBloc.dispose();
+
     super.dispose();
   }
 
@@ -206,14 +207,45 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
             text: stockModel.product_name,
             flex: 2,
             style: TextStyle(fontWeight: FontWeight.bold),
-            onTap: () {
-              // TODO: When user clicks on product, show info
-              // TODO: Make request to products and also snackbar product info
-              Scaffold.of(context).showSnackBar(SnackBar(
-                content: Text("Originally inserted by ${stockModel
-                    .entered_by_username} in date ${stockModel.entry_date
-                    .toString()}"),
-              ));
+            onTap: () async {
+              final Response<ProductModel> response = await
+                _paginatedProductsBloc.getProduct(id: stockModel.product);
+              switch (response.status) {
+                case Status.LOADING:
+                  break;
+                case Status.COMPLETED:
+                  Scaffold.of(context).showSnackBar(SnackBar(
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(response.data.name,
+                          style: TextStyle(fontWeight: FontWeight.bold),),
+                        Text(response.data.description == null
+                            ? 'No description'
+                            : response.data.description,
+                        style: TextStyle(fontStyle: FontStyle.italic),),
+                        Text('${response.data.pieces} pieces per set'),
+                        Divider(),
+                        Text('Originally inserted by ${stockModel
+                            .entered_by_username} in date ${stockModel
+                            .entry_date
+                            .toString()} for piggybank with id ${response.data
+                            .validForPiggyBank}'),
+                      ],
+                    ),
+                  ));
+                  break;
+                case Status.ERROR:
+                  if (response.message.toLowerCase().contains('token')) {
+                    showAlertDialog(context, 'Error', response.message,
+                        redirectRoute: '/');
+                  } else {
+                    showAlertDialog(context, 'Error', response.message);
+                  }
+                  break;
+              }
+
             }
         ),
 

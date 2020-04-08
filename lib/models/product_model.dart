@@ -3,7 +3,7 @@ class ProductModel {
   int id;
   String name;
   String description;
-  BigInt pieces;
+  int pieces;
   int validForPiggyBank;
 
 	ProductModel({

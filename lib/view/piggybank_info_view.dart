@@ -136,7 +136,7 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
   }
 
   Widget _buildForm() {
-    // TODO
+    // TODO EDIT FORM
     return Form(
         key: _formKey,
         child: Padding(
@@ -351,17 +351,17 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
                 final ConfirmAction confirmation = await asyncConfirmDialog(context,
                     title: "Do you really want to close this piggy bank?",
                     question_message:
-                        "You won't be able to cancel this operation once you "
+                        "You won't be able to rollback once you "
                             "decide to close a piggy bank. "
                             "No one will be able to insert/edit things inside "
                             "this PG.");
                 switch (confirmation) {
                   case ConfirmAction.CANCEL:
-                    // TODO: Handle this case.
+
                     break;
                   case ConfirmAction.ACCEPT:
-                    // TODO: Handle this case.
-                    print('TODO close');
+
+
                     break;
                 }
               },

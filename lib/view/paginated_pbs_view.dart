@@ -41,10 +41,10 @@ class _PiggyBanksPageState extends State<PiggyBanksPage> {
         );
         break;
       case Choice.NOTIFICATIONS:
-        // TODO: Handle this case.
+        // TODO: Handle NOTIFICATIONS case.
         break;
       case Choice.HISTORY:
-        // TODO: Handle this case.
+        // TODO: Handle HISTORY case.
         break;
     }
   }
