@@ -2,12 +2,14 @@ import 'dart:async';
 
 import 'package:cyberdindaroloapp/blocs/credit_bloc.dart';
 import 'package:cyberdindaroloapp/blocs/paginated_participants_bloc.dart';
+import 'package:cyberdindaroloapp/blocs/paginated_purchases_bloc.dart';
 import 'package:cyberdindaroloapp/blocs/paginated_stock_bloc.dart';
 import 'package:cyberdindaroloapp/blocs/pb_bloc.dart';
 import 'package:cyberdindaroloapp/models/paginated_participants_model.dart';
 import 'package:cyberdindaroloapp/models/piggybank_model.dart';
 import 'package:cyberdindaroloapp/models/stock_model.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
+import 'package:cyberdindaroloapp/widgets/stock_listview_widget.dart';
 import 'package:cyberdindaroloapp/widgets/universal_drawer_widget.dart';
 import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
@@ -58,7 +60,7 @@ class _PiggyBankInfoPageState extends State<PiggyBankInfoPage> {
                   return Loading(loadingMessage: snapshot.data.message);
                   break;
                 case Status.COMPLETED:
-                  return PiggyBankWidget(piggyBank: snapshot.data.data);
+                  return PiggyBankInfoWidget(piggyBank: snapshot.data.data);
                   break;
                 case Status.ERROR:
                   return Error(
@@ -83,28 +85,32 @@ class _PiggyBankInfoPageState extends State<PiggyBankInfoPage> {
   }
 }
 
-class PiggyBankWidget extends StatefulWidget {
+//-----------------------------------------------------------------------------
+
+class PiggyBankInfoWidget extends StatefulWidget {
   final PiggyBankModel piggyBank;
 
-  PiggyBankWidget({@required this.piggyBank});
+  PiggyBankInfoWidget({@required this.piggyBank});
 
   @override
-  _PiggyBankWidgetState createState() {
-    return _PiggyBankWidgetState();
+  _PiggyBankInfoWidgetState createState() {
+    return _PiggyBankInfoWidgetState();
   }
 }
 
 enum Operation { INFO_VIEW, EDIT_VIEW }
 
-// Define a corresponding State class.
-// This class holds data related to the form.
-class _PiggyBankWidgetState extends State<PiggyBankWidget> {
-  final _formKey = GlobalKey<FormState>();
 
+class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
+  // Operation setter: Viewing info / Edit piggybank
   Operation _operation;
 
-  final unameController = TextEditingController(text: "lorenzo_lamas123");
-  final pwdController = TextEditingController(text: "prova1234");
+  // Form fields
+  final _formKey = GlobalKey<FormState>();
+  final pbNameController = TextEditingController(text: "");
+  final pbDescriptionController = TextEditingController(text: "");
+
+  // Blocs
   PaginatedParticipantsBloc _paginatedParticipantsBloc;
   CreditBloc _creditBloc;
 
@@ -114,6 +120,8 @@ class _PiggyBankWidgetState extends State<PiggyBankWidget> {
   void initState() {
     super.initState();
     _operation = Operation.INFO_VIEW;
+
+    // BLOCS MANAGED BY A STREAM BUILDER
     _paginatedParticipantsBloc = new PaginatedParticipantsBloc();
     _creditBloc = new CreditBloc();
 
@@ -124,8 +132,8 @@ class _PiggyBankWidgetState extends State<PiggyBankWidget> {
   @override
   void dispose() {
     // Clean up the controller when the widget is disposed.
-    unameController.dispose();
-    pwdController.dispose();
+    pbNameController.dispose();
+    pbDescriptionController.dispose();
 
     _creditBloc.dispose();
     _paginatedParticipantsBloc.dispose();
@@ -172,76 +180,161 @@ class _PiggyBankWidgetState extends State<PiggyBankWidget> {
             ])));
   }
 
+  Widget _getCreditWidget() {
+    /*
+    * returns user's credit in this PG
+    */
+    return StreamBuilder<Response<Decimal>>(
+      stream: _creditBloc.creditStream,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          print(snapshot.data.data);
+          switch (snapshot.data.status) {
+            case Status.LOADING:
+            //return Loading(loadingMessage: snapshot.data.message);
+              return CircularProgressIndicator();
+              break;
+            case Status.COMPLETED:
+              return Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.blueAccent),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(3.0),
+                  child: Text(
+                    '${snapshot.data.data.toString()} PGM',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      //backgroundColor: Colors.lightBlueAccent
+                    ),
+                  ),
+                ),
+              );
+              break;
+            case Status.ERROR:
+              return Error(
+                errorMessage: snapshot.data.message,
+                onRetryPressed: () =>
+                    _creditBloc.getCredit(piggybank: widget.piggyBank.id),
+              );
+              break;
+          }
+        }
+        return Container();
+      },
+    );
+  }
+  
+  Widget _getPiggyBankHeader() {
+    return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Expanded(
+            flex: 2,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                CircleAvatar(
+                  child: Image(
+                    image: AssetImage('assets/images/pink_pig.png'),
+                  ),
+                )
+              ],
+            ),
+          ),
+          Expanded(
+            flex: 6,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  widget.piggyBank.pbName,
+                  style:
+                  TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                ),
+                Text(
+                    widget.piggyBank.pbDescription == null
+                        ? 'No Description'
+                        : widget.piggyBank.pbDescription,
+                    style: TextStyle(
+                        fontStyle: FontStyle.italic,
+                        color: Colors.black45)),
+              ],
+            ),
+          ),
+          Expanded(
+            flex: 4,
+            child: Column(
+              children: <Widget>[
+                _getCreditWidget(),
+              ],
+            ),
+          ),
+        ]);
+  }
+
+  Widget _participantsOverviewStreamBuilder() {
+    return StreamBuilder<Response<PaginatedParticipantsModel>>(
+      stream: _paginatedParticipantsBloc.pagParticipantsListStream,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          switch (snapshot.data.status) {
+            case Status.LOADING:
+              return Loading(loadingMessage: snapshot.data.message);
+              break;
+            case Status.COMPLETED:
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child:
+                Text('You and ${snapshot.data.data.count - 1} other users'),
+              );
+              break;
+            case Status.ERROR:
+              print(snapshot.data.message);
+              return Error(
+                errorMessage: snapshot.data.message,
+                onRetryPressed: () => _paginatedParticipantsBloc.fetchUsersData(
+                    piggybank: widget.piggyBank.id),
+              );
+              break;
+          }
+        }
+        return Container();
+      },
+    );
+  }
+
+  Widget _getParticipantsOverviewWidget() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: <Widget>[
+        Column(
+          children: <Widget>[
+            _participantsOverviewStreamBuilder(),
+          ],
+        ),
+        Column(children: <Widget>[
+          IconButton(
+            icon: Icon(Icons.arrow_forward_ios),
+            // TODO: REINDIRIZZAMENTO A PAGINA PARTECIPANTI
+            onPressed: () =>
+                print('REINDIRIZZAMENTO A PAGINA DEI PARTECIPANTI'),
+          ),
+        ]),
+      ],
+    );
+  }
+
   Widget _buildInfoView() {
     return ListView(
       padding: EdgeInsets.all(10),
       children: <Widget>[
         // PiggyBank Header: Name, Desc, Credit
-        Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Expanded(
-                flex: 2,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    CircleAvatar(
-                      child: Image(
-                        image: AssetImage('assets/images/pink_pig.png'),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              Expanded(
-                flex: 6,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      widget.piggyBank.pbName,
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                    ),
-                    Text(
-                        widget.piggyBank.pbDescription == null
-                            ? 'No Description'
-                            : widget.piggyBank.pbDescription,
-                        style: TextStyle(
-                            fontStyle: FontStyle.italic,
-                            color: Colors.black45)),
-                  ],
-                ),
-              ),
-              Expanded(
-                flex: 2,
-                child: Column(
-                  children: <Widget>[
-                    _getCreditWidget(),
-                  ],
-                ),
-              ),
-            ]),
+        _getPiggyBankHeader(),
         Divider(),
         // Participants overview
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Column(
-              children: <Widget>[
-                _getParticipantsOverviewWidget(),
-              ],
-            ),
-            Column(children: <Widget>[
-              IconButton(
-                icon: Icon(Icons.arrow_forward_ios),
-                // TODO: REINDIRIZZAMENTO A PAGINA PARTECIPANTI
-                onPressed: () =>
-                    print('REINDIRIZZAMENTO A PAGINA DEI PARTECIPANTI'),
-              ),
-            ]),
-          ],
-        ),
+        _getParticipantsOverviewWidget(),
         Divider(),
         // Edit button
         Row(
@@ -260,14 +353,21 @@ class _PiggyBankWidgetState extends State<PiggyBankWidget> {
             RaisedButton(
               child: Text('CLOSE PG'),
               // TODO: CLOSE PG
-              onPressed: () {
-                print('TODO');
-
+              onPressed: () async {
+                showConfirmationDialog(context,
+                    title: "Do you really want to close this piggy bank?",
+                    question_message:
+                        "You won't be able to cancel this operation once you "
+                            "decide to close a piggy bank. "
+                            "No one will be able to insert/edit things inside "
+                            "this PG.", onConfirmation: () { //CLOSE PG
+                  print("WOW"); });
+                print('TODO close');
               },
-            ),/*
+            ), /*
             RaisedButton(
               child: Text('INVITE USER'),
-              // TODO: CLOSE PG
+              // TODO: INVITE USER
               onPressed: () {
                 print('TODO');
 
@@ -275,7 +375,7 @@ class _PiggyBankWidgetState extends State<PiggyBankWidget> {
             ),
             RaisedButton(
               child: Text('INSERT PRODUCT'),
-              // TODO: CLOSE PG
+              // TODO: INSERT PRODUCT
               onPressed: () {
                 print('TODO');
 
@@ -289,7 +389,9 @@ class _PiggyBankWidgetState extends State<PiggyBankWidget> {
           children: <Widget>[
             StockListViewWidget(
                 piggybank_id: widget.piggyBank.id,
-                onPurchase: () => print('purchase')),
+                onPurchase: () {
+                  _creditBloc.getCredit(piggybank: widget.piggyBank.id);
+                }),
           ],
         )
       ],
@@ -301,340 +403,11 @@ class _PiggyBankWidgetState extends State<PiggyBankWidget> {
     // Build a Form widget using the _formKey created above.
     switch (_operation) {
       case Operation.INFO_VIEW:
-        // TODO: Handle this case.
         return _buildInfoView();
         break;
       case Operation.EDIT_VIEW:
         return _buildForm();
         break;
     }
-  }
-
-  _getCreditWidget() {
-    return StreamBuilder<Response<Decimal>>(
-      stream: _creditBloc.creditStream,
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          print(snapshot.data.data);
-          switch (snapshot.data.status) {
-            case Status.LOADING:
-              return Loading(loadingMessage: snapshot.data.message);
-              break;
-            case Status.COMPLETED:
-              return Text(
-                '${snapshot.data.data.toString()} PGM',
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    backgroundColor: Colors.lightBlueAccent),
-              );
-              break;
-            case Status.ERROR:
-              return Error(
-                errorMessage: snapshot.data.message,
-                onRetryPressed: () =>
-                    _creditBloc.getCredit(piggybank: widget.piggyBank.id),
-              );
-              break;
-          }
-        }
-        return Container();
-      },
-    );
-  }
-
-  _getParticipantsOverviewWidget() {
-    return StreamBuilder<Response<PaginatedParticipantsModel>>(
-      stream: _paginatedParticipantsBloc.pagParticipantsListStream,
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          switch (snapshot.data.status) {
-            case Status.LOADING:
-              return Loading(loadingMessage: snapshot.data.message);
-              break;
-            case Status.COMPLETED:
-              return Text(
-                  'You and ${snapshot.data.data.count - 1} other users');
-              break;
-            case Status.ERROR:
-              print(snapshot.data.message);
-              return Error(
-                errorMessage: snapshot.data.message,
-                onRetryPressed: () => _paginatedParticipantsBloc.fetchUsersData(
-                    piggybank: widget.piggyBank.id),
-              );
-              break;
-          }
-        }
-        return Container();
-      },
-    );
-  }
-}
-
-class StockListViewWidget extends StatefulWidget {
-  final int piggybank_id;
-  final void Function() onPurchase;
-
-  StockListViewWidget({@required this.piggybank_id, @required this.onPurchase});
-
-  @override
-  _StockListViewWidgetState createState() {
-    return _StockListViewWidgetState();
-  }
-}
-
-/*class _StockWidgetState extends State<StockWidget> {
-
-  PaginatedStockBloc _paginatedStockBloc;
-
-  @override
-  void initState() {
-    _paginatedStockBloc = new PaginatedStockBloc();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _paginatedStockBloc.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Text('Ciao bellissimi');
-  }
-
-}*/
-
-class _StockListViewWidgetState extends State<StockListViewWidget> {
-  StreamSubscription _dataStreamSubscription;
-
-  PaginatedStockBloc _paginatedStockBloc;
-
-  int nextPage = 1;
-
-  bool isLoading = false;
-
-  List stockList = new List();
-
-  bool dataFetchComplete = false;
-
-  @override
-  void initState() {
-    _paginatedStockBloc = new PaginatedStockBloc();
-    _listen();
-    _getMoreData();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _dataStreamSubscription.cancel();
-    _paginatedStockBloc.dispose();
-    super.dispose();
-  }
-
-  // Fetch stock and set state to "loading"
-  // while fetching
-  Future<void> _getMoreData() async {
-    if (dataFetchComplete) {
-      print("Already fetched all data, exiting.");
-      return;
-    }
-
-    // Set state to loading
-    if (!isLoading) {
-      setState(() {
-        isLoading = true;
-      });
-
-      _paginatedStockBloc.fetchPiggyBankStock(
-          page: nextPage, piggybank: widget.piggybank_id);
-    }
-  }
-
-  // Listen for piggybanks changes and set state to "complete"
-  _listen() {
-    // Subscribe to datas_tream
-    _dataStreamSubscription =
-        _paginatedStockBloc.pagStockListStream.listen((event) {
-      switch (event.status) {
-        case Status.LOADING:
-          break;
-
-        case Status.COMPLETED:
-          // Add data to piggybanks list
-          stockList.addAll(event.data.results);
-          //print(piggybanks[0].pbName);
-          // If there is a next page, then set nextPage += 1
-          if (event.data.next != null)
-            nextPage++;
-          else
-            dataFetchComplete = true;
-
-          // Fetch is now complete
-          setState(() {
-            isLoading = false;
-          });
-          break;
-
-        case Status.ERROR:
-          // If an error occured and if it is token related
-          // redirect to login (with autologin : true)
-          if (event.message.toLowerCase().contains('token')) {
-            showAlertDialog(context, 'Error', event.message,
-                redirectRoute: '/');
-          }
-          break;
-      }
-    });
-  }
-
-  // If refresh triggered, fetch data from page 1
-  _handleRefresh() async {
-    dataFetchComplete = false;
-    nextPage = 1;
-
-    stockList = new List();
-
-    // Need await to handle refresh indicator ending callback
-    await _getMoreData();
-  }
-
-  // Callback of scrollNotification listener
-  // If scroll reached the bottom, try to fetch more data
-  _onEndScroll(ScrollNotification scrollNotification) {
-    {
-      if (scrollNotification is ScrollEndNotification) {
-        var metrics = scrollNotification.metrics;
-        if (metrics.pixels >= metrics.maxScrollExtent && !metrics.outOfRange) {
-          _getMoreData();
-        }
-      }
-      return false;
-    }
-  }
-
-  // Build the circular progress indicator in listview
-  Widget _buildProgressIndicator() {
-    return new Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: new Center(
-        child: new Opacity(
-          opacity: isLoading ? 1.0 : 00,
-          child: new CircularProgressIndicator(),
-        ),
-      ),
-    );
-  }
-
-  // ListView builder of piggybanks
-  Widget _buildList() {
-    return ListView.separated(
-      separatorBuilder: (context, index) {
-        return Divider(
-          indent: 60,
-          endIndent: 60,
-        );
-      },
-      //+1 for progressbar
-      itemCount: stockList.length + 1,
-      itemBuilder: (BuildContext context, int index) {
-        if (index == stockList.length) {
-          return _buildProgressIndicator();
-        } else {
-          return _getStockTile(stockList[index]);
-        }
-      },
-      physics: AlwaysScrollableScrollPhysics(),
-      shrinkWrap: true,
-    );
-  }
-
-  // Build widget:
-  // LIST AND INFO LABEL
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Column(
-          children: [
-            NotificationListener<ScrollNotification>(
-              onNotification: (scrollNotification) =>
-                  _onEndScroll(scrollNotification),
-              child: RefreshIndicator(
-                child: ConstrainedBox(
-                    constraints: new BoxConstraints(
-                      minHeight: 300.0,
-                    ),
-                    child: _buildList()),
-                onRefresh: () => _handleRefresh(),
-              ),
-            ),
-            Center(
-                child: Padding(
-                  child: Text(dataFetchComplete
-                      ? "All data is shown"
-                      : "Scroll down to fetch more data"),
-                  padding: new EdgeInsets.all(8),
-                )),
-          ]),
-    );
-  }
-
-  Widget _getStockTile(StockModel stockModel) {
-    return Row(
-      children: <Widget>[
-        // PRODUCT NAME
-        Expanded(
-          flex: 2,
-          child: Column(
-            children: <Widget>[
-              Text(stockModel.product_name),
-            ],
-          ),
-        ),
-        // PRODUCT NAME
-        Expanded(
-          flex: 2,
-          child: Column(
-            children: <Widget>[
-              Text(stockModel.entered_by_username),
-            ],
-          ),
-        ),
-        // pieces
-        Expanded(
-          flex: 1,
-          child: Column(
-            children: <Widget>[
-              Text(stockModel.pieces.toString()),
-            ],
-          ),
-        ),
-        // unitary_price
-        Expanded(
-          flex: 1,
-          child: Column(
-            children: <Widget>[
-              Text(stockModel.unitary_price.toString()),
-            ],
-          ),
-        ),
-        // PRODUCT NAME
-        Expanded(
-          flex: 1,
-          child: Column(
-            children: <Widget>[
-              InkWell(
-                child: Text('BUY'),
-                //TODO: BUY
-                onTap: () => print('TODO'),
-              ),
-            ],
-          ),
-        ),
-
-      ],
-    );
   }
 }
