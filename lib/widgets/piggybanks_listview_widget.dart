@@ -2,20 +2,20 @@ import 'dart:async';
 
 import 'package:cyberdindaroloapp/blocs/paginated_pbs_bloc.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
-import 'package:cyberdindaroloapp/view/piggybank_info_view.dart';
+import 'package:cyberdindaroloapp/view/piggybank_info_page.dart';
 import 'package:flutter/material.dart';
 
 import '../alerts.dart';
 import '../bloc_provider.dart';
 
-class PiggyBankListView extends StatefulWidget {
-  const PiggyBankListView({Key key}) : super(key: key);
+class PiggyBanksListViewWidget extends StatefulWidget {
+  const PiggyBanksListViewWidget({Key key}) : super(key: key);
 
   @override
-  _PiggyBankListViewState createState() => _PiggyBankListViewState();
+  _PiggyBanksListViewWidgetState createState() => _PiggyBanksListViewWidgetState();
 }
 
-class _PiggyBankListViewState extends State<PiggyBankListView> {
+class _PiggyBanksListViewWidgetState extends State<PiggyBanksListViewWidget> {
   StreamSubscription _dataStreamSubscription;
 
   PaginatedPiggyBanksBloc _piggyBankBloc;

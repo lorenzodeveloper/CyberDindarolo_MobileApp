@@ -1,7 +1,7 @@
 import 'package:cyberdindaroloapp/bloc_provider.dart';
 import 'package:cyberdindaroloapp/blocs/user_session_bloc.dart';
-import 'package:cyberdindaroloapp/view/login_view.dart';
-import 'package:cyberdindaroloapp/view/paginated_pbs_view.dart';
+import 'package:cyberdindaroloapp/view/login_page.dart';
+import 'package:cyberdindaroloapp/view/piggybanks_listview_page.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
           initialRoute: '/',
           routes: {
             '/': (BuildContext context) => LoginPage(),
-            '/home': (BuildContext context) => PiggyBanksPage(),
+            '/home': (BuildContext context) => PiggyBanksListPage(),
           },
         ));
   }

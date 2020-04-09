@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:cyberdindaroloapp/blocs/user_session_bloc.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
-import 'package:cyberdindaroloapp/view/paginated_pbs_view.dart';
+import 'package:cyberdindaroloapp/view/piggybanks_listview_page.dart';
 import 'package:flutter/material.dart';
 
 import '../alerts.dart';
@@ -77,7 +77,7 @@ class LoginFormState extends State<LoginForm> {
           break;
         case Status.COMPLETED:
           Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => PiggyBanksPage()));
+              MaterialPageRoute(builder: (context) => PiggyBanksListPage()));
           //Navigator.of(context).pushReplacementNamed('/home');
           break;
         case Status.ERROR:

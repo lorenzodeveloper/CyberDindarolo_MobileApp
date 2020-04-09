@@ -5,7 +5,7 @@ import 'package:cyberdindaroloapp/blocs/pb_bloc.dart';
 import 'package:cyberdindaroloapp/models/paginated_participants_model.dart';
 import 'package:cyberdindaroloapp/models/piggybank_model.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
-import 'package:cyberdindaroloapp/view/paginated_pbs_view.dart';
+import 'package:cyberdindaroloapp/view/piggybanks_listview_page.dart';
 import 'package:cyberdindaroloapp/widgets/composed_floating_button.dart';
 import 'package:cyberdindaroloapp/widgets/stock_listview_widget.dart';
 import 'package:cyberdindaroloapp/widgets/universal_drawer_widget.dart';
@@ -168,13 +168,17 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
         case ConfirmAction.CANCEL:
           break;
         case ConfirmAction.ACCEPT:
+          // Close request
           final response = await _piggyBankBloc.closePiggyBank(piggybank_id);
 
+          // Handle response
           if (response.status == Status.COMPLETED) {
+            // redirect and refresh piggybanks list
             Navigator.of(context).pop();
             Navigator.of(context).pushReplacement(MaterialPageRoute(
-                builder: (context) => PiggyBanksPage()));
+                builder: (context) => PiggyBanksListPage()));
           } else if (response.status == Status.ERROR){
+            // Show error message
             if (response.message.toLowerCase().contains('token')) {
               showAlertDialog(context, 'Error', response.message,
                   redirectRoute: '/');

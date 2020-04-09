@@ -8,14 +8,14 @@ import '../bloc_provider.dart';
 
 enum Choice { PIGGYBANKS, NOTIFICATIONS, HISTORY }
 
-class PiggyBanksPage extends StatefulWidget {
-  PiggyBanksPage({Key key}) : super(key: key);
+class PiggyBanksListPage extends StatefulWidget {
+  PiggyBanksListPage({Key key}) : super(key: key);
 
   @override
-  _PiggyBanksPageState createState() => _PiggyBanksPageState();
+  _PiggyBanksListPageState createState() => _PiggyBanksListPageState();
 }
 
-class _PiggyBanksPageState extends State<PiggyBanksPage> {
+class _PiggyBanksListPageState extends State<PiggyBanksListPage> {
   PaginatedPiggyBanksBloc _bloc;
   Choice selectedChoice;
 
@@ -37,7 +37,7 @@ class _PiggyBanksPageState extends State<PiggyBanksPage> {
       case Choice.PIGGYBANKS:
         return BlocProvider(
           bloc: _bloc,
-          child: PiggyBankListView(),
+          child: PiggyBanksListViewWidget(),
         );
         break;
       case Choice.NOTIFICATIONS:
