@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:cyberdindaroloapp/blocs/paginated_pbs_bloc.dart';
+import 'package:cyberdindaroloapp/blocs/paginated_piggybanks_bloc.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
 import 'package:cyberdindaroloapp/view/piggybank_info_page.dart';
 import 'package:flutter/material.dart';

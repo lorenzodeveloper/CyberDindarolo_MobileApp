@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:cyberdindaroloapp/bloc_provider.dart';
 import 'package:cyberdindaroloapp/models/piggybank_model.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
-import 'package:cyberdindaroloapp/repository/paginated_pbs_repository.dart';
+import 'package:cyberdindaroloapp/repository/paginated_piggybanks_repository.dart';
 
 class PaginatedPiggyBanksBloc extends BlocBase {
   PaginatedPiggyBanksRepository _piggybankRepository;
