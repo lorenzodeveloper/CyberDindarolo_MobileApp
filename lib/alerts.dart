@@ -29,12 +29,12 @@ showAlertDialog(BuildContext context, String title, String message,
     context: context,
     barrierDismissible: false,
     builder: (BuildContext context) {
-      return alert;
+      return WillPopScope(onWillPop: () async => false, child: alert);
     },
   );
 }
 
-showConfirmationDialog(BuildContext context,
+/*showConfirmationDialog(BuildContext context,
     {@required String title,
     @required String question_message,
     @required void Function() onConfirmation,
@@ -78,7 +78,7 @@ showConfirmationDialog(BuildContext context,
       return alert;
     },
   );
-}
+}*/
 
 enum ConfirmAction { CANCEL, ACCEPT }
 
@@ -91,27 +91,30 @@ Future<ConfirmAction> asyncConfirmDialog(BuildContext context,
     context: context,
     barrierDismissible: false, // user must tap button for close dialog!
     builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text(title),
-        content: Text(question_message),
-        actions: <Widget>[
-          FlatButton(
-            child: const Text('CANCEL'),
-            onPressed: () {
-              Navigator.of(context).pop(ConfirmAction.CANCEL);
-            },
-          ),
-          FlatButton(
-            child: const Text('ACCEPT'),
-            onPressed: () {
-              //onConfirmation();
-              Navigator.of(context).pop(ConfirmAction.ACCEPT);
-              if (redirectRoute != null) {
-                Navigator.of(context).pushReplacementNamed(redirectRoute);
-              }
-            },
-          )
-        ],
+      return WillPopScope(
+        onWillPop: () async => false,
+        child: AlertDialog(
+          title: Text(title),
+          content: Text(question_message),
+          actions: <Widget>[
+            FlatButton(
+              child: const Text('CANCEL'),
+              onPressed: () {
+                Navigator.of(context).pop(ConfirmAction.CANCEL);
+              },
+            ),
+            FlatButton(
+              child: const Text('ACCEPT'),
+              onPressed: () {
+                //onConfirmation();
+                Navigator.of(context).pop(ConfirmAction.ACCEPT);
+                if (redirectRoute != null) {
+                  Navigator.of(context).pushReplacementNamed(redirectRoute);
+                }
+              },
+            )
+          ],
+        ),
       );
     },
   );
@@ -142,15 +145,13 @@ Future<int> asyncInputDialog(BuildContext context,
                 child: new TextField(
               autofocus: true,
               keyboardType: TextInputType.number,
-
               inputFormatters: <TextInputFormatter>[
                 WhitelistingTextInputFormatter.digitsOnly
               ],
-              decoration:
-                  new InputDecoration(
-                    labelText: 'Quantity',
-                    hintText: 'eg. 1',
-                  ),
+              decoration: new InputDecoration(
+                labelText: 'Quantity',
+                hintText: 'eg. 1',
+              ),
               onChanged: (value) {
                 choice = value;
               },
@@ -166,7 +167,7 @@ Future<int> asyncInputDialog(BuildContext context,
                 if (intChoice >= min && intChoice <= max) {
                   Navigator.of(context).pop(intChoice);
                 } else {
-                  print("None");
+                  print("Not valid");
                 }
               }
             },

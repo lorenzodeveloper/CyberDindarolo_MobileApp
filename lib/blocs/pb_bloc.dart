@@ -1,10 +1,11 @@
 import 'dart:async';
 
+import 'package:cyberdindaroloapp/bloc_provider.dart';
 import 'package:cyberdindaroloapp/models/piggybank_model.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
 import 'package:cyberdindaroloapp/repository/pb_repository.dart';
 
-class PiggyBankBloc {
+class PiggyBankBloc extends BlocBase {
   PiggyBankRepository _piggybankRepository;
   StreamController _piggybankListController;
 
@@ -32,7 +33,21 @@ class PiggyBankBloc {
     }
   }
 
+  Future<Response<bool>> closePiggyBank(int id) async {
+    try {
+      final bool success =
+      await _piggybankRepository.closePiggyBank(id);
+
+      return Response.completed(success);
+    } catch (e) {
+      print(e);
+      return Response.error(e.toString());
+    }
+  }
+
   dispose() {
     _piggybankListController?.close();
   }
+
+
 }

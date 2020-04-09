@@ -62,10 +62,11 @@ class CyberDindaroloAPIv1Provider {
       case 200:
       case 201:
       case 202:
-      case 204:
         var responseJson = json.decode(response.body.toString());
         print(responseJson);
         return responseJson;
+      case 204:
+        return { 'success' : true };
       case 400:
         throw BadRequestException(response.body.toString());
       case 401:

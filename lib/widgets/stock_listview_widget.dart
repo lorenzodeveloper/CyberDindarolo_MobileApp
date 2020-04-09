@@ -11,9 +11,11 @@ import '../alerts.dart';
 
 class StockListViewWidget extends StatefulWidget {
   final int piggybank_id;
+  final bool closed;
   final void Function() onPurchase;
 
-  StockListViewWidget({@required this.piggybank_id, @required this.onPurchase});
+  StockListViewWidget({@required this.piggybank_id, @required this.onPurchase,
+    this.closed});
 
   @override
   _StockListViewWidgetState createState() {
@@ -214,6 +216,7 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
                 case Status.LOADING:
                   break;
                 case Status.COMPLETED:
+                  // Show toast with product info
                   Scaffold.of(context).showSnackBar(SnackBar(
                     content: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -271,9 +274,10 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
             children: <Widget>[
               IconButton(
                 icon: Icon(Icons.shopping_basket),
-                onPressed: (stockModel.pieces <= 0)
+                onPressed: (stockModel.pieces <= 0 || widget.closed)
                     ? null
                     : () async {
+                        print(widget.closed);
                         await _onPurchase(stockModel);
                       },
               ),

@@ -92,6 +92,8 @@ class _PiggyBankListViewState extends State<PiggyBankListView> {
           if (event.message.toLowerCase().contains('token')) {
             showAlertDialog(context, 'Error', event.message,
                 redirectRoute: '/');
+          } else {
+            showAlertDialog(context, 'Error', event.message);
           }
           break;
       }
@@ -199,9 +201,24 @@ class PiggyBankTile extends StatelessWidget {
         piggybanks[index].pbName,
         style: TextStyle(fontWeight: FontWeight.bold),
       ),
-      subtitle: Text(piggybanks[index].pbDescription == null
-          ? 'No description.'
-          : piggybanks[index].pbDescription),
+      subtitle: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(piggybanks[index].pbDescription == null
+              ? 'No description.'
+              : piggybanks[index].pbDescription),
+          Text(
+              piggybanks[index].closed
+                  ? 'CLOSED'
+                  : 'OPEN',
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: piggybanks[index].closed
+                      ? Colors.red
+                      : Colors.green))
+        ],
+      ),
       leading: Image(
         image: AssetImage('assets/images/pink_pig.png'),
         width: 30,

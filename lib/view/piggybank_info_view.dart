@@ -1,10 +1,12 @@
-
+import 'package:cyberdindaroloapp/bloc_provider.dart';
 import 'package:cyberdindaroloapp/blocs/credit_bloc.dart';
 import 'package:cyberdindaroloapp/blocs/paginated_participants_bloc.dart';
 import 'package:cyberdindaroloapp/blocs/pb_bloc.dart';
 import 'package:cyberdindaroloapp/models/paginated_participants_model.dart';
 import 'package:cyberdindaroloapp/models/piggybank_model.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
+import 'package:cyberdindaroloapp/view/paginated_pbs_view.dart';
+import 'package:cyberdindaroloapp/widgets/composed_floating_button.dart';
 import 'package:cyberdindaroloapp/widgets/stock_listview_widget.dart';
 import 'package:cyberdindaroloapp/widgets/universal_drawer_widget.dart';
 import 'package:decimal/decimal.dart';
@@ -46,7 +48,8 @@ class _PiggyBankInfoPageState extends State<PiggyBankInfoPage> {
       drawer: DefaultDrawer(),
       //backgroundColor: Color(0xFF333333),
       body: RefreshIndicator(
-        onRefresh: () => _piggyBankBloc.fetchPiggyBank(widget.selectedPiggybank),
+        onRefresh: () =>
+            _piggyBankBloc.fetchPiggyBank(widget.selectedPiggybank),
         child: StreamBuilder<Response<PiggyBankModel>>(
           stream: _piggyBankBloc.pbListStream,
           builder: (context, snapshot) {
@@ -56,7 +59,11 @@ class _PiggyBankInfoPageState extends State<PiggyBankInfoPage> {
                   return Loading(loadingMessage: snapshot.data.message);
                   break;
                 case Status.COMPLETED:
-                  return PiggyBankInfoWidget(piggyBankInstance: snapshot.data.data);
+                  return BlocProvider(
+                    child: PiggyBankInfoWidget(
+                        piggyBankInstance: snapshot.data.data),
+                    bloc: _piggyBankBloc,
+                  );
                   break;
                 case Status.ERROR:
                   return Error(
@@ -96,10 +103,11 @@ class PiggyBankInfoWidget extends StatefulWidget {
 
 enum Operation { INFO_VIEW, EDIT_VIEW }
 
-
 class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
   // Operation setter: Viewing info / Edit piggybank
   Operation _operation;
+
+  PiggyBankBloc _piggyBankBloc;
 
   // Form fields
   final _formKey = GlobalKey<FormState>();
@@ -110,17 +118,98 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
   PaginatedParticipantsBloc _paginatedParticipantsBloc;
   CreditBloc _creditBloc;
 
+  // Composed Floating Button params
+  List<Function> functions;
+  List<dynamic> parameters;
+  static const List<IconData> icons = const [
+    Icons.account_circle, // invite user
+    Icons.delete, // close piggybank
+    Icons.edit, // edit piggybank
+    Icons.add, // insert product
+  ];
+
+  void Function(int) onInviteUser;
+  void Function(int) onClosePiggyBank;
+  void Function(int) onEditPiggyBank;
+  void Function(int) onInsertProduct;
+
   @override
   void initState() {
     super.initState();
+
+    _piggyBankBloc = BlocProvider.of<PiggyBankBloc>(context);
+
     _operation = Operation.INFO_VIEW;
 
     // BLOCS MANAGED BY A STREAM BUILDER
     _paginatedParticipantsBloc = new PaginatedParticipantsBloc();
     _creditBloc = new CreditBloc();
 
-    _paginatedParticipantsBloc.fetchUsersData(piggybank: widget.piggyBankInstance.id);
+    _paginatedParticipantsBloc.fetchUsersData(
+        piggybank: widget.piggyBankInstance.id);
     _creditBloc.getCredit(piggybank: widget.piggyBankInstance.id);
+
+
+    // Composed Floating Button functions and params
+    onInviteUser = (int piggybank_id) {
+      // TODO: REDIRECT TO INVITE USER
+    };
+
+    // Close piggybank
+    onClosePiggyBank = (int piggybank_id) async {
+      final ConfirmAction confirmation = await asyncConfirmDialog(
+          context,
+          title: "Do you really want to close this piggy bank?",
+          question_message: "You won't be able to rollback once you "
+              "decide to close a piggy bank. "
+              "No one will be able to insert/edit things inside "
+              "this PG.");
+      switch (confirmation) {
+        case ConfirmAction.CANCEL:
+          break;
+        case ConfirmAction.ACCEPT:
+          final response = await _piggyBankBloc.closePiggyBank(piggybank_id);
+
+          if (response.status == Status.COMPLETED) {
+            Navigator.of(context).pop();
+            Navigator.of(context).pushReplacement(MaterialPageRoute(
+                builder: (context) => PiggyBanksPage()));
+          } else if (response.status == Status.ERROR){
+            if (response.message.toLowerCase().contains('token')) {
+              showAlertDialog(context, 'Error', response.message,
+                  redirectRoute: '/');
+            } else {
+              showAlertDialog(context, 'Error', response.message);
+            }
+          }
+          break;
+      }
+    };
+
+    onEditPiggyBank = (int piggybank_id) {
+      setState(() {
+        _operation = Operation.EDIT_VIEW;
+      });
+    };
+
+    onInsertProduct = (int piggybank_id) {
+      // TODO: REDIRECT TO INSERT ENTRY
+    };
+
+    // Composed Floating Button functions and params
+    functions = [
+      onInviteUser,
+      onClosePiggyBank,
+      onEditPiggyBank,
+      onInsertProduct,
+    ];
+
+    parameters = [
+      widget.piggyBankInstance.id,
+      widget.piggyBankInstance.id,
+      widget.piggyBankInstance.id,
+      widget.piggyBankInstance.id,
+    ];
   }
 
   @override
@@ -164,7 +253,8 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
                   //if (_formKey.currentState.validate()) {}
                   setState(() {
                     _operation = Operation.INFO_VIEW;
-                    _creditBloc.getCredit(piggybank: widget.piggyBankInstance.id);
+                    _creditBloc.getCredit(
+                        piggybank: widget.piggyBankInstance.id);
                     _paginatedParticipantsBloc.fetchUsersData(
                         piggybank: widget.piggyBankInstance.id);
                   });
@@ -185,7 +275,7 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
           print(snapshot.data.data);
           switch (snapshot.data.status) {
             case Status.LOADING:
-            //return Loading(loadingMessage: snapshot.data.message);
+              //return Loading(loadingMessage: snapshot.data.message);
               return CircularProgressIndicator();
               break;
             case Status.COMPLETED:
@@ -209,8 +299,8 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
             case Status.ERROR:
               return Error(
                 errorMessage: snapshot.data.message,
-                onRetryPressed: () =>
-                    _creditBloc.getCredit(piggybank: widget.piggyBankInstance.id),
+                onRetryPressed: () => _creditBloc.getCredit(
+                    piggybank: widget.piggyBankInstance.id),
               );
               break;
           }
@@ -219,7 +309,7 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
       },
     );
   }
-  
+
   Widget _getPiggyBankHeader() {
     return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -244,16 +334,23 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
               children: <Widget>[
                 Text(
                   widget.piggyBankInstance.pbName,
-                  style:
-                  TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                 ),
                 Text(
                     widget.piggyBankInstance.pbDescription == null
                         ? 'No Description'
                         : widget.piggyBankInstance.pbDescription,
                     style: TextStyle(
-                        fontStyle: FontStyle.italic,
-                        color: Colors.black45)),
+                        fontStyle: FontStyle.italic, color: Colors.black45)),
+                Text(
+                    widget.piggyBankInstance.closed
+                        ? 'CLOSED'
+                        : 'OPEN',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: widget.piggyBankInstance.closed
+                            ? Colors.red
+                            : Colors.green))
               ],
             ),
           ),
@@ -281,7 +378,7 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
               return Padding(
                 padding: const EdgeInsets.all(8.0),
                 child:
-                Text('You and ${snapshot.data.data.count - 1} other users'),
+                    Text('You and ${snapshot.data.data.count - 1} other users'),
               );
               break;
             case Status.ERROR:
@@ -321,81 +418,49 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
   }
 
   Widget _buildInfoView() {
-    return ListView(
-      padding: EdgeInsets.all(10),
+    return Stack(
       children: <Widget>[
-        // PiggyBank Header: Name, Desc, Credit
-        _getPiggyBankHeader(),
-        Divider(),
-        // Participants overview
-        _getParticipantsOverviewWidget(),
-        Divider(),
-        // Edit button
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        ListView(
+          padding: EdgeInsets.all(10),
           children: <Widget>[
-            RaisedButton(
-              child: Text('Edit PG'),
-              // TODO: EDIT PG
-              onPressed: () {
-                print('TODO');
-                setState(() {
-                  _operation = Operation.EDIT_VIEW;
-                });
-              },
+            // PiggyBank Header: Name, Desc, Credit
+            _getPiggyBankHeader(),
+            Divider(),
+            // Participants overview
+            _getParticipantsOverviewWidget(),
+            Divider(),
+            // STOCK LIST
+            Row(
+              children: <Widget>[
+                StockListViewWidget(
+                    closed: widget.piggyBankInstance.closed,
+                    piggybank_id: widget.piggyBankInstance.id,
+                    onPurchase:() {
+                      _creditBloc.getCredit(piggybank: widget.piggyBankInstance.id);
+                    }),
+              ],
             ),
-            RaisedButton(
-              child: Text('CLOSE PG'),
-              // TODO: CLOSE PG
-              onPressed: () async {
-                final ConfirmAction confirmation = await asyncConfirmDialog(context,
-                    title: "Do you really want to close this piggy bank?",
-                    question_message:
-                        "You won't be able to rollback once you "
-                            "decide to close a piggy bank. "
-                            "No one will be able to insert/edit things inside "
-                            "this PG.");
-                switch (confirmation) {
-                  case ConfirmAction.CANCEL:
 
-                    break;
-                  case ConfirmAction.ACCEPT:
-
-
-                    break;
-                }
-              },
-            ), /*
-            RaisedButton(
-              child: Text('INVITE USER'),
-              // TODO: INVITE USER
-              onPressed: () {
-                print('TODO');
-
-              },
-            ),
-            RaisedButton(
-              child: Text('INSERT PRODUCT'),
-              // TODO: INSERT PRODUCT
-              onPressed: () {
-                print('TODO');
-
-              },
-            )*/
           ],
         ),
-        Divider(),
-        // STOCK LIST
-        Row(
-          children: <Widget>[
-            StockListViewWidget(
-                piggybank_id: widget.piggyBankInstance.id,
-                onPurchase: () {
-                  _creditBloc.getCredit(piggybank: widget.piggyBankInstance.id);
-
-                }),
-          ],
-        )
+        // Floating button
+        Container(
+          alignment: Alignment.bottomRight,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            // If piggybank is closed, floating button is disabled
+            child: !widget.piggyBankInstance.closed ?
+            ComposedFloatingButton(
+              icons: icons,
+              functions: functions,
+              parameters: parameters,
+            ) :
+            FloatingActionButton(
+              child: Icon(Icons.add),
+              onPressed: null,
+            ),
+          ),
+        ),
       ],
     );
   }
