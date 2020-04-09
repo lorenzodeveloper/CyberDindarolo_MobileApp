@@ -10,6 +10,13 @@ import 'package:cyberdindaroloapp/widgets/loading_widget.dart';
 import 'package:flutter/widgets.dart';
 
 
+/*
+* This class prepare the piggybank info widget
+*
+*
+* */
+
+
 class PiggyBankInfoPage extends StatefulWidget {
   final int selectedPiggybank;
 

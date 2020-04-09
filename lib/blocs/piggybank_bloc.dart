@@ -4,6 +4,7 @@ import 'package:cyberdindaroloapp/bloc_provider.dart';
 import 'package:cyberdindaroloapp/models/piggybank_model.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
 import 'package:cyberdindaroloapp/repository/piggybank_repository.dart';
+import 'package:flutter/material.dart';
 
 class PiggyBankBloc extends BlocBase {
   PiggyBankRepository _piggybankRepository;
@@ -24,8 +25,7 @@ class PiggyBankBloc extends BlocBase {
   fetchPiggyBank(int id) async {
     pbListSink.add(Response.loading('Getting piggybank.'));
     try {
-      PiggyBankModel pb =
-      await _piggybankRepository.fetchPiggyBankData(id);
+      PiggyBankModel pb = await _piggybankRepository.fetchPiggyBankData(id);
       pbListSink.add(Response.completed(pb));
     } catch (e) {
       pbListSink.add(Response.error(e.toString()));
@@ -35,10 +35,23 @@ class PiggyBankBloc extends BlocBase {
 
   Future<Response<bool>> closePiggyBank(int id) async {
     try {
-      final bool success =
-      await _piggybankRepository.closePiggyBank(id);
+      final bool success = await _piggybankRepository.closePiggyBank(id);
 
       return Response.completed(success);
+    } catch (e) {
+      print(e);
+      return Response.error(e.toString());
+    }
+  }
+
+  Future<Response<PiggyBankModel>> updatePiggyBank(
+      {@required int id,
+      @required String newName,
+      @required String newDescription}) async {
+    try {
+      PiggyBankModel pb = await _piggybankRepository.updatePiggyBank(
+          id: id, newName: newName, newDescription: newDescription);
+      return Response.completed(pb);
     } catch (e) {
       print(e);
       return Response.error(e.toString());
@@ -48,6 +61,4 @@ class PiggyBankBloc extends BlocBase {
   dispose() {
     _piggybankListController?.close();
   }
-
-
 }

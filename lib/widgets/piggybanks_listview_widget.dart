@@ -205,7 +205,8 @@ class PiggyBankTile extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(piggybanks[index].pbDescription == null
+          Text(piggybanks[index].pbDescription == null  ||
+              piggybanks[index].pbDescription.isEmpty
               ? 'No description.'
               : piggybanks[index].pbDescription),
           Text(

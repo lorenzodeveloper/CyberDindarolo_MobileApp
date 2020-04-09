@@ -13,6 +13,29 @@ Function(String) usernameValidator = (String value) {
   return null;
 };
 
+Function(String) gpStringValidator = (String value) {
+  if (value.isEmpty) {
+    return 'Please enter some text';
+  }
+
+  final alphanumeric = RegExp(r'^[-a-zA-Z0-9_@. ]+$');
+
+  if (!alphanumeric.hasMatch(value)) {
+    return 'Invalid characters';
+  }
+  return null;
+};
+
+Function(String) gpEmptyStringValidator = (String value) {
+  final alphanumeric = RegExp(r'^[-a-zA-Z0-9_@. ]+$');
+
+  if (!alphanumeric.hasMatch(value) && value.isNotEmpty) {
+    return 'Invalid characters';
+  }
+  return null;
+};
+
+
 Function(String) passwordValidator = (String value) {
   if (value.isEmpty) {
     return 'Please enter some text';
