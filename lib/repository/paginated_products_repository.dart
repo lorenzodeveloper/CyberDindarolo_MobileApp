@@ -11,7 +11,7 @@ class PaginatedProductsRepository {
 
   Future<PaginatedProductsModel> fetchProducts(
       {int page: 1, String pattern}) async {
-    var headers = _getAuthHeader();
+    var headers = await _getAuthHeader();
 
     var response;
 

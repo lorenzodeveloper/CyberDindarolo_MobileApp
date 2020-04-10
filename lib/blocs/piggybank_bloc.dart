@@ -16,10 +16,10 @@ class PiggyBankBloc extends BlocBase {
   Stream<Response<PiggyBankModel>> get pbListStream =>
       _piggybankListController.stream;
 
-  PiggyBankBloc(int id) {
+  PiggyBankBloc() {
     _piggybankListController = StreamController<Response<PiggyBankModel>>();
     _piggybankRepository = PiggyBankRepository();
-    fetchPiggyBank(id);
+    //fetchPiggyBank(id);
   }
 
   fetchPiggyBank(int id) async {
@@ -51,6 +51,17 @@ class PiggyBankBloc extends BlocBase {
     try {
       PiggyBankModel pb = await _piggybankRepository.updatePiggyBank(
           id: id, newName: newName, newDescription: newDescription);
+      return Response.completed(pb);
+    } catch (e) {
+      print(e);
+      return Response.error(e.toString());
+    }
+  }
+
+  Future<Response<PiggyBankModel>> createPiggyBank({@required String name, @required String description}) async {
+    try {
+      PiggyBankModel pb = await _piggybankRepository.createPiggyBank(
+          name: name, description: description);
       return Response.completed(pb);
     } catch (e) {
       print(e);

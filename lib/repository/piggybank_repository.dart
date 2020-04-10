@@ -24,14 +24,15 @@ class PiggyBankRepository {
     final headers = await _getAuthHeader();
 
     final response =
-    await _provider.delete("piggybanks/$id/", headers: headers);
+        await _provider.delete("piggybanks/$id/", headers: headers);
 
     return response['success'];
   }
 
-  Future<PiggyBankModel> updatePiggyBank({@required int id,
-    @required String newName,
-    @required String newDescription}) async {
+  Future<PiggyBankModel> updatePiggyBank(
+      {@required int id,
+      @required String newName,
+      @required String newDescription}) async {
     final headers = await _getAuthHeader();
 
     var body = {
@@ -40,7 +41,22 @@ class PiggyBankRepository {
     };
 
     final response =
-    await _provider.patch("piggybanks/$id/", headers: headers, body: body);
+        await _provider.patch("piggybanks/$id/", headers: headers, body: body);
+
+    return PiggyBankModel.fromJson(response);
+  }
+
+  Future<PiggyBankModel> createPiggyBank(
+      {@required String name, @required String description}) async {
+    final headers = await _getAuthHeader();
+
+    var body = {
+      'pb_name': name,
+      'pb_description': description,
+    };
+
+    final response =
+        await _provider.post("piggybanks/", headers: headers, body: body);
 
     return PiggyBankModel.fromJson(response);
   }

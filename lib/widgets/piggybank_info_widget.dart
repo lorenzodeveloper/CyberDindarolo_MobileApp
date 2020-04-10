@@ -5,11 +5,13 @@ import 'package:cyberdindaroloapp/blocs/piggybank_bloc.dart';
 import 'package:cyberdindaroloapp/models/paginated_participants_model.dart';
 import 'package:cyberdindaroloapp/models/piggybank_model.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
+import 'package:cyberdindaroloapp/view/entry_form_page.dart';
 import 'package:cyberdindaroloapp/view/piggybanks_listview_page.dart';
 import 'package:cyberdindaroloapp/widgets/composed_floating_button_widget.dart';
 import 'package:cyberdindaroloapp/widgets/piggybank_form_widget.dart';
 import 'package:cyberdindaroloapp/widgets/stock_listview_widget.dart';
 import 'package:decimal/decimal.dart';
+import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:cyberdindaroloapp/widgets/error_widget.dart';
 import 'package:cyberdindaroloapp/widgets/loading_widget.dart';
@@ -22,7 +24,11 @@ import '../alerts.dart';
 *   - Name, Description and status (opened / closed)
 *   - Stock
 *
-* It handles piggybank operations
+* It handles piggybank operations:
+*   - CLOSE PG
+*   - EDIT PG
+*   - ADD PRODUCT IN PG
+*   - INVITE USER
 * */
 
 class PiggyBankInfoWidget extends StatefulWidget {
@@ -61,7 +67,7 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
   void Function(int) onInviteUser;
   void Function(int) onClosePiggyBank;
   void Function(int) onEditPiggyBank;
-  void Function(int) onInsertProduct;
+  void Function(int) onAddEntry;
 
   @override
   void initState() {
@@ -86,6 +92,7 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
 
     // Close piggybank
     onClosePiggyBank = (int piggybank_id) async {
+      //region ClosePiggyBankFunction
       final ConfirmAction confirmation = await asyncConfirmDialog(context,
           title: "Do you really want to close this piggy bank?",
           question_message: "You won't be able to rollback once you "
@@ -116,16 +123,29 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
           }
           break;
       }
+      //endregion
     };
 
+    // Edit piggybank
     onEditPiggyBank = (int piggybank_id) {
       setState(() {
         _operation = Operation.EDIT_VIEW;
       });
     };
 
-    onInsertProduct = (int piggybank_id) {
-      // TODO: REDIRECT TO INSERT ENTRY
+    // Add entry in piggybank
+    onAddEntry = (int piggybank_id) async {
+      var selectedProduct = await asyncProductOptionDialog(context);
+
+      // If operation not canceled and selectedProduct exists
+      if (selectedProduct != null && selectedProduct != -1) {
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => EntryFormPage(
+                piggyBankInstance: widget.piggyBankInstance,
+                productID: selectedProduct)));
+      } else if (selectedProduct != null && selectedProduct == -1) {
+        // TODO: REDIRECT TO INSERT NEW PRODUCT
+      }
     };
 
     // Composed Floating Button functions and params
@@ -133,7 +153,7 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
       onInviteUser,
       onClosePiggyBank,
       onEditPiggyBank,
-      onInsertProduct,
+      onAddEntry,
     ];
 
     parameters = [
@@ -196,58 +216,81 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
     );
   }
 
+  Expanded _expColumn(
+      {@required int flex,
+      @required List<Widget> children,
+      MainAxisAlignment mAA: MainAxisAlignment.start,
+      CrossAxisAlignment cAA: CrossAxisAlignment.start}) {
+    return Expanded(
+        flex: flex,
+        child: Column(
+          mainAxisAlignment: mAA,
+          crossAxisAlignment: cAA,
+          children: children,
+        ));
+  }
+
   Widget _getPiggyBankHeader() {
     // Build Row with piggybank image, name, status and description.
-    return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          Expanded(
-            flex: 2,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                CircleAvatar(
-                  child: Image(
-                    image: AssetImage('assets/images/pink_pig.png'),
-                  ),
-                )
-              ],
-            ),
-          ),
-          Expanded(
-            flex: 6,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
+
+    return Column(
+      children: <Widget>[
+        Row(
+          children: <Widget>[
+            _expColumn(flex: 3, children: <Widget>[
+              CircleAvatar(
+                minRadius: 15,
+                maxRadius: 30,
+                child: Image(
+                  image: AssetImage('assets/images/pink_pig.png'),
+                ),
+              )
+            ]),
+            _expColumn(flex: 8, children: <Widget>[
+              ExpandablePanel(
+                header: Text(
                   widget.piggyBankInstance.pbName,
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                Text(
-                    widget.piggyBankInstance.pbDescription == null ||
-                        widget.piggyBankInstance.pbDescription.isEmpty
-                        ? 'No Description.'
-                        : widget.piggyBankInstance.pbDescription,
+                collapsed: Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 8.0, 0, 0),
+                  child: Text(
+                    '(ID: ${widget.piggyBankInstance.id}) - ${widget.piggyBankInstance.getDescription()}',
                     style: TextStyle(
-                        fontStyle: FontStyle.italic, color: Colors.black45)),
-                Text(widget.piggyBankInstance.closed ? 'CLOSED' : 'OPEN',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: widget.piggyBankInstance.closed
-                            ? Colors.red
-                            : Colors.green))
-              ],
-            ),
-          ),
-          Expanded(
-            flex: 4,
-            child: Column(
-              children: <Widget>[
-                _getCreditWidget(),
-              ],
-            ),
-          ),
-        ]);
+                        fontStyle: FontStyle.italic, color: Colors.black45),
+                    softWrap: true,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                expanded: Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 8.0, 0, 0),
+                  child: Text(
+                      '(ID: ${widget.piggyBankInstance.id}) - ${widget.piggyBankInstance.getDescription()}',
+                      style: TextStyle(
+                          fontStyle: FontStyle.italic, color: Colors.black45)),
+                ),
+              )
+            ]),
+            _expColumn(
+                mAA: MainAxisAlignment.spaceAround,
+                cAA: CrossAxisAlignment.center,
+                flex: 4,
+                children: <Widget>[
+                  Text(widget.piggyBankInstance.closed ? 'CLOSED' : 'OPEN',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: widget.piggyBankInstance.closed
+                              ? Colors.red
+                              : Colors.green)),
+                  _getCreditWidget(),
+                ])
+          ],
+        ),
+      ],
+    );
   }
 
   Widget _participantsOverviewStreamBuilder() {

@@ -65,6 +65,8 @@ class LoginFormState extends State<LoginForm> {
     unameController.dispose();
     pwdController.dispose();
     _userSessionStreamSubscription.cancel();
+    // TODO: BLOC PROVIDER DISPOSE
+    //_userSessionbloc.dispose();
     super.dispose();
   }
 

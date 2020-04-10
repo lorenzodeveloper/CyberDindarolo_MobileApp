@@ -1,5 +1,6 @@
-
 import 'package:cyberdindaroloapp/blocs/paginated_piggybanks_bloc.dart';
+import 'package:cyberdindaroloapp/view/piggybank_form_page.dart';
+import 'package:cyberdindaroloapp/widgets/piggybank_form_widget.dart';
 import 'package:cyberdindaroloapp/widgets/piggybanks_listview_widget.dart';
 import 'package:cyberdindaroloapp/widgets/universal_drawer_widget.dart';
 import 'package:flutter/material.dart';
@@ -16,19 +17,19 @@ class PiggyBanksListPage extends StatefulWidget {
 }
 
 class _PiggyBanksListPageState extends State<PiggyBanksListPage> {
-  PaginatedPiggyBanksBloc _bloc;
+  PaginatedPiggyBanksBloc _paginatedPiggyBanksBloc;
   Choice selectedChoice;
 
   @override
   void initState() {
-    _bloc = PaginatedPiggyBanksBloc();
+    _paginatedPiggyBanksBloc = PaginatedPiggyBanksBloc();
     selectedChoice = Choice.PIGGYBANKS;
     super.initState();
   }
 
   @override
   void dispose() {
-    _bloc.dispose();
+    _paginatedPiggyBanksBloc.dispose();
     super.dispose();
   }
 
@@ -36,7 +37,7 @@ class _PiggyBanksListPageState extends State<PiggyBanksListPage> {
     switch (selectedChoice) {
       case Choice.PIGGYBANKS:
         return BlocProvider(
-          bloc: _bloc,
+          bloc: _paginatedPiggyBanksBloc,
           child: PiggyBanksListViewWidget(),
         );
         break;
@@ -52,6 +53,13 @@ class _PiggyBanksListPageState extends State<PiggyBanksListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.add),
+          onPressed: () {
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => PiggyBankFormPage()));
+          },
+        ),
         appBar: AppBar(
           title: const Text('PiggyBanks'),
           actions: <Widget>[
@@ -105,5 +113,3 @@ class _PiggyBanksListPageState extends State<PiggyBanksListPage> {
     });
   }
 }
-
-

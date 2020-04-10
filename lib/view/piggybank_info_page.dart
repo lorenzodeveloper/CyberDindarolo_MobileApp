@@ -32,7 +32,8 @@ class _PiggyBankInfoPageState extends State<PiggyBankInfoPage> {
   @override
   void initState() {
     super.initState();
-    _piggyBankBloc = PiggyBankBloc(widget.selectedPiggybank);
+    _piggyBankBloc = PiggyBankBloc();
+    _piggyBankBloc.fetchPiggyBank(widget.selectedPiggybank);
   }
 
   @override

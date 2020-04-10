@@ -14,7 +14,7 @@ class PiggyBankForm extends StatefulWidget {
   final Function() onFormCancel;
 
   const PiggyBankForm({Key key,
-    @required this.piggyBankInstance,
+    this.piggyBankInstance,
     @required this.onFormSuccessfullyValidated,
     @required this.onFormCancel})
       : super(key: key);
@@ -38,9 +38,9 @@ class _PiggyBankFormState extends State<PiggyBankForm> {
     _piggyBankBloc = BlocProvider.of<PiggyBankBloc>(context);
 
     _pbNameController =
-        TextEditingController(text: widget.piggyBankInstance.pbName);
+        TextEditingController(text: widget.piggyBankInstance?.pbName);
     _pbDescriptionController =
-        TextEditingController(text: widget.piggyBankInstance.pbDescription);
+        TextEditingController(text: widget.piggyBankInstance?.pbDescription);
 
     super.initState();
   }
@@ -50,6 +50,11 @@ class _PiggyBankFormState extends State<PiggyBankForm> {
     // Clean up the controller when the widget is disposed.
     _pbNameController.dispose();
     _pbDescriptionController.dispose();
+
+    // TODO: FIX BLOC PROVIDER DISPOSE METHOD
+    if (widget.piggyBankInstance == null) {
+      _piggyBankBloc.dispose();
+    }
 
     super.dispose();
   }
@@ -84,10 +89,17 @@ class _PiggyBankFormState extends State<PiggyBankForm> {
                 onPressed: () async {
                   // Validate returns true if the form is valid, otherwise false.
                   if (_formKey.currentState.validate()) {
-                    final response = await _piggyBankBloc.updatePiggyBank(
-                        id: widget.piggyBankInstance.id,
-                        newName: _pbNameController.text,
-                        newDescription: _pbDescriptionController.text);
+                    var response;
+                    if (widget.piggyBankInstance != null) {
+                      response = await _piggyBankBloc.updatePiggyBank(
+                          id: widget.piggyBankInstance.id,
+                          newName: _pbNameController.text,
+                          newDescription: _pbDescriptionController.text);
+                    } else {
+                      response = await _piggyBankBloc.createPiggyBank(
+                          name: _pbNameController.text,
+                          description: _pbDescriptionController.text);
+                    }
 
                     switch (response.status) {
                       case Status.LOADING:

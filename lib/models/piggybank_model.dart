@@ -31,6 +31,12 @@ class PiggyBankModel {
   String createdByUsername;
   bool closed;
 
+  String getDescription() {
+    return pbDescription == null || pbDescription.isEmpty
+        ? 'No Description.'
+        : pbDescription;
+  }
+
   PiggyBankModel.fromJson(Map<String, dynamic> map)
       : id = map["id"],
         pbName = map["pb_name"],

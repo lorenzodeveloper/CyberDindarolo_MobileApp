@@ -20,7 +20,7 @@ class PaginatedProductsBloc extends BlocBase {
   bool get isClosed => _pagProductsListController.isClosed;
 
   PaginatedProductsBloc() {
-    _pagProductsListController = StreamController<Response<ProductModel>>.broadcast();
+    _pagProductsListController = StreamController<Response<PaginatedProductsModel>>.broadcast();
     _pagProductsRepository = PaginatedProductsRepository();
   }
 

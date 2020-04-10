@@ -12,7 +12,8 @@ class PiggyBanksListViewWidget extends StatefulWidget {
   const PiggyBanksListViewWidget({Key key}) : super(key: key);
 
   @override
-  _PiggyBanksListViewWidgetState createState() => _PiggyBanksListViewWidgetState();
+  _PiggyBanksListViewWidgetState createState() =>
+      _PiggyBanksListViewWidgetState();
 }
 
 class _PiggyBanksListViewWidgetState extends State<PiggyBanksListViewWidget> {
@@ -71,7 +72,7 @@ class _PiggyBanksListViewWidgetState extends State<PiggyBanksListViewWidget> {
           break;
 
         case Status.COMPLETED:
-        // Add data to piggybanks list
+          // Add data to piggybanks list
           piggybanks.addAll(event.data.results);
           //print(piggybanks[0].pbName);
           // If there is a next page, then set nextPage += 1
@@ -87,8 +88,8 @@ class _PiggyBanksListViewWidgetState extends State<PiggyBanksListViewWidget> {
           break;
 
         case Status.ERROR:
-        // If an error occured and if it is token related
-        // redirect to login (with autologin : true)
+          // If an error occured and if it is token related
+          // redirect to login (with autologin : true)
           if (event.message.toLowerCase().contains('token')) {
             showAlertDialog(context, 'Error', event.message,
                 redirectRoute: '/');
@@ -166,23 +167,23 @@ class _PiggyBanksListViewWidgetState extends State<PiggyBanksListViewWidget> {
   Widget build(BuildContext context) {
     return Container(
         child: Column(children: [
-          NotificationListener<ScrollNotification>(
-            onNotification: (scrollNotification) =>
-                _onEndScroll(scrollNotification),
-            child: Expanded(
-                child: RefreshIndicator(
-                  child: _buildList(),
-                  onRefresh: () => _handleRefresh(),
-                )),
-          ),
-          Center(
-              child: Padding(
-                child: Text(dataFetchComplete
-                    ? "All data is shown"
-                    : "Scroll down to fetch more data"),
-                padding: new EdgeInsets.all(8),
-              )),
-        ]));
+      NotificationListener<ScrollNotification>(
+        onNotification: (scrollNotification) =>
+            _onEndScroll(scrollNotification),
+        child: Expanded(
+            child: RefreshIndicator(
+          child: _buildList(),
+          onRefresh: () => _handleRefresh(),
+        )),
+      ),
+      Center(
+          child: Padding(
+        child: Text(dataFetchComplete
+            ? "All data is shown"
+            : "Scroll down to fetch more data"),
+        padding: new EdgeInsets.all(8),
+      )),
+    ]));
   }
 }
 
@@ -205,19 +206,16 @@ class PiggyBankTile extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(piggybanks[index].pbDescription == null  ||
-              piggybanks[index].pbDescription.isEmpty
-              ? 'No description.'
-              : piggybanks[index].pbDescription),
           Text(
-              piggybanks[index].closed
-                  ? 'CLOSED'
-                  : 'OPEN',
+            piggybanks[index].getDescription(),
+            softWrap: true,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          Text(piggybanks[index].closed ? 'CLOSED' : 'OPEN',
               style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: piggybanks[index].closed
-                      ? Colors.red
-                      : Colors.green))
+                  color: piggybanks[index].closed ? Colors.red : Colors.green))
         ],
       ),
       leading: Image(

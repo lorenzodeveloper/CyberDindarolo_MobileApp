@@ -1,4 +1,3 @@
-
 class ProductModel {
   int id;
   String name;
@@ -6,28 +5,34 @@ class ProductModel {
   int pieces;
   int validForPiggyBank;
 
-	ProductModel({
-		this.id,
-		this.name,
-		this.description,
-		this.pieces,
-		this.validForPiggyBank,
-	});
+  ProductModel({
+    this.id,
+    this.name,
+    this.description,
+    this.pieces,
+    this.validForPiggyBank,
+  });
 
-	ProductModel.fromJson(Map<String, dynamic> json):
-		id = json["id"],
-		name = json["name"],
-		description = json["description"],
-		pieces = json["pieces"],
-		validForPiggyBank = json["valid_for_piggybank"];
+  String getDescription() {
+    return description == null || description.isEmpty
+        ? 'No Description.'
+        : description;
+  }
 
-	Map<String, dynamic> toJson() {
-		final Map<String, dynamic> data = new Map<String, dynamic>();
-		data['id'] = id;
-		data['name'] = name;
-		data['description'] = description;
-		data['pieces'] = pieces;
-		data['valid_for_piggybank'] = validForPiggyBank;
-		return data;
-	}
+  ProductModel.fromJson(Map<String, dynamic> json)
+      : id = json["id"],
+        name = json["name"],
+        description = json["description"],
+        pieces = json["pieces"],
+        validForPiggyBank = json["valid_for_piggybank"];
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = id;
+    data['name'] = name;
+    data['description'] = description;
+    data['pieces'] = pieces;
+    data['valid_for_piggybank'] = validForPiggyBank;
+    return data;
+  }
 }
