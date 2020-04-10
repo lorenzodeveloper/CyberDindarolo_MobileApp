@@ -69,7 +69,7 @@ class _PiggyBankFormState extends State<PiggyBankForm> {
               // PB Name field
               TextFormField(
                 // The validator receives the text that the user has entered.
-                validator: gpStringValidator,
+                validator: (value) => gpStringValidator(value, 30),
                 decoration:
                 InputDecoration(labelText: 'Enter PiggyBank\'s name'),
                 controller: _pbNameController,
@@ -78,7 +78,7 @@ class _PiggyBankFormState extends State<PiggyBankForm> {
               // PB Description field
               TextFormField(
                 // The validator receives the text that the user has entered.
-                validator: gpEmptyStringValidator,
+                validator: (value) => gpEmptyStringValidator(value, 255),
                 decoration: InputDecoration(
                     labelText: 'Enter PiggyBank\'s description'),
                 controller: _pbDescriptionController,

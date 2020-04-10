@@ -1,9 +1,12 @@
 library validators;
 
-Function(String) usernameValidator = (String value) {
+Function(String, int) usernameValidator = (String value, int maxLength) {
   if (value.isEmpty) {
     return 'Please enter some text';
   }
+
+  if (value.length > maxLength) return 'Max $maxLength chars';
+
   if (!value.contains(new RegExp(r'^[-a-zA-Z0-9_@.]+$'))) {
     return 'Invalid characters';
   }
@@ -13,10 +16,12 @@ Function(String) usernameValidator = (String value) {
   return null;
 };
 
-Function(String) gpStringValidator = (String value) {
+Function(String, int) gpStringValidator = (String value, int maxLength) {
   if (value.isEmpty) {
     return 'Please enter some text';
   }
+
+  if (value.length > maxLength) return 'Max $maxLength chars';
 
   final alphanumeric = RegExp(r'^[-a-zA-Z0-9_@. ]+$');
 
@@ -26,7 +31,9 @@ Function(String) gpStringValidator = (String value) {
   return null;
 };
 
-Function(String) gpEmptyStringValidator = (String value) {
+Function(String, int) gpEmptyStringValidator = (String value, int maxLength) {
+  if (value.length > maxLength) return 'Max $maxLength chars';
+
   final alphanumeric = RegExp(r'^[-a-zA-Z0-9_@. ]+$');
 
   if (!alphanumeric.hasMatch(value) && value.isNotEmpty) {
@@ -36,10 +43,12 @@ Function(String) gpEmptyStringValidator = (String value) {
 };
 
 
-Function(String) passwordValidator = (String value) {
+Function(String, int, int) passwordValidator = (String value, int minLength, int maxLength) {
   if (value.isEmpty) {
     return 'Please enter some text';
   }
-  if (value.length < 8) return 'At least 8 chars';
+  if (value.length < minLength) return 'At least $minLength chars';
+  if (value.length > maxLength) return 'Max $maxLength chars';
+
   return null;
 };

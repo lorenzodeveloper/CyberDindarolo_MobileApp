@@ -102,14 +102,14 @@ class LoginFormState extends State<LoginForm> {
               // Username field
               TextFormField(
                 // The validator receives the text that the user has entered.
-                validator: usernameValidator,
+                validator: (value) => usernameValidator(value, 30),
                 decoration: InputDecoration(labelText: 'Enter your username'),
                 controller: unameController,
               ),
               // Pwd field
               TextFormField(
                 // The validator receives the text that the user has entered.
-                validator: passwordValidator,
+                validator: (value) => passwordValidator(value, 8, 30),
                 decoration: InputDecoration(labelText: 'Enter your password'),
                 obscureText: true,
                 controller: pwdController,

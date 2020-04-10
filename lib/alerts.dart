@@ -197,6 +197,7 @@ Future<int> asyncProductOptionDialog(BuildContext context) async {
         int nextPage = -1;
         int prevPage = -1;
 
+        // stateful builder needed to update Next and Prev button
         return StatefulBuilder(
           builder: (context, setState) {
             return StreamBuilder<Response<PaginatedProductsModel>>(
@@ -208,6 +209,7 @@ Future<int> asyncProductOptionDialog(BuildContext context) async {
                         return CircularProgressIndicator();
                         break;
                       case Status.COMPLETED:
+                        // Next page and prevoius page setting..
                         if (snapshot.data.data.previous == null) {
                           prevPage = -1;
                         } else {
@@ -221,7 +223,7 @@ Future<int> asyncProductOptionDialog(BuildContext context) async {
                         }
 
                         return SimpleDialog(
-                          title: const Text('Select Product'),
+                          title: const Text('Select a Product'),
                           // Generate list of product
                           children: [
                             ListView.builder(
@@ -278,78 +280,10 @@ Future<int> asyncProductOptionDialog(BuildContext context) async {
                               ],
                             )
                           ],
-
-                          /*List.generate(
-                                snapshot.data.data.results.length, (int index) {
-                              ProductModel productInstance =
-                              snapshot.data.data.results[index];
-
-                              return SimpleDialogOption(
-                                onPressed: () {
-                                  paginatedProductsBloc.dispose();
-                                  Navigator.pop(context, productInstance.id);
-                                },
-                                child: Text(
-                                  '${productInstance.name} '
-                                      '(PG_ID: ${productInstance.validForPiggyBank}'
-                                      '- ${productInstance.getDescription()})',
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              );
-                            }).toList()
-                              ..add(SimpleDialogOption(
-                                  onPressed: () {
-                                    paginatedProductsBloc.dispose();
-                                    Navigator.pop(context, -1);
-                                  },
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      Divider(),
-                                      Row(
-                                        children: <Widget>[
-                                          Icon(Icons.add),
-                                          Text('Insert New Product'),
-                                        ],
-                                      ),
-                                      Divider(),
-                                      Row(
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                        children: <Widget>[
-                                          RaisedButton(
-                                            child: Text('Prev'),
-                                            onPressed: prevPage <= 0
-                                                ? null
-                                                : () {
-                                              currentPage--;
-                                              paginatedProductsBloc
-                                                  .fetchProducts(
-                                                  page: prevPage);
-                                            },
-                                          ),
-                                          RaisedButton(
-                                            child: Text('Next'),
-                                            onPressed: nextPage <= 0
-                                                ? null
-                                                : () {
-                                              currentPage++;
-                                              paginatedProductsBloc
-                                                  .fetchProducts(
-                                                  page: nextPage);
-                                            },
-                                          ),
-                                        ],
-                                      )
-                                    ],
-                                  ))
-                              )*/
                         );
                         break;
                       case Status.ERROR:
                         // TODO: HANDLE ERROR
-
                         break;
                     }
                   }
