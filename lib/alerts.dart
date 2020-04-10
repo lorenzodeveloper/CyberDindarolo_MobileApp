@@ -229,30 +229,44 @@ Future<int> asyncProductOptionDialog(BuildContext context) async {
                             ListView.builder(
                                 shrinkWrap: true,
                                 physics: ClampingScrollPhysics(),
-                                itemCount: snapshot.data.data.results.length,
+                                itemCount:
+                                    snapshot.data.data.results.length + 1,
                                 itemBuilder: (context, index) {
-                                  ProductModel productInstance =
-                                      snapshot.data.data.results[index];
-                                  return SimpleDialogOption(
-                                    onPressed: () {
-                                      paginatedProductsBloc.dispose();
-                                      Navigator.pop(
-                                          context, productInstance.id);
-                                    },
-                                    child: ListTile(
-                                      title: Text(
-                                        '${productInstance.name} '
-                                        '(PG_ID: ${productInstance.validForPiggyBank})',
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
+                                  // First tile is reserved for 'add new product'
+                                  if (index != 0) {
+                                    ProductModel productInstance =
+                                        snapshot.data.data.results[index - 1];
+                                    return SimpleDialogOption(
+                                      onPressed: () {
+                                        paginatedProductsBloc.dispose();
+                                        Navigator.pop(
+                                            context, productInstance.id);
+                                      },
+                                      child: ListTile(
+                                        title: Text(
+                                          '${productInstance.name} '
+                                          '(PG_ID: ${productInstance.validForPiggyBank})',
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        subtitle: Text(
+                                          productInstance.getDescription(),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
                                       ),
-                                      subtitle: Text(
-                                        productInstance.getDescription(),
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  );
+                                    );
+                                  } else {
+                                    return SimpleDialogOption(
+                                        onPressed: () {
+                                          paginatedProductsBloc.dispose();
+                                          Navigator.pop(context, -1);
+                                        },
+                                        child: ListTile(
+                                            title: Text('Add new product'),
+                                          leading: Icon(Icons.add),
+                                        ));
+                                  }
                                 }),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
