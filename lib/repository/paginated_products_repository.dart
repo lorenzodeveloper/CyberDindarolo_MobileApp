@@ -15,7 +15,7 @@ class PaginatedProductsRepository {
 
     var response;
 
-    if (pattern == null) {
+    if (pattern == null || pattern.isEmpty) {
       response = await _provider.get("products/?page=$page", headers: headers);
     } else {
       response = await _provider.get("products/search/$pattern/?page=$page",

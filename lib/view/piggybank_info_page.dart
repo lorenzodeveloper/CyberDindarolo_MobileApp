@@ -39,6 +39,7 @@ class _PiggyBankInfoPageState extends State<PiggyBankInfoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomPadding: false,
       appBar: AppBar(
         elevation: 0.0,
         title: Text('PiggyBank Info',

@@ -1,7 +1,4 @@
-import 'package:cyberdindaroloapp/blocs/paginated_products_bloc.dart';
-import 'package:cyberdindaroloapp/models/paginated_products_model.dart';
-import 'package:cyberdindaroloapp/models/product_model.dart';
-import 'package:cyberdindaroloapp/networking/Repsonse.dart';
+import 'package:cyberdindaroloapp/widgets/products_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -186,124 +183,10 @@ Future<int> asyncProductOptionDialog(BuildContext context) async {
   // This method create a dynamic Product Dialog -> returns -1 if new product
   // is selected, product_id otherwise
 
-  PaginatedProductsBloc paginatedProductsBloc = new PaginatedProductsBloc();
-  paginatedProductsBloc.fetchProducts();
-
   return await showDialog<int>(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        int currentPage = 1;
-        int nextPage = -1;
-        int prevPage = -1;
-
-        // stateful builder needed to update Next and Prev button
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return StreamBuilder<Response<PaginatedProductsModel>>(
-                stream: paginatedProductsBloc.pagProductsListStream,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData && snapshot.data.data != null) {
-                    switch (snapshot.data.status) {
-                      case Status.LOADING:
-                        return CircularProgressIndicator();
-                        break;
-                      case Status.COMPLETED:
-                        // Next page and prevoius page setting..
-                        if (snapshot.data.data.previous == null) {
-                          prevPage = -1;
-                        } else {
-                          prevPage = currentPage - 1;
-                        }
-
-                        if (snapshot.data.data.next == null) {
-                          nextPage = -1;
-                        } else {
-                          nextPage = currentPage + 1;
-                        }
-
-                        return SimpleDialog(
-                          title: const Text('Select a Product'),
-                          // Generate list of product
-                          children: [
-                            ListView.builder(
-                                shrinkWrap: true,
-                                physics: ClampingScrollPhysics(),
-                                itemCount:
-                                    snapshot.data.data.results.length + 1,
-                                itemBuilder: (context, index) {
-                                  // First tile is reserved for 'add new product'
-                                  if (index != 0) {
-                                    ProductModel productInstance =
-                                        snapshot.data.data.results[index - 1];
-                                    return SimpleDialogOption(
-                                      onPressed: () {
-                                        paginatedProductsBloc.dispose();
-                                        Navigator.pop(
-                                            context, productInstance.id);
-                                      },
-                                      child: ListTile(
-                                        title: Text(
-                                          '${productInstance.name} '
-                                          '(PG_ID: ${productInstance.validForPiggyBank})',
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        subtitle: Text(
-                                          productInstance.getDescription(),
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    );
-                                  } else {
-                                    return SimpleDialogOption(
-                                        onPressed: () {
-                                          paginatedProductsBloc.dispose();
-                                          Navigator.pop(context, -1);
-                                        },
-                                        child: ListTile(
-                                            title: Text('Add new product'),
-                                          leading: Icon(Icons.add),
-                                        ));
-                                  }
-                                }),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: <Widget>[
-                                RaisedButton(
-                                  child: Text('Prev'),
-                                  onPressed: prevPage <= 0
-                                      ? null
-                                      : () {
-                                          currentPage--;
-                                          paginatedProductsBloc.fetchProducts(
-                                              page: prevPage);
-                                        },
-                                ),
-                                RaisedButton(
-                                  child: Text('Next'),
-                                  onPressed: nextPage <= 0
-                                      ? null
-                                      : () {
-                                          currentPage++;
-                                          paginatedProductsBloc.fetchProducts(
-                                              page: nextPage);
-                                        },
-                                ),
-                              ],
-                            )
-                          ],
-                        );
-                        break;
-                      case Status.ERROR:
-                        // TODO: HANDLE ERROR
-                        break;
-                    }
-                  }
-                  return Container();
-                });
-          },
-        );
+        return ProductsDialog();
       });
 }
