@@ -3,6 +3,7 @@ import 'package:cyberdindaroloapp/models/paginated_products_model.dart';
 import 'package:cyberdindaroloapp/models/product_model.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class ProductsDialog extends StatefulWidget {
   @override
@@ -19,8 +20,11 @@ class ProductsDialogState extends State<ProductsDialog> {
   PaginatedProductsBloc _paginatedProductsBloc;
   TextEditingController _searchFieldController;
 
+  String _errorMessage;
+
   @override
   void initState() {
+
     _paginatedProductsBloc = new PaginatedProductsBloc();
     _searchFieldController = new TextEditingController();
     _paginatedProductsBloc.fetchProducts();
@@ -68,22 +72,38 @@ class ProductsDialogState extends State<ProductsDialog> {
           onPressed: prevPage <= 0
               ? null
               : () {
-            currentPage--;
-            _paginatedProductsBloc.fetchProducts(
-                pattern: _searchFieldController.text, page: prevPage);
-          },
+                  currentPage--;
+                  _paginatedProductsBloc.fetchProducts(
+                      pattern: _searchFieldController.text, page: prevPage);
+                },
         ),
         RaisedButton(
           child: Text('Next'),
           onPressed: nextPage <= 0
               ? null
               : () {
-            currentPage++;
-            _paginatedProductsBloc.fetchProducts(
-                pattern: _searchFieldController.text, page: nextPage);
-          },
+                  currentPage++;
+                  _paginatedProductsBloc.fetchProducts(
+                      pattern: _searchFieldController.text, page: nextPage);
+                },
         ),
       ],
+    );
+  }
+
+  ListTile _getProductTile(ProductModel productInstance) {
+    return ListTile(
+      title: Text(
+        '${productInstance.name} '
+        '(PG_ID: ${productInstance.validForPiggyBank})',
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+      subtitle: Text(
+        productInstance.getDescription(),
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      ),
     );
   }
 
@@ -92,13 +112,13 @@ class ProductsDialogState extends State<ProductsDialog> {
     return StreamBuilder<Response<PaginatedProductsModel>>(
         stream: _paginatedProductsBloc.pagProductsListStream,
         builder: (context, snapshot) {
-          if (snapshot.hasData && snapshot.data.data != null) {
+          if (snapshot.hasData) {
             switch (snapshot.data.status) {
               case Status.LOADING:
                 return CircularProgressIndicator();
                 break;
               case Status.COMPLETED:
-              // Next page and prevoius page setting..
+                // Next page and prevoius page setting..
                 if (snapshot.data.data.previous == null) {
                   prevPage = -1;
                 } else {
@@ -124,24 +144,12 @@ class ProductsDialogState extends State<ProductsDialog> {
                           // First tile is reserved for 'add new product'
                           if (index != 0) {
                             ProductModel productInstance =
-                            snapshot.data.data.results[index - 1];
+                                snapshot.data.data.results[index - 1];
                             return SimpleDialogOption(
                               onPressed: () {
                                 Navigator.pop(context, productInstance.id);
                               },
-                              child: ListTile(
-                                title: Text(
-                                  '${productInstance.name} '
-                                      '(PG_ID: ${productInstance.validForPiggyBank})',
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                subtitle: Text(
-                                  productInstance.getDescription(),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
+                              child: _getProductTile(productInstance),
                             );
                           } else {
                             return SimpleDialogOption(
@@ -161,7 +169,20 @@ class ProductsDialogState extends State<ProductsDialog> {
                 );
                 break;
               case Status.ERROR:
-              // TODO: HANDLE ERROR
+                _errorMessage = snapshot.data.message;
+
+                return  AlertDialog(
+                  title: Text('Error'),
+                  content: Text(_errorMessage),
+                  actions: [
+                    RaisedButton(
+                      onPressed: () {
+                        Navigator.pop(context, -2);
+                      },
+                      child: Text('Ok'),
+                    ),
+                  ],
+                );
                 break;
             }
           }

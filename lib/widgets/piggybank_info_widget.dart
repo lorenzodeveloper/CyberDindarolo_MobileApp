@@ -137,14 +137,16 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
     onAddEntry = (int piggybank_id) async {
       var selectedProduct = await asyncProductOptionDialog(context);
 
-      // If operation not canceled and selectedProduct exists
-      if (selectedProduct != null && selectedProduct != -1) {
+      // If operation not canceled and selectedProduct exists and not error
+      if (selectedProduct != null && selectedProduct != -1 && selectedProduct != -2) {
         Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => EntryFormPage(
                 piggyBankInstance: widget.piggyBankInstance,
                 productID: selectedProduct)));
       } else if (selectedProduct != null && selectedProduct == -1) {
         // TODO: REDIRECT TO INSERT NEW PRODUCT
+      } else if (selectedProduct != null && selectedProduct == -2) {
+        // TODO: HANDLE ERROR
       }
     };
 
