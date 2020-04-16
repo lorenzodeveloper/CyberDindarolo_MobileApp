@@ -1,8 +1,9 @@
 import 'dart:async';
 
 import 'package:cyberdindaroloapp/blocs/paginated/paginated_piggybanks_bloc.dart';
+import 'package:cyberdindaroloapp/blocs/piggybank_bloc.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
-import 'package:cyberdindaroloapp/view/piggybank_info/piggybank_info_page.dart';
+import 'package:cyberdindaroloapp/view/piggybank_info/piggybank_info_main_page.dart';
 import 'package:flutter/material.dart';
 
 import '../alerts.dart';
@@ -32,7 +33,7 @@ class _PiggyBanksListViewWidgetState extends State<PiggyBanksListViewWidget> {
   @override
   void initState() {
     _piggyBankBloc = BlocProvider.of<PaginatedPiggyBanksBloc>(context);
-    if (_piggyBankBloc.isClosed) _piggyBankBloc = new PaginatedPiggyBanksBloc();
+    //if (_piggyBankBloc.isClosed) _piggyBankBloc = new PaginatedPiggyBanksBloc();
     _listen();
     _getMoreData();
     super.initState();
@@ -41,7 +42,7 @@ class _PiggyBanksListViewWidgetState extends State<PiggyBanksListViewWidget> {
   @override
   void dispose() {
     _dataStreamSubscription.cancel();
-    _piggyBankBloc.dispose();
+    //_piggyBankBloc.dispose();
     super.dispose();
   }
 
@@ -226,7 +227,9 @@ class PiggyBankTile extends StatelessWidget {
       onTap: () async {
         //print('Clicked ${piggybanks[index]}');
         var result = await Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => PiggyBankInfoPage(piggybanks[index].id)));
+            builder: (context) => BlocProvider(
+                bloc: PiggyBankBloc(),
+                child: PiggyBankInfoPage(piggybanks[index].id))));
       },
     );
   }

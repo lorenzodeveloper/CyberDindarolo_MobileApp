@@ -1,5 +1,5 @@
 import 'package:cyberdindaroloapp/blocs/paginated/paginated_piggybanks_bloc.dart';
-import 'package:cyberdindaroloapp/view/piggybank_info/piggybank_form_page.dart';
+import 'package:cyberdindaroloapp/view/piggybank_info/piggybank_info_form_page.dart';
 import 'package:cyberdindaroloapp/widgets/piggybank_form_widget.dart';
 import 'package:cyberdindaroloapp/widgets/piggybanks_listview_widget.dart';
 import 'package:cyberdindaroloapp/widgets/universal_drawer_widget.dart';
@@ -9,33 +9,33 @@ import '../bloc_provider.dart';
 
 
 /*
-* This class is the homepage
+* This class is the homepage -> You can see your PGs, Notifs and P/E History
 *
 * */
 
 enum Choice { PIGGYBANKS, NOTIFICATIONS, HISTORY }
 
-class PiggyBanksListPage extends StatefulWidget {
-  PiggyBanksListPage({Key key}) : super(key: key);
+class HomePage extends StatefulWidget {
+  HomePage({Key key}) : super(key: key);
 
   @override
-  _PiggyBanksListPageState createState() => _PiggyBanksListPageState();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _PiggyBanksListPageState extends State<PiggyBanksListPage> {
-  PaginatedPiggyBanksBloc _paginatedPiggyBanksBloc;
+class _HomePageState extends State<HomePage> {
+  //PaginatedPiggyBanksBloc _paginatedPiggyBanksBloc;
   Choice selectedChoice;
 
   @override
   void initState() {
-    _paginatedPiggyBanksBloc = PaginatedPiggyBanksBloc();
+    //_paginatedPiggyBanksBloc = PaginatedPiggyBanksBloc();
     selectedChoice = Choice.PIGGYBANKS;
     super.initState();
   }
 
   @override
   void dispose() {
-    _paginatedPiggyBanksBloc.dispose();
+    //_paginatedPiggyBanksBloc.dispose();
     super.dispose();
   }
 
@@ -43,7 +43,7 @@ class _PiggyBanksListPageState extends State<PiggyBanksListPage> {
     switch (selectedChoice) {
       case Choice.PIGGYBANKS:
         return BlocProvider(
-          bloc: _paginatedPiggyBanksBloc,
+          bloc: PaginatedPiggyBanksBloc(),
           child: PiggyBanksListViewWidget(),
         );
         break;

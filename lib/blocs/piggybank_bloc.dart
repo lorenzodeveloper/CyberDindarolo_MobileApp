@@ -16,6 +16,8 @@ class PiggyBankBloc extends BlocBase {
   Stream<Response<PiggyBankModel>> get pbListStream =>
       _piggybankListController.stream;
 
+  bool get isClosed => _piggybankListController.isClosed;
+
   PiggyBankBloc() {
     _piggybankListController = StreamController<Response<PiggyBankModel>>();
     _piggybankRepository = PiggyBankRepository();

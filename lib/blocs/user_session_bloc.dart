@@ -20,6 +20,8 @@ class UserSessionBloc extends BlocBase {
   Stream<Response<UserSessionModel>> get userListStream =>
       _userSessionListController.stream;
 
+  bool get isClosed => _userSessionListController.isClosed;
+
   UserSessionBloc() {
     _userSessionListController = StreamController<Response<UserSessionModel>>.broadcast();
     _userSessionRepository = UserSessionRepository();

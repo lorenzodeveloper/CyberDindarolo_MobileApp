@@ -51,11 +51,6 @@ class _PiggyBankFormState extends State<PiggyBankForm> {
     _pbNameController.dispose();
     _pbDescriptionController.dispose();
 
-    // TODO: FIX BLOC PROVIDER DISPOSE METHOD
-    if (widget.piggyBankInstance == null) {
-      _piggyBankBloc.dispose();
-    }
-
     super.dispose();
   }
 

@@ -9,13 +9,11 @@ import 'package:cyberdindaroloapp/widgets/error_widget.dart';
 import 'package:cyberdindaroloapp/widgets/loading_widget.dart';
 import 'package:flutter/widgets.dart';
 
-
 /*
 * This class prepare the piggybank info widget
 *
 *
 * */
-
 
 class PiggyBankInfoPage extends StatefulWidget {
   final int selectedPiggybank;
@@ -32,7 +30,7 @@ class _PiggyBankInfoPageState extends State<PiggyBankInfoPage> {
   @override
   void initState() {
     super.initState();
-    _piggyBankBloc = PiggyBankBloc();
+    _piggyBankBloc = BlocProvider.of<PiggyBankBloc>(context);
     _piggyBankBloc.fetchPiggyBank(widget.selectedPiggybank);
   }
 
@@ -61,9 +59,9 @@ class _PiggyBankInfoPageState extends State<PiggyBankInfoPage> {
                   break;
                 case Status.COMPLETED:
                   return BlocProvider(
+                    bloc: PiggyBankBloc(),
                     child: PiggyBankInfoWidget(
                         piggyBankInstance: snapshot.data.data),
-                    bloc: _piggyBankBloc,
                   );
                   break;
                 case Status.ERROR:
@@ -84,7 +82,7 @@ class _PiggyBankInfoPageState extends State<PiggyBankInfoPage> {
 
   @override
   void dispose() {
-    _piggyBankBloc.dispose();
+    //_piggyBankBloc.dispose();
     super.dispose();
   }
 }

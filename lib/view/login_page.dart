@@ -52,6 +52,7 @@ class LoginFormState extends State<LoginForm> {
   void initState() {
     super.initState();
     _userSessionbloc = BlocProvider.of<UserSessionBloc>(context);
+    //if (_userSessionbloc.isClosed) _userSessionbloc = new UserSessionBloc();
     _listen();
     // Try login with stored credential (if stored)
     if (widget.autoLogin) {
@@ -65,8 +66,6 @@ class LoginFormState extends State<LoginForm> {
     unameController.dispose();
     pwdController.dispose();
     _userSessionStreamSubscription.cancel();
-    // TODO: BLOC PROVIDER DISPOSE
-    //_userSessionbloc.dispose();
     super.dispose();
   }
 
@@ -79,7 +78,7 @@ class LoginFormState extends State<LoginForm> {
           break;
         case Status.COMPLETED:
           Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => PiggyBanksListPage()));
+              MaterialPageRoute(builder: (context) => HomePage()));
           //Navigator.of(context).pushReplacementNamed('/home');
           break;
         case Status.ERROR:

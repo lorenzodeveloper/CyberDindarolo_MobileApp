@@ -6,6 +6,7 @@ import 'package:cyberdindaroloapp/widgets/universal_drawer_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
+import '../bloc_provider.dart';
 import '../validators.dart';
 
 
@@ -46,8 +47,8 @@ class _EntryFormPageState extends State<EntryFormPage> {
 
   @override
   void initState() {
-    _paginatedEntriesBloc = new PaginatedEntriesBloc();
-    _paginatedProductsBloc = new PaginatedProductsBloc();
+    _paginatedEntriesBloc = BlocProvider.of<PaginatedEntriesBloc>(context);
+    _paginatedProductsBloc = BlocProvider.of<PaginatedProductsBloc>(context);
 
     _pbNameController =
         TextEditingController(text: widget.piggyBankInstance.pbName);
@@ -62,8 +63,8 @@ class _EntryFormPageState extends State<EntryFormPage> {
   @override
   void dispose() {
     // Clean up the controller when the widget is disposed.
-    _pbNameController.dispose();
-    _pbDescriptionController.dispose();
+    //_pbNameController.dispose();
+    //_pbDescriptionController.dispose();
 
     super.dispose();
   }

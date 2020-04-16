@@ -73,7 +73,7 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
   void initState() {
     super.initState();
 
-    _piggyBankBloc = BlocProvider.of<PiggyBankBloc>(context);
+    _piggyBankBloc = BlocProvider.of<PiggyBankBloc>(context); //new PiggyBankBloc();
 
     _operation = Operation.INFO_VIEW;
 
@@ -111,7 +111,7 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
             // redirect and refresh piggybanks list
             Navigator.of(context).pop();
             Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => PiggyBanksListPage()));
+                MaterialPageRoute(builder: (context) => HomePage()));
           } else if (response.status == Status.ERROR) {
             // Show error message
             if (response.message.toLowerCase().contains('token')) {
@@ -170,7 +170,7 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
   void dispose() {
     _creditBloc.dispose();
     _paginatedParticipantsBloc.dispose();
-
+    //_piggyBankBloc.dispose();
     super.dispose();
   }
 
@@ -412,19 +412,25 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
         break;
       case Operation.EDIT_VIEW:
         return BlocProvider(
-          bloc: _piggyBankBloc,
+          bloc: PiggyBankBloc(),
           child: PiggyBankForm(
             piggyBankInstance: widget.piggyBankInstance,
             onFormCancel: () {
               setState(() {
                 _operation = Operation.INFO_VIEW;
-                _piggyBankBloc.fetchPiggyBank(widget.piggyBankInstance.id);
+                //_piggyBankBloc.fetchPiggyBank(widget.piggyBankInstance.id);
+                _paginatedParticipantsBloc.fetchUsersData(
+                    piggybank: widget.piggyBankInstance.id);
+                _creditBloc.getCredit(piggybank: widget.piggyBankInstance.id);
               });
             },
             onFormSuccessfullyValidated: () {
               setState(() {
                 _operation = Operation.INFO_VIEW;
-                _piggyBankBloc.fetchPiggyBank(widget.piggyBankInstance.id);
+                //_piggyBankBloc.fetchPiggyBank(widget.piggyBankInstance.id);
+                _paginatedParticipantsBloc.fetchUsersData(
+                    piggybank: widget.piggyBankInstance.id);
+                _creditBloc.getCredit(piggybank: widget.piggyBankInstance.id);
               });
             },
           ),

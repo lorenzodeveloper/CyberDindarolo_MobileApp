@@ -18,7 +18,6 @@ import 'package:flutter/material.dart';
 class PiggyBankFormPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Scaffold(
       appBar: AppBar(
         title: Text('Insert new Piggy bank'),
@@ -30,12 +29,12 @@ class PiggyBankFormPage extends StatelessWidget {
           onFormSuccessfullyValidated: () {
             Navigator.of(context).pop();
             Navigator.of(context).pushReplacement(MaterialPageRoute(
-                builder: (context) => PiggyBanksListPage()));
+                builder: (context) => HomePage()));
           },
           onFormCancel: () {
             Navigator.of(context).pop();
             Navigator.of(context).pushReplacement(MaterialPageRoute(
-                builder: (context) => PiggyBanksListPage()));
+                builder: (context) => HomePage()));
           },
         ),
       ),
