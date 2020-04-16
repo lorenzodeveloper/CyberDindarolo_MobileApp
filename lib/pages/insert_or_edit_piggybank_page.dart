@@ -5,7 +5,7 @@
 
 import 'package:cyberdindaroloapp/bloc_provider.dart';
 import 'package:cyberdindaroloapp/blocs/piggybank_bloc.dart';
-import 'package:cyberdindaroloapp/view/home_page.dart';
+import 'package:cyberdindaroloapp/pages/home_page.dart';
 import 'package:cyberdindaroloapp/widgets/piggybank_form_widget.dart';
 import 'package:cyberdindaroloapp/widgets/universal_drawer_widget.dart';
 import 'package:flutter/material.dart';

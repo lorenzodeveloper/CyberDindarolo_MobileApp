@@ -2,9 +2,9 @@ import 'package:cyberdindaroloapp/bloc_provider.dart';
 import 'package:cyberdindaroloapp/blocs/user_session_bloc.dart';
 import 'package:cyberdindaroloapp/models/user_session_model.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
-import 'package:cyberdindaroloapp/view/login_page.dart';
-import 'package:flutter/material.dart';
+import 'package:cyberdindaroloapp/pages/login_page.dart';
 import 'package:cyberdindaroloapp/widgets/error_widget.dart';
+import 'package:flutter/material.dart';
 
 enum Voice { PIGGYBANKS, USERS, PRODUCTS, LOGOUT }
 

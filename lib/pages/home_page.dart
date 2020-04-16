@@ -1,6 +1,5 @@
 import 'package:cyberdindaroloapp/blocs/paginated/paginated_piggybanks_bloc.dart';
-import 'package:cyberdindaroloapp/view/piggybank_info/piggybank_info_form_page.dart';
-import 'package:cyberdindaroloapp/widgets/piggybank_form_widget.dart';
+import 'package:cyberdindaroloapp/pages/insert_or_edit_piggybank_page.dart';
 import 'package:cyberdindaroloapp/widgets/piggybanks_listview_widget.dart';
 import 'package:cyberdindaroloapp/widgets/universal_drawer_widget.dart';
 import 'package:flutter/material.dart';

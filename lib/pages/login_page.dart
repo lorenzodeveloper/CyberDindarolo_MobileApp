@@ -2,12 +2,12 @@ import 'dart:async';
 
 import 'package:cyberdindaroloapp/blocs/user_session_bloc.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
-import 'package:cyberdindaroloapp/view/home_page.dart';
+import 'package:cyberdindaroloapp/pages/home_page.dart';
+import 'package:cyberdindaroloapp/validators.dart';
 import 'package:flutter/material.dart';
 
 import '../alerts.dart';
 import '../bloc_provider.dart';
-import 'package:cyberdindaroloapp/validators.dart';
 
 
 class LoginPage extends StatelessWidget {
