@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:cyberdindaroloapp/blocs/paginated_products_bloc.dart';
-import 'package:cyberdindaroloapp/blocs/paginated_purchases_bloc.dart';
-import 'package:cyberdindaroloapp/blocs/paginated_stock_bloc.dart';
+import 'package:cyberdindaroloapp/blocs/paginated/paginated_products_bloc.dart';
+import 'package:cyberdindaroloapp/blocs/paginated/paginated_purchases_bloc.dart';
+import 'package:cyberdindaroloapp/blocs/paginated/paginated_stock_bloc.dart';
 import 'package:cyberdindaroloapp/models/product_model.dart';
 import 'package:cyberdindaroloapp/models/stock_model.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';

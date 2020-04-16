@@ -1,4 +1,4 @@
-import 'package:cyberdindaroloapp/models/paginated_stock_model.dart';
+import 'package:cyberdindaroloapp/models/paginated/paginated_stock_model.dart';
 import 'package:cyberdindaroloapp/networking/ApiProvider.dart';
 import 'package:cyberdindaroloapp/repository/storage_repository.dart';
 import 'package:flutter/material.dart';

@@ -1,5 +1,5 @@
-import 'package:cyberdindaroloapp/models/paginated_participants_model.dart';
-import 'package:cyberdindaroloapp/models/paginated_users_model.dart';
+import 'package:cyberdindaroloapp/models/paginated/paginated_participants_model.dart';
+import 'package:cyberdindaroloapp/models/paginated/paginated_users_model.dart';
 import 'package:cyberdindaroloapp/networking/ApiProvider.dart';
 import 'package:cyberdindaroloapp/repository/storage_repository.dart';
 import 'package:flutter/material.dart';

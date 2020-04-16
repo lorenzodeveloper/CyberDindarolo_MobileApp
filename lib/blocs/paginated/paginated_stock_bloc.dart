@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:cyberdindaroloapp/bloc_provider.dart';
-import 'package:cyberdindaroloapp/models/paginated_stock_model.dart';
+import 'package:cyberdindaroloapp/models/paginated/paginated_stock_model.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
-import 'package:cyberdindaroloapp/repository/paginated_stock_repository.dart';
+import 'package:cyberdindaroloapp/repository/paginated/paginated_stock_repository.dart';
 import 'package:flutter/material.dart';
 
 

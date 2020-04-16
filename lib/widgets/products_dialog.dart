@@ -1,5 +1,5 @@
-import 'package:cyberdindaroloapp/blocs/paginated_products_bloc.dart';
-import 'package:cyberdindaroloapp/models/paginated_products_model.dart';
+import 'package:cyberdindaroloapp/blocs/paginated/paginated_products_bloc.dart';
+import 'package:cyberdindaroloapp/models/paginated/paginated_products_model.dart';
 import 'package:cyberdindaroloapp/models/product_model.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
 import 'package:flutter/material.dart';

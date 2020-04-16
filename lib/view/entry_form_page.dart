@@ -1,5 +1,5 @@
-import 'package:cyberdindaroloapp/blocs/paginated_entries_bloc.dart';
-import 'package:cyberdindaroloapp/blocs/paginated_products_bloc.dart';
+import 'package:cyberdindaroloapp/blocs/paginated/paginated_entries_bloc.dart';
+import 'package:cyberdindaroloapp/blocs/paginated/paginated_products_bloc.dart';
 import 'package:cyberdindaroloapp/models/piggybank_model.dart';
 import 'package:cyberdindaroloapp/models/product_model.dart';
 import 'package:cyberdindaroloapp/widgets/universal_drawer_widget.dart';
@@ -7,6 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 import '../validators.dart';
+
+
+/*
+* This class is the one responsible for entering products in piggybanks
+* */
 
 class EntryFormPage extends StatefulWidget {
   final PiggyBankModel piggyBankInstance;

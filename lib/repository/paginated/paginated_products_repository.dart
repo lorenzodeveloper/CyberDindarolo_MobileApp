@@ -1,5 +1,5 @@
 
-import 'package:cyberdindaroloapp/models/paginated_products_model.dart';
+import 'package:cyberdindaroloapp/models/paginated/paginated_products_model.dart';
 import 'package:cyberdindaroloapp/models/product_model.dart';
 import 'package:cyberdindaroloapp/networking/ApiProvider.dart';
 import 'package:cyberdindaroloapp/repository/storage_repository.dart';

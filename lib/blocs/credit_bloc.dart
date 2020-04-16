@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:cyberdindaroloapp/bloc_provider.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
-import 'package:cyberdindaroloapp/repository/paginated_piggybanks_repository.dart';
+import 'package:cyberdindaroloapp/repository/paginated/paginated_piggybanks_repository.dart';
 import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 

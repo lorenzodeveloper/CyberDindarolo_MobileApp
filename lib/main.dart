@@ -1,7 +1,7 @@
 import 'package:cyberdindaroloapp/bloc_provider.dart';
 import 'package:cyberdindaroloapp/blocs/user_session_bloc.dart';
 import 'package:cyberdindaroloapp/view/login_page.dart';
-import 'package:cyberdindaroloapp/view/piggybanks_listview_page.dart';
+import 'package:cyberdindaroloapp/view/home_page.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());

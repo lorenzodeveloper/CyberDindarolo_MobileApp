@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:cyberdindaroloapp/bloc_provider.dart';
-import 'package:cyberdindaroloapp/models/paginated_purchases_model.dart';
+import 'package:cyberdindaroloapp/models/paginated/paginated_purchases_model.dart';
 import 'package:cyberdindaroloapp/models/purchase_model.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
-import 'package:cyberdindaroloapp/repository/paginated_purchases_repository.dart';
+import 'package:cyberdindaroloapp/repository/paginated/paginated_purchases_repository.dart';
 import 'package:flutter/material.dart';
 
 class PaginatedPurchasesBloc extends BlocBase {
