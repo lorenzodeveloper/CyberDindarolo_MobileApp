@@ -2,11 +2,11 @@ import 'package:cyberdindaroloapp/bloc_provider.dart';
 import 'package:cyberdindaroloapp/blocs/piggybank_bloc.dart';
 import 'package:cyberdindaroloapp/models/piggybank_model.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
+import 'package:cyberdindaroloapp/widgets/error_widget.dart';
+import 'package:cyberdindaroloapp/widgets/loading_widget.dart';
 import 'package:cyberdindaroloapp/widgets/piggybank_info_widget.dart';
 import 'package:cyberdindaroloapp/widgets/universal_drawer_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:cyberdindaroloapp/widgets/error_widget.dart';
-import 'package:cyberdindaroloapp/widgets/loading_widget.dart';
 import 'package:flutter/widgets.dart';
 
 /*
@@ -58,11 +58,8 @@ class _PiggyBankInfoPageState extends State<PiggyBankInfoPage> {
                   return Loading(loadingMessage: snapshot.data.message);
                   break;
                 case Status.COMPLETED:
-                  return BlocProvider(
-                    bloc: PiggyBankBloc(),
-                    child: PiggyBankInfoWidget(
-                        piggyBankInstance: snapshot.data.data),
-                  );
+                  return PiggyBankInfoWidget(
+                      piggyBankInstance: snapshot.data.data);
                   break;
                 case Status.ERROR:
                   return Error(

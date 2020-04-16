@@ -3,8 +3,6 @@
                     * */
 
 
-import 'package:cyberdindaroloapp/bloc_provider.dart';
-import 'package:cyberdindaroloapp/blocs/piggybank_bloc.dart';
 import 'package:cyberdindaroloapp/pages/home_page.dart';
 import 'package:cyberdindaroloapp/widgets/piggybank_form_widget.dart';
 import 'package:cyberdindaroloapp/widgets/universal_drawer_widget.dart';
@@ -23,20 +21,17 @@ class PiggyBankFormPage extends StatelessWidget {
         title: Text('Insert new Piggy bank'),
       ),
       drawer: DefaultDrawer(),
-      body: BlocProvider(
-        bloc: PiggyBankBloc(),
-        child: PiggyBankForm(
-          onFormSuccessfullyValidated: () {
-            Navigator.of(context).pop();
-            Navigator.of(context).pushReplacement(MaterialPageRoute(
-                builder: (context) => HomePage()));
-          },
-          onFormCancel: () {
-            Navigator.of(context).pop();
-            Navigator.of(context).pushReplacement(MaterialPageRoute(
-                builder: (context) => HomePage()));
-          },
-        ),
+      body: PiggyBankForm(
+        onFormSuccessfullyValidated: () {
+          Navigator.of(context).pop();
+          Navigator.of(context).pushReplacement(MaterialPageRoute(
+              builder: (context) => HomePage()));
+        },
+        onFormCancel: () {
+          Navigator.of(context).pop();
+          Navigator.of(context).pushReplacement(MaterialPageRoute(
+              builder: (context) => HomePage()));
+        },
       ),
     );
   }

@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:cyberdindaroloapp/blocs/paginated/paginated_piggybanks_bloc.dart';
-import 'package:cyberdindaroloapp/blocs/piggybank_bloc.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
 import 'package:cyberdindaroloapp/pages/piggybank_info_main_page.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +19,7 @@ class PiggyBanksListViewWidget extends StatefulWidget {
 class _PiggyBanksListViewWidgetState extends State<PiggyBanksListViewWidget> {
   StreamSubscription _dataStreamSubscription;
 
-  PaginatedPiggyBanksBloc _piggyBankBloc;
+  PaginatedPiggyBanksBloc _paginatedPiggyBanksBloc;
 
   int nextPage = 1;
 
@@ -32,7 +31,7 @@ class _PiggyBanksListViewWidgetState extends State<PiggyBanksListViewWidget> {
 
   @override
   void initState() {
-    _piggyBankBloc = BlocProvider.of<PaginatedPiggyBanksBloc>(context);
+    _paginatedPiggyBanksBloc = BlocProvider.of<PaginatedPiggyBanksBloc>(context);
     //if (_piggyBankBloc.isClosed) _piggyBankBloc = new PaginatedPiggyBanksBloc();
     _listen();
     _getMoreData();
@@ -60,14 +59,14 @@ class _PiggyBanksListViewWidgetState extends State<PiggyBanksListViewWidget> {
         isLoading = true;
       });
 
-      _piggyBankBloc.fetchPiggyBanks(page: nextPage);
+      _paginatedPiggyBanksBloc.fetchPiggyBanks(page: nextPage);
     }
   }
 
   // Listen for piggybanks changes and set state to "complete"
   _listen() {
     // Subscribe to datas_tream
-    _dataStreamSubscription = _piggyBankBloc.pbListStream.listen((event) {
+    _dataStreamSubscription = _paginatedPiggyBanksBloc.pbListStream.listen((event) {
       switch (event.status) {
         case Status.LOADING:
           break;
@@ -227,9 +226,7 @@ class PiggyBankTile extends StatelessWidget {
       onTap: () async {
         //print('Clicked ${piggybanks[index]}');
         var result = await Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => BlocProvider(
-                bloc: PiggyBankBloc(),
-                child: PiggyBankInfoPage(piggybanks[index].id))));
+            builder: (context) => PiggyBankInfoPage(piggybanks[index].id)));
       },
     );
   }

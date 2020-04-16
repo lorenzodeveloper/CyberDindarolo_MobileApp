@@ -19,7 +19,8 @@ class PiggyBankBloc extends BlocBase {
   bool get isClosed => _piggybankListController.isClosed;
 
   PiggyBankBloc() {
-    _piggybankListController = StreamController<Response<PiggyBankModel>>();
+    _piggybankListController =
+        StreamController<Response<PiggyBankModel>>.broadcast();
     _piggybankRepository = PiggyBankRepository();
     //fetchPiggyBank(id);
   }
@@ -60,7 +61,8 @@ class PiggyBankBloc extends BlocBase {
     }
   }
 
-  Future<Response<PiggyBankModel>> createPiggyBank({@required String name, @required String description}) async {
+  Future<Response<PiggyBankModel>> createPiggyBank(
+      {@required String name, @required String description}) async {
     try {
       PiggyBankModel pb = await _piggybankRepository.createPiggyBank(
           name: name, description: description);

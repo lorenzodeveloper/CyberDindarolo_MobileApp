@@ -1,6 +1,8 @@
 import 'package:cyberdindaroloapp/bloc_provider.dart';
 import 'package:cyberdindaroloapp/blocs/credit_bloc.dart';
+import 'package:cyberdindaroloapp/blocs/paginated/paginated_entries_bloc.dart';
 import 'package:cyberdindaroloapp/blocs/paginated/paginated_participants_bloc.dart';
+import 'package:cyberdindaroloapp/blocs/paginated/paginated_products_bloc.dart';
 import 'package:cyberdindaroloapp/blocs/piggybank_bloc.dart';
 import 'package:cyberdindaroloapp/models/paginated/paginated_participants_model.dart';
 import 'package:cyberdindaroloapp/models/piggybank_model.dart';
@@ -73,7 +75,8 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
   void initState() {
     super.initState();
 
-    _piggyBankBloc = BlocProvider.of<PiggyBankBloc>(context); //new PiggyBankBloc();
+    _piggyBankBloc =
+        BlocProvider.of<PiggyBankBloc>(context); //new PiggyBankBloc();
 
     _operation = Operation.INFO_VIEW;
 
@@ -138,11 +141,19 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
       var selectedProduct = await asyncProductOptionDialog(context);
 
       // If operation not canceled and selectedProduct exists and not error
-      if (selectedProduct != null && selectedProduct != -1 && selectedProduct != -2) {
+      if (selectedProduct != null &&
+          selectedProduct != -1 &&
+          selectedProduct != -2) {
         Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => EntryFormPage(
-                piggyBankInstance: widget.piggyBankInstance,
-                productID: selectedProduct)));
+            builder: (context) => BlocProvider(
+                  bloc: PaginatedEntriesBloc(),
+                  child: BlocProvider(
+                    bloc: PaginatedProductsBloc(),
+                    child: EntryFormPage(
+                        piggyBankInstance: widget.piggyBankInstance,
+                        productID: selectedProduct),
+                  ),
+                )));
       } else if (selectedProduct != null && selectedProduct == -1) {
         // TODO: REDIRECT TO INSERT NEW PRODUCT
       } else if (selectedProduct != null && selectedProduct == -2) {
@@ -411,29 +422,26 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
         return _buildInfoView();
         break;
       case Operation.EDIT_VIEW:
-        return BlocProvider(
-          bloc: PiggyBankBloc(),
-          child: PiggyBankForm(
-            piggyBankInstance: widget.piggyBankInstance,
-            onFormCancel: () {
-              setState(() {
-                _operation = Operation.INFO_VIEW;
-                //_piggyBankBloc.fetchPiggyBank(widget.piggyBankInstance.id);
-                _paginatedParticipantsBloc.fetchUsersData(
-                    piggybank: widget.piggyBankInstance.id);
-                _creditBloc.getCredit(piggybank: widget.piggyBankInstance.id);
-              });
-            },
-            onFormSuccessfullyValidated: () {
-              setState(() {
-                _operation = Operation.INFO_VIEW;
-                //_piggyBankBloc.fetchPiggyBank(widget.piggyBankInstance.id);
-                _paginatedParticipantsBloc.fetchUsersData(
-                    piggybank: widget.piggyBankInstance.id);
-                _creditBloc.getCredit(piggybank: widget.piggyBankInstance.id);
-              });
-            },
-          ),
+        return PiggyBankForm(
+          piggyBankInstance: widget.piggyBankInstance,
+          onFormCancel: () {
+            setState(() {
+              _operation = Operation.INFO_VIEW;
+              //_piggyBankBloc.fetchPiggyBank(widget.piggyBankInstance.id);
+              _paginatedParticipantsBloc.fetchUsersData(
+                  piggybank: widget.piggyBankInstance.id);
+              _creditBloc.getCredit(piggybank: widget.piggyBankInstance.id);
+            });
+          },
+          onFormSuccessfullyValidated: () {
+            setState(() {
+              _operation = Operation.INFO_VIEW;
+              //_piggyBankBloc.fetchPiggyBank(widget.piggyBankInstance.id);
+              _paginatedParticipantsBloc.fetchUsersData(
+                  piggybank: widget.piggyBankInstance.id);
+              _creditBloc.getCredit(piggybank: widget.piggyBankInstance.id);
+            });
+          },
         );
         break;
     }
