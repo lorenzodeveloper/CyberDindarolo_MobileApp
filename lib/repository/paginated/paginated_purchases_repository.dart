@@ -33,7 +33,6 @@ class PaginatedPurchasesRepository {
 
     final response =
     await _provider.post("purchases/", headers: headers, body: requestBody);
-    print(response);
     return PurchaseModel.fromJson(response);
   }
 }

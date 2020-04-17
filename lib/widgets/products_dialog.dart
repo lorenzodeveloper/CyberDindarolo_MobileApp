@@ -24,7 +24,6 @@ class ProductsDialogState extends State<ProductsDialog> {
 
   @override
   void initState() {
-
     _paginatedProductsBloc = new PaginatedProductsBloc();
     _searchFieldController = new TextEditingController();
     _paginatedProductsBloc.fetchProducts();
@@ -147,7 +146,8 @@ class ProductsDialogState extends State<ProductsDialog> {
                                 snapshot.data.data.results[index - 1];
                             return SimpleDialogOption(
                               onPressed: () {
-                                Navigator.pop(context, productInstance.id);
+                                Navigator.pop(context,
+                                    Response.completed(productInstance));
                               },
                               child: _getProductTile(productInstance),
                             );
@@ -156,7 +156,8 @@ class ProductsDialogState extends State<ProductsDialog> {
                                 onPressed: () {
                                   // -1 = Insert new product,
                                   // null = operation canceled
-                                  Navigator.pop(context, -1);
+                                  Navigator.pop(
+                                      context, Response.completed(null));
                                 },
                                 child: ListTile(
                                   title: Text('Add new product'),
@@ -171,13 +172,13 @@ class ProductsDialogState extends State<ProductsDialog> {
               case Status.ERROR:
                 _errorMessage = snapshot.data.message;
 
-                return  AlertDialog(
+                return AlertDialog(
                   title: Text('Error'),
                   content: Text(_errorMessage),
                   actions: [
                     RaisedButton(
                       onPressed: () {
-                        Navigator.pop(context, -2);
+                        Navigator.pop(context, Response.error(_errorMessage));
                       },
                       child: Text('Ok'),
                     ),

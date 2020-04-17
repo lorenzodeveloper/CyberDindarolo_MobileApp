@@ -1,3 +1,5 @@
+import 'package:cyberdindaroloapp/models/product_model.dart';
+import 'package:cyberdindaroloapp/networking/Repsonse.dart';
 import 'package:cyberdindaroloapp/widgets/products_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -179,11 +181,11 @@ Future<int> asyncInputDialog(BuildContext context,
   );
 }
 
-Future<int> asyncProductOptionDialog(BuildContext context) async {
-  // This method create a dynamic Product Dialog -> returns -1 if new product
-  // is selected, product_id otherwise
+Future<Response<ProductModel>> asyncProductOptionDialog(BuildContext context) async {
+  // This method create a dynamic Product Dialog -> returns null if new product
+  // is selected, productInstance otherwise
 
-  return await showDialog<int>(
+  return await showDialog<Response<ProductModel>>(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {

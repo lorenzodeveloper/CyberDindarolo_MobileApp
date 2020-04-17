@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cyberdindaroloapp/bloc_provider.dart';
 import 'package:cyberdindaroloapp/blocs/paginated/paginated_products_bloc.dart';
 import 'package:cyberdindaroloapp/blocs/paginated/paginated_purchases_bloc.dart';
 import 'package:cyberdindaroloapp/blocs/paginated/paginated_stock_bloc.dart';
@@ -7,6 +8,7 @@ import 'package:cyberdindaroloapp/models/product_model.dart';
 import 'package:cyberdindaroloapp/models/stock_model.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
 import 'package:flutter/material.dart';
+
 import '../alerts.dart';
 
 class StockListViewWidget extends StatefulWidget {
@@ -14,8 +16,8 @@ class StockListViewWidget extends StatefulWidget {
   final bool closed;
   final void Function() onPurchase;
 
-  StockListViewWidget({@required this.piggybank_id, @required this.onPurchase,
-    this.closed});
+  StockListViewWidget(
+      {@required this.piggybank_id, @required this.onPurchase, this.closed});
 
   @override
   _StockListViewWidgetState createState() {
@@ -38,15 +40,21 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
 
   bool isLoading = false;
 
-  List stockList = new List();
+  List stockList;
 
   bool dataFetchComplete = false;
 
   @override
   void initState() {
-    _paginatedStockBloc = new PaginatedStockBloc();
-    _paginatedPurchasesBloc = new PaginatedPurchasesBloc();
-    _paginatedProductsBloc = new PaginatedProductsBloc();
+    //_paginatedStockBloc = new PaginatedStockBloc();
+    //_paginatedPurchasesBloc = new PaginatedPurchasesBloc();
+    //_paginatedProductsBloc = new PaginatedProductsBloc();
+
+    stockList = new List();
+
+    _paginatedStockBloc = BlocProvider.of<PaginatedStockBloc>(context);
+    _paginatedPurchasesBloc = BlocProvider.of<PaginatedPurchasesBloc>(context);
+    _paginatedProductsBloc = BlocProvider.of<PaginatedProductsBloc>(context);
 
     _listenStockStream();
 
@@ -57,11 +65,6 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
   @override
   void dispose() {
     _stockDataStreamSubscription.cancel();
-
-    _paginatedStockBloc.dispose();
-    _paginatedPurchasesBloc.dispose();
-    _paginatedProductsBloc.dispose();
-
     super.dispose();
   }
 
@@ -96,7 +99,6 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
         case Status.COMPLETED:
           // Add data to piggybanks list
           stockList.addAll(event.data.results);
-          //print(piggybanks[0].pbName);
           // If there is a next page, then set nextPage += 1
           if (event.data.next != null)
             nextPage++;
@@ -183,7 +185,10 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
   }
 
   Expanded _textInExpColumn(
-      {@required String text, @required int flex, TextStyle style, Function() onTap}) {
+      {@required String text,
+      @required int flex,
+      TextStyle style,
+      Function() onTap}) {
     // returns a Text widget inside an expanded column
     return Expanded(
       flex: flex,
@@ -210,8 +215,9 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
             flex: 2,
             style: TextStyle(fontWeight: FontWeight.bold),
             onTap: () async {
-              final Response<ProductModel> response = await
-                _paginatedProductsBloc.getProduct(id: stockModel.product);
+              final Response<ProductModel> response =
+                  await _paginatedProductsBloc.getProduct(
+                      id: stockModel.product);
               switch (response.status) {
                 case Status.LOADING:
                   break;
@@ -222,19 +228,20 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Text(response.data.name,
-                          style: TextStyle(fontWeight: FontWeight.bold),),
-                        Text(response.data.description == null
-                            ? 'No description'
-                            : response.data.description,
-                        style: TextStyle(fontStyle: FontStyle.italic),),
+                        Text(
+                          response.data.name,
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          response.data.description == null
+                              ? 'No description'
+                              : response.data.description,
+                          style: TextStyle(fontStyle: FontStyle.italic),
+                        ),
                         Text('${response.data.pieces} pieces per set'),
                         Divider(),
-                        Text('Originally inserted by ${stockModel
-                            .entered_by_username} in date ${stockModel
-                            .entry_date
-                            .toString()} for piggybank with id ${response.data
-                            .validForPiggyBank}'),
+                        Text(
+                            'Originally inserted by ${stockModel.entered_by_username} in date ${stockModel.entry_date.toString()} for piggybank with id ${response.data.validForPiggyBank}'),
                       ],
                     ),
                   ));
@@ -248,9 +255,7 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
                   }
                   break;
               }
-
-            }
-        ),
+            }),
 
         // pieces
         _textInExpColumn(
@@ -288,13 +293,36 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
     );
   }
 
+  Widget _buildColumnListDescriptor() {
+    return Row(
+      mainAxisSize: MainAxisSize.max,
+      children: <Widget>[
+        _textInExpColumn(
+            text: 'Product Name',
+            flex: 3,
+            style: TextStyle(fontStyle: FontStyle.italic)),
+        _textInExpColumn(
+            text: 'Quantity',
+            flex: 2,
+            style: TextStyle(fontStyle: FontStyle.italic)),
+        _textInExpColumn(
+            text: 'Unitary Cost',
+            flex: 3,
+            style: TextStyle(fontStyle: FontStyle.italic)),
+        _textInExpColumn(
+            text: 'Buy',
+            flex: 2,
+            style: TextStyle(fontStyle: FontStyle.italic)),
+      ],
+    );
+  }
+
   Future _onPurchase(StockModel stockModel) async {
     final int quantity = await asyncInputDialog(context,
         title: 'Quantity:', min: 1, max: stockModel.pieces);
 
     if (quantity != null) {
-      final response =
-        await _paginatedPurchasesBloc.buyProductFromStock(
+      final response = await _paginatedPurchasesBloc.buyProductFromStock(
           product: stockModel.product,
           piggybank: widget.piggybank_id,
           pieces: quantity);
@@ -312,8 +340,8 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
           break;
 
         case Status.ERROR:
-        // If an error occured and if it is token related
-        // redirect to login (with autologin : true)
+          // If an error occured and if it is token related
+          // redirect to login (with autologin : true)
           if (response.message.toLowerCase().contains('token')) {
             showAlertDialog(context, 'Error', response.message,
                 redirectRoute: '/');
@@ -329,13 +357,16 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
   Widget build(BuildContext context) {
     return Expanded(
       child: Column(children: [
+        _buildColumnListDescriptor(),
+        Divider(),
         NotificationListener<ScrollNotification>(
           onNotification: (scrollNotification) =>
               _onEndScroll(scrollNotification),
           child: RefreshIndicator(
             child: ConstrainedBox(
                 constraints: new BoxConstraints(
-                  minHeight: 300.0,
+                  minHeight: 200.0,
+                  maxHeight: 350.0,
                 ),
                 child: _buildList()),
             onRefresh: () => _handleRefresh(),

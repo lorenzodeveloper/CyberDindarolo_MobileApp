@@ -1,10 +1,7 @@
-import 'package:cyberdindaroloapp/blocs/paginated/paginated_piggybanks_bloc.dart';
 import 'package:cyberdindaroloapp/pages/insert_or_edit_piggybank_page.dart';
 import 'package:cyberdindaroloapp/widgets/piggybanks_listview_widget.dart';
 import 'package:cyberdindaroloapp/widgets/universal_drawer_widget.dart';
 import 'package:flutter/material.dart';
-
-import '../bloc_provider.dart';
 
 
 /*
@@ -41,10 +38,7 @@ class _HomePageState extends State<HomePage> {
   Widget _chosenWidget() {
     switch (selectedChoice) {
       case Choice.PIGGYBANKS:
-        return BlocProvider(
-          bloc: PaginatedPiggyBanksBloc(),
-          child: PiggyBanksListViewWidget(),
-        );
+        return PiggyBanksListViewWidget();
         break;
       case Choice.NOTIFICATIONS:
         // TODO: Handle NOTIFICATIONS case.

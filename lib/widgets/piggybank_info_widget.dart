@@ -1,11 +1,10 @@
 import 'package:cyberdindaroloapp/bloc_provider.dart';
 import 'package:cyberdindaroloapp/blocs/credit_bloc.dart';
-import 'package:cyberdindaroloapp/blocs/paginated/paginated_entries_bloc.dart';
 import 'package:cyberdindaroloapp/blocs/paginated/paginated_participants_bloc.dart';
-import 'package:cyberdindaroloapp/blocs/paginated/paginated_products_bloc.dart';
 import 'package:cyberdindaroloapp/blocs/piggybank_bloc.dart';
 import 'package:cyberdindaroloapp/models/paginated/paginated_participants_model.dart';
 import 'package:cyberdindaroloapp/models/piggybank_model.dart';
+import 'package:cyberdindaroloapp/models/product_model.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
 import 'package:cyberdindaroloapp/pages/entry_form_page.dart';
 import 'package:cyberdindaroloapp/pages/home_page.dart';
@@ -81,7 +80,8 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
     _operation = Operation.INFO_VIEW;
 
     // BLOCS MANAGED BY A STREAM BUILDER
-    _paginatedParticipantsBloc = BlocProvider.of<PaginatedParticipantsBloc>(context);
+    _paginatedParticipantsBloc =
+        BlocProvider.of<PaginatedParticipantsBloc>(context);
     _creditBloc = BlocProvider.of<CreditBloc>(context);
 
     _paginatedParticipantsBloc.fetchUsersData(
@@ -138,27 +138,37 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
 
     // Add entry in piggybank
     onAddEntry = (int piggybank_id) async {
-      var selectedProduct = await asyncProductOptionDialog(context);
+      Response<ProductModel> selectedProductResponse =
+          await asyncProductOptionDialog(context);
+
+      if (selectedProductResponse != null) {
+        switch (selectedProductResponse.status) {
+          case Status.LOADING:
+            // impossible
+            break;
+          case Status.COMPLETED:
+            ProductModel selectedProductInstance = selectedProductResponse.data;
+
+            if (selectedProductInstance != null) {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => EntryFormPage(
+                        piggyBankInstance: widget.piggyBankInstance,
+                        productInstance: selectedProductInstance,
+                        onFormSuccessfullyValidated: () {},
+                        onFormCancel: () {},
+                      )));
+            } else {
+              // TODO: REDIRECT TO INSERT NEW PRODUCT
+            }
+            break;
+          case Status.ERROR:
+            // TODO: Handle this case.
+            break;
+        }
+      }
 
       // If operation not canceled and selectedProduct exists and not error
-      if (selectedProduct != null &&
-          selectedProduct != -1 &&
-          selectedProduct != -2) {
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => BlocProvider(
-                  bloc: PaginatedEntriesBloc(),
-                  child: BlocProvider(
-                    bloc: PaginatedProductsBloc(),
-                    child: EntryFormPage(
-                        piggyBankInstance: widget.piggyBankInstance,
-                        productID: selectedProduct),
-                  ),
-                )));
-      } else if (selectedProduct != null && selectedProduct == -1) {
-        // TODO: REDIRECT TO INSERT NEW PRODUCT
-      } else if (selectedProduct != null && selectedProduct == -2) {
-        // TODO: HANDLE ERROR
-      }
+      // redirect to entry form
     };
 
     // Composed Floating Button functions and params
@@ -427,7 +437,6 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
           onFormCancel: () {
             // trigger didUpdateWidget
             setState(() {
-              print("REFRESHING WIDGET");
               // refresh all info
               _piggyBankBloc.fetchPiggyBank(widget.piggyBankInstance.id);
               _operation = Operation.INFO_VIEW;

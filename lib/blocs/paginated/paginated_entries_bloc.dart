@@ -1,9 +1,11 @@
 import 'dart:async';
 
 import 'package:cyberdindaroloapp/bloc_provider.dart';
+import 'package:cyberdindaroloapp/models/entry_model.dart';
 import 'package:cyberdindaroloapp/models/paginated/paginated_entries_model.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
 import 'package:cyberdindaroloapp/repository/paginated/paginated_entries_repository.dart';
+import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 
 class PaginatedEntriesBloc extends BlocBase {
@@ -36,7 +38,7 @@ class PaginatedEntriesBloc extends BlocBase {
     }
   }
 
- /* Future<Response<PurchaseModel>> buyProductFromStock(
+  /* Future<Response<PurchaseModel>> buyProductFromStock(
       {@required int product,
       @required int piggybank,
       @required int pieces}) async {
@@ -53,5 +55,25 @@ class PaginatedEntriesBloc extends BlocBase {
 
   dispose() {
     _pagEntriesListController?.close();
+  }
+
+  Future<Response<EntryModel>> insertEntry(
+      {@required int piggybank_id,
+      @required int product_id,
+      @required int set_quantity,
+      @required Decimal single_set_price}) async {
+    try {
+      EntryModel entryModel =
+          await _pagEntriesRepository.insertEntry(
+            piggybank_id: piggybank_id,
+            product_id: product_id,
+            set_quantity: set_quantity,
+            single_set_price: single_set_price,)
+      ;
+
+      return Response.completed(entryModel);
+    } catch (e) {
+      return Response.error(e.toString());
+    }
   }
 }

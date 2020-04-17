@@ -1,7 +1,5 @@
 import 'dart:async';
 
-import 'package:cyberdindaroloapp/blocs/credit_bloc.dart';
-import 'package:cyberdindaroloapp/blocs/paginated/paginated_participants_bloc.dart';
 import 'package:cyberdindaroloapp/blocs/paginated/paginated_piggybanks_bloc.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
 import 'package:cyberdindaroloapp/pages/piggybank_detail_page.dart';
@@ -230,11 +228,8 @@ class PiggyBankTile extends StatelessWidget {
       onTap: () async {
         // Passing here needed Blocs
         var result = await Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => BlocProvider(
-                bloc: CreditBloc(),
-                child: BlocProvider(
-                    bloc: PaginatedParticipantsBloc(),
-                    child: PiggyBankDetailPage(piggybanks[index].id)))));
+            builder: (context) => PiggyBankDetailPage(
+                piggybanks[index].id)));
       },
     );
   }
