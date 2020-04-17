@@ -25,7 +25,6 @@ class PaginatedParticipantsBloc extends BlocBase {
   }
 
   fetchUsersData({int page: 1, @required int piggybank}) async {
-    print("qui");
     pagParticipantsListSink.add(Response.loading('Getting participants.'));
     try {
       PaginatedParticipantsModel paginatedUsers =

@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'package:cyberdindaroloapp/blocs/credit_bloc.dart';
+import 'package:cyberdindaroloapp/blocs/paginated/paginated_participants_bloc.dart';
 import 'package:cyberdindaroloapp/blocs/paginated/paginated_piggybanks_bloc.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
-import 'package:cyberdindaroloapp/pages/piggybank_info_main_page.dart';
+import 'package:cyberdindaroloapp/pages/piggybank_detail_page.dart';
 import 'package:flutter/material.dart';
 
 import '../alerts.dart';
@@ -31,7 +33,8 @@ class _PiggyBanksListViewWidgetState extends State<PiggyBanksListViewWidget> {
 
   @override
   void initState() {
-    _paginatedPiggyBanksBloc = BlocProvider.of<PaginatedPiggyBanksBloc>(context);
+    _paginatedPiggyBanksBloc =
+        BlocProvider.of<PaginatedPiggyBanksBloc>(context);
     //if (_piggyBankBloc.isClosed) _piggyBankBloc = new PaginatedPiggyBanksBloc();
     _listen();
     _getMoreData();
@@ -66,7 +69,8 @@ class _PiggyBanksListViewWidgetState extends State<PiggyBanksListViewWidget> {
   // Listen for piggybanks changes and set state to "complete"
   _listen() {
     // Subscribe to datas_tream
-    _dataStreamSubscription = _paginatedPiggyBanksBloc.pbListStream.listen((event) {
+    _dataStreamSubscription =
+        _paginatedPiggyBanksBloc.pbListStream.listen((event) {
       switch (event.status) {
         case Status.LOADING:
           break;
@@ -224,9 +228,13 @@ class PiggyBankTile extends StatelessWidget {
         height: 30,
       ),
       onTap: () async {
-        //print('Clicked ${piggybanks[index]}');
+        // Passing here needed Blocs
         var result = await Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => PiggyBankInfoPage(piggybanks[index].id)));
+            builder: (context) => BlocProvider(
+                bloc: CreditBloc(),
+                child: BlocProvider(
+                    bloc: PaginatedParticipantsBloc(),
+                    child: PiggyBankDetailPage(piggybanks[index].id)))));
       },
     );
   }

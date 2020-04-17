@@ -15,16 +15,16 @@ import 'package:flutter/widgets.dart';
 *
 * */
 
-class PiggyBankInfoPage extends StatefulWidget {
+class PiggyBankDetailPage extends StatefulWidget {
   final int selectedPiggybank;
 
-  const PiggyBankInfoPage(this.selectedPiggybank);
+  const PiggyBankDetailPage(this.selectedPiggybank);
 
   @override
-  _PiggyBankInfoPageState createState() => _PiggyBankInfoPageState();
+  _PiggyBankDetailPageState createState() => _PiggyBankDetailPageState();
 }
 
-class _PiggyBankInfoPageState extends State<PiggyBankInfoPage> {
+class _PiggyBankDetailPageState extends State<PiggyBankDetailPage> {
   PiggyBankBloc _piggyBankBloc;
 
   @override

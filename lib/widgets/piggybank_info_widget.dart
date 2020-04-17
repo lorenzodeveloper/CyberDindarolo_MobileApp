@@ -81,8 +81,8 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
     _operation = Operation.INFO_VIEW;
 
     // BLOCS MANAGED BY A STREAM BUILDER
-    _paginatedParticipantsBloc = new PaginatedParticipantsBloc();
-    _creditBloc = new CreditBloc();
+    _paginatedParticipantsBloc = BlocProvider.of<PaginatedParticipantsBloc>(context);
+    _creditBloc = BlocProvider.of<CreditBloc>(context);
 
     _paginatedParticipantsBloc.fetchUsersData(
         piggybank: widget.piggyBankInstance.id);
@@ -179,8 +179,8 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
 
   @override
   void dispose() {
-    _creditBloc.dispose();
-    _paginatedParticipantsBloc.dispose();
+    //_creditBloc.dispose();
+    //_paginatedParticipantsBloc.dispose();
     //_piggyBankBloc.dispose();
     super.dispose();
   }
@@ -425,21 +425,20 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
         return PiggyBankForm(
           piggyBankInstance: widget.piggyBankInstance,
           onFormCancel: () {
+            // trigger didUpdateWidget
             setState(() {
+              print("REFRESHING WIDGET");
+              // refresh all info
+              _piggyBankBloc.fetchPiggyBank(widget.piggyBankInstance.id);
               _operation = Operation.INFO_VIEW;
-              //_piggyBankBloc.fetchPiggyBank(widget.piggyBankInstance.id);
-              _paginatedParticipantsBloc.fetchUsersData(
-                  piggybank: widget.piggyBankInstance.id);
-              _creditBloc.getCredit(piggybank: widget.piggyBankInstance.id);
             });
           },
           onFormSuccessfullyValidated: () {
+            // trigger didUpdateWidget
             setState(() {
+              // refresh all info
+              _piggyBankBloc.fetchPiggyBank(widget.piggyBankInstance.id);
               _operation = Operation.INFO_VIEW;
-              //_piggyBankBloc.fetchPiggyBank(widget.piggyBankInstance.id);
-              _paginatedParticipantsBloc.fetchUsersData(
-                  piggybank: widget.piggyBankInstance.id);
-              _creditBloc.getCredit(piggybank: widget.piggyBankInstance.id);
             });
           },
         );
