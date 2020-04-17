@@ -1,5 +1,6 @@
 import 'package:cyberdindaroloapp/models/product_model.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
+import 'package:cyberdindaroloapp/validators.dart';
 import 'package:cyberdindaroloapp/widgets/products_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -123,7 +124,7 @@ Future<ConfirmAction> asyncConfirmDialog(BuildContext context,
   );
 }
 
-Future<int> asyncInputDialog(BuildContext context,
+Future<int> showQuantityInputDialog(BuildContext context,
     {@required String title,
     @required int min,
     @required int max,
@@ -152,8 +153,8 @@ Future<int> asyncInputDialog(BuildContext context,
                 WhitelistingTextInputFormatter.digitsOnly
               ],
               decoration: new InputDecoration(
-                labelText: 'Quantity',
-                hintText: 'eg. 1',
+                labelText: 'Quantity (min $min, max $max)',
+                hintText: 'e.g. 1',
               ),
               onChanged: (value) {
                 choice = value;
@@ -181,7 +182,111 @@ Future<int> asyncInputDialog(BuildContext context,
   );
 }
 
-Future<Response<ProductModel>> asyncProductOptionDialog(BuildContext context) async {
+Future<String> showStringInputDialog(BuildContext context,
+    {@required String title,
+    @required String labelText,
+    @required String hintText,
+    @required int maxLength,
+    bool empty: false}) async {
+  return showDialog<String>(
+    context: context,
+    barrierDismissible: false,
+    // dialog is dismissible with a tap on the barrier
+    builder: (BuildContext context) {
+      return StringInputDialog(
+        title: title,
+        labelText: labelText,
+        hintText: hintText,
+        maxLength: maxLength,
+        empty: empty,
+      );
+    },
+  );
+}
+
+class StringInputDialog extends StatefulWidget {
+  final String title;
+  final String labelText;
+  final String hintText;
+  final int maxLength;
+  final bool empty;
+
+  const StringInputDialog({
+    Key key,
+    @required this.title,
+    @required this.labelText,
+    @required this.hintText,
+    @required this.maxLength,
+    this.empty: false,
+  }) : super(key: key);
+
+  @override
+  _StringInputDialogState createState() {
+    return _StringInputDialogState();
+  }
+}
+
+class _StringInputDialogState extends State<StringInputDialog> {
+
+  String choice = '';
+
+  final _formKey = GlobalKey<FormState>();
+  TextEditingController _fieldController;
+
+  @override
+  void initState() {
+    if (widget.maxLength < 0 && widget.empty ||
+        widget.maxLength <= 0 && !widget.empty)
+      throw Exception('maxLength must be a non negative number');
+    _fieldController = new TextEditingController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _fieldController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(widget.title),
+      content: new Row(
+        children: <Widget>[
+          Expanded(
+            child: Form( //TODO: SET GLOBAL KEY
+                key: _formKey,
+                child: new TextFormField(
+              controller: _fieldController,
+              validator: widget.empty
+                  ? (value) => gpEmptyStringValidator(value, widget.maxLength)
+                  : (value) => gpStringValidator(value, widget.maxLength),
+              autofocus: true,
+              decoration: new InputDecoration(
+                labelText: widget.labelText,
+                hintText: widget.hintText,
+              ),
+            )),
+          )
+        ],
+      ),
+      actions: <Widget>[
+        FlatButton(
+          child: Text('Ok'),
+          onPressed: () {
+            if (_formKey.currentState.validate()) {
+              Navigator.of(context).pop(_fieldController.text);
+            }
+          },
+        ),
+      ],
+    );
+  }
+}
+
+Future<Response<ProductModel>> showProductOptionDialog(
+    BuildContext context) async {
   // This method create a dynamic Product Dialog -> returns null if new product
   // is selected, productInstance otherwise
 

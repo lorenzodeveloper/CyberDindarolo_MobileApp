@@ -2,6 +2,7 @@ import 'package:cyberdindaroloapp/blocs/paginated/paginated_products_bloc.dart';
 import 'package:cyberdindaroloapp/models/paginated/paginated_products_model.dart';
 import 'package:cyberdindaroloapp/models/product_model.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
+import 'package:cyberdindaroloapp/widgets/error_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -47,7 +48,7 @@ class ProductsDialogState extends State<ProductsDialog> {
             padding: const EdgeInsets.all(8.0),
             child: TextField(
               controller: _searchFieldController,
-              //autofocus: true,
+              autofocus: true,
               decoration: InputDecoration(
                   labelText: 'Search for a product (e.g. \'Chicken\')'),
               onEditingComplete: () {
@@ -172,17 +173,12 @@ class ProductsDialogState extends State<ProductsDialog> {
               case Status.ERROR:
                 _errorMessage = snapshot.data.message;
 
-                return AlertDialog(
-                  title: Text('Error'),
-                  content: Text(_errorMessage),
-                  actions: [
-                    RaisedButton(
-                      onPressed: () {
-                        Navigator.pop(context, Response.error(_errorMessage));
-                      },
-                      child: Text('Ok'),
-                    ),
-                  ],
+                return Error(
+                  errorButtonText: 'Error',
+                  errorMessage: _errorMessage,
+                  onRetryPressed: () {
+                    Navigator.pop(context, Response.error(_errorMessage));
+                  },
                 );
                 break;
             }

@@ -58,7 +58,7 @@ class _PiggyBankDetailPageState extends State<PiggyBankDetailPage> {
                   return Loading(loadingMessage: snapshot.data.message);
                   break;
                 case Status.COMPLETED:
-                  return PiggyBankInfoWidget(
+                  return new PiggyBankInfoWidget(
                       piggyBankInstance: snapshot.data.data);
                   break;
                 case Status.ERROR:

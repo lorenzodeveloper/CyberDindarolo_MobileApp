@@ -1,6 +1,7 @@
 import 'package:cyberdindaroloapp/bloc_provider.dart';
 import 'package:cyberdindaroloapp/blocs/credit_bloc.dart';
 import 'package:cyberdindaroloapp/blocs/paginated/paginated_participants_bloc.dart';
+import 'package:cyberdindaroloapp/blocs/paginated/paginated_products_bloc.dart';
 import 'package:cyberdindaroloapp/blocs/piggybank_bloc.dart';
 import 'package:cyberdindaroloapp/models/paginated/paginated_participants_model.dart';
 import 'package:cyberdindaroloapp/models/piggybank_model.dart';
@@ -139,7 +140,7 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
     // Add entry in piggybank
     onAddEntry = (int piggybank_id) async {
       Response<ProductModel> selectedProductResponse =
-          await asyncProductOptionDialog(context);
+          await showProductOptionDialog(context);
 
       if (selectedProductResponse != null) {
         switch (selectedProductResponse.status) {
@@ -159,6 +160,30 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
                       )));
             } else {
               // TODO: REDIRECT TO INSERT NEW PRODUCT
+              String name = await showStringInputDialog(context,
+                  title: 'New Product',
+                  labelText: 'Product Name',
+                  hintText: 'e.g. Fish And Chips',
+                  maxLength: 30);
+              if (name != null) {
+                String description = await showStringInputDialog(context,
+                    title: 'New Product',
+                    labelText: 'Product Description',
+                    hintText:
+                        'e.g. Hot dish consisting of fried fish in batter served with chips,',
+                    maxLength: 255,
+                    empty: true);
+
+                int pieces = await showQuantityInputDialog(context,
+                    title: 'Pieces', min: 1, max: 100000);
+
+                if (pieces != null) {
+                  _createProductAndRedirect(
+                      product_name: name,
+                      product_description: description,
+                      pieces: pieces);
+                }
+              }
             }
             break;
           case Status.ERROR:
@@ -391,7 +416,7 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
             // STOCK
             Row(
               children: <Widget>[
-                StockListViewWidget(
+                new StockListViewWidget(
                     closed: widget.piggyBankInstance.closed,
                     piggybank_id: widget.piggyBankInstance.id,
                     onPurchase: () {
@@ -451,6 +476,47 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
             });
           },
         );
+        break;
+    }
+  }
+
+  _createProductAndRedirect(
+      {@required String product_name,
+      @required String product_description,
+      @required int pieces,
+      Future Function() action}) async {
+    // Products Bloc
+    PaginatedProductsBloc productsBloc =
+        BlocProvider.of<PaginatedProductsBloc>(context);
+
+    // Create product
+    var response = await productsBloc.createProduct(
+        product_name: product_name,
+        product_description: product_description,
+        valid_for_piggybank: widget.piggyBankInstance.id,
+        pieces: pieces);
+
+    switch (response.status) {
+      case Status.LOADING:
+        // impossible
+        break;
+      case Status.COMPLETED:
+        ProductModel productInstance = response.data;
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => EntryFormPage(
+                  piggyBankInstance: widget.piggyBankInstance,
+                  productInstance: productInstance,
+                  onFormSuccessfullyValidated: () {},
+                  onFormCancel: () {},
+                )));
+        break;
+      case Status.ERROR:
+        if (response.message.toLowerCase().contains('token')) {
+          showAlertDialog(context, 'Error', response.message,
+              redirectRoute: '/');
+        } else {
+          showAlertDialog(context, 'Error', response.message);
+        }
         break;
     }
   }

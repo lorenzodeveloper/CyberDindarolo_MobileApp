@@ -65,6 +65,7 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
   @override
   void dispose() {
     _stockDataStreamSubscription.cancel();
+    stockList.clear();
     super.dispose();
   }
 
@@ -318,7 +319,7 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
   }
 
   Future _onPurchase(StockModel stockModel) async {
-    final int quantity = await asyncInputDialog(context,
+    final int quantity = await showQuantityInputDialog(context,
         title: 'Quantity:', min: 1, max: stockModel.pieces);
 
     if (quantity != null) {

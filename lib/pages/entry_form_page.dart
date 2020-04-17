@@ -12,6 +12,7 @@ import 'package:flutter/widgets.dart';
 
 import '../alerts.dart';
 import '../bloc_provider.dart';
+import '../validators.dart';
 
 /*
 * This class is the one responsible for entering products in piggybanks
@@ -24,13 +25,13 @@ class EntryFormPage extends StatefulWidget {
   final Function() onFormSuccessfullyValidated;
   final Function() onFormCancel;
 
-  const EntryFormPage({
-    Key key,
-    @required this.piggyBankInstance,
-    @required this.productInstance,
-    this.onFormSuccessfullyValidated,
-    this.onFormCancel
-  }) : super(key: key);
+  const EntryFormPage(
+      {Key key,
+      @required this.piggyBankInstance,
+      @required this.productInstance,
+      this.onFormSuccessfullyValidated,
+      this.onFormCancel})
+      : super(key: key);
 
   @override
   _EntryFormPageState createState() {
@@ -46,6 +47,7 @@ class _EntryFormPageState extends State<EntryFormPage> {
 
   // Blocs
   PaginatedEntriesBloc _paginatedEntriesBloc;
+
   //PaginatedProductsBloc _paginatedProductsBloc;
 
   final _amountValidator = RegExInputFormatter.withRegex(
@@ -168,6 +170,7 @@ class _EntryFormPageState extends State<EntryFormPage> {
                       decoration: InputDecoration(
                           labelText: 'Enter Product\'s set quantity (e.g. 2)'),
                       controller: _quantityFieldController,
+                      validator: (value) => gpStringValidator(value, 6)
                     ),
 
                     // PB Description field
@@ -181,6 +184,7 @@ class _EntryFormPageState extends State<EntryFormPage> {
                           labelText:
                               'Enter single product\'s set price (e.g. 5.99)'),
                       controller: _setPriceController,
+                      validator: (value) => gpStringValidator(value, 6),
                     ),
 
                     // Save button
@@ -188,11 +192,14 @@ class _EntryFormPageState extends State<EntryFormPage> {
                       onPressed: () async {
                         // Validate returns true if the form is valid, otherwise false.
                         if (_formKey.currentState.validate()) {
-                          final response = await _paginatedEntriesBloc.insertEntry(
-                              piggybank_id: widget.piggyBankInstance.id,
-                              product_id: widget.productInstance.id,
-                              set_quantity: int.parse(_quantityFieldController.text),
-                              single_set_price: Decimal.parse(_setPriceController.text),
+                          final response =
+                              await _paginatedEntriesBloc.insertEntry(
+                            piggybank_id: widget.piggyBankInstance.id,
+                            product_id: widget.productInstance.id,
+                            set_quantity:
+                                int.parse(_quantityFieldController.text),
+                            single_set_price:
+                                Decimal.parse(_setPriceController.text),
                           );
 
                           switch (response.status) {
@@ -202,18 +209,24 @@ class _EntryFormPageState extends State<EntryFormPage> {
                             case Status.COMPLETED:
                               if (widget.onFormSuccessfullyValidated != null)
                                 widget.onFormSuccessfullyValidated();
+                              // TODO: FIX DOUBLED STOCK LIST BUG
                               Navigator.of(context).pop();
                               Navigator.of(context).pop();
                               Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => PiggyBankDetailPage(widget.piggyBankInstance.id)));
+                                  builder: (context) => new PiggyBankDetailPage(
+                                      widget.piggyBankInstance.id)));
 
                               break;
                             case Status.ERROR:
-                              if (response.message.toLowerCase().contains('token')) {
-                                showAlertDialog(context, 'Error', response.message,
+                              if (response.message
+                                  .toLowerCase()
+                                  .contains('token')) {
+                                showAlertDialog(
+                                    context, 'Error', response.message,
                                     redirectRoute: '/');
                               } else {
-                                showAlertDialog(context, 'Error', response.message);
+                                showAlertDialog(
+                                    context, 'Error', response.message);
                               }
                               break;
                           }
@@ -225,8 +238,7 @@ class _EntryFormPageState extends State<EntryFormPage> {
                     // Cancel button
                     RaisedButton(
                       onPressed: () async {
-                        if (widget.onFormCancel != null)
-                          widget.onFormCancel();
+                        if (widget.onFormCancel != null) widget.onFormCancel();
                         Navigator.of(context).pop();
                       },
                       child: Text('Cancel'),

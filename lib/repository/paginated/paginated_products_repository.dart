@@ -1,4 +1,3 @@
-
 import 'package:cyberdindaroloapp/models/paginated/paginated_products_model.dart';
 import 'package:cyberdindaroloapp/models/product_model.dart';
 import 'package:cyberdindaroloapp/networking/ApiProvider.dart';
@@ -36,13 +35,32 @@ class PaginatedProductsRepository {
     final stored_token = await _storageRepository.getToken();
 
     return {'Authorization': 'Token $stored_token'};
-
   }
 
-  Future<ProductModel> getProduct({int id}) async {
+  Future<ProductModel> getProduct({@required int id}) async {
     var headers = await _getAuthHeader();
 
     final response = await _provider.get("products/$id/", headers: headers);
+
+    return ProductModel.fromJson(response);
+  }
+
+  Future<ProductModel> createProduct(
+      {@required String product_name,
+      @required String product_description,
+      @required int valid_for_piggybank,
+      @required int pieces}) async {
+    final headers = await _getAuthHeader();
+
+    var body = {
+      'name': product_name,
+      'description': product_description,
+      'valid_for_piggybank': valid_for_piggybank.toString(),
+      'pieces' : pieces.toString(),
+    };
+
+    final response =
+        await _provider.post("products/", headers: headers, body: body);
 
     return ProductModel.fromJson(response);
   }
