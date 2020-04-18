@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
 import 'dart:math';
+
+import 'package:flutter/material.dart';
 
 class ComposedFloatingButton extends StatefulWidget {
   final List<IconData> icons;
@@ -37,6 +38,7 @@ class ComposedFloatingButtonState extends State<ComposedFloatingButton>
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
+    super.initState();
   }
 
   Widget build(BuildContext context) {

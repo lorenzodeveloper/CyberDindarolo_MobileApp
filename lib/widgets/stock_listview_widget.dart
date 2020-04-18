@@ -46,10 +46,6 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
 
   @override
   void initState() {
-    //_paginatedStockBloc = new PaginatedStockBloc();
-    //_paginatedPurchasesBloc = new PaginatedPurchasesBloc();
-    //_paginatedProductsBloc = new PaginatedProductsBloc();
-
     stockList = new List();
 
     _paginatedStockBloc = BlocProvider.of<PaginatedStockBloc>(context);
@@ -64,7 +60,7 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
 
   @override
   void dispose() {
-    _stockDataStreamSubscription.cancel();
+    _stockDataStreamSubscription?.cancel();
     stockList.clear();
     super.dispose();
   }

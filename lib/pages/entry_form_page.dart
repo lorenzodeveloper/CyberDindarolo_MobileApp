@@ -2,7 +2,6 @@ import 'package:cyberdindaroloapp/blocs/paginated/paginated_entries_bloc.dart';
 import 'package:cyberdindaroloapp/models/piggybank_model.dart';
 import 'package:cyberdindaroloapp/models/product_model.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
-import 'package:cyberdindaroloapp/pages/piggybank_detail_page.dart';
 import 'package:cyberdindaroloapp/widgets/universal_drawer_widget.dart';
 import 'package:decimal/decimal.dart';
 import 'package:expandable/expandable.dart';
@@ -209,12 +208,7 @@ class _EntryFormPageState extends State<EntryFormPage> {
                             case Status.COMPLETED:
                               if (widget.onFormSuccessfullyValidated != null)
                                 widget.onFormSuccessfullyValidated();
-                              // TODO: FIX DOUBLED STOCK LIST BUG
                               Navigator.of(context).pop();
-                              Navigator.of(context).pop();
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => new PiggyBankDetailPage(
-                                      widget.piggyBankInstance.id)));
 
                               break;
                             case Status.ERROR:

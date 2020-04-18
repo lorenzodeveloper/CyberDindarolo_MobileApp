@@ -41,7 +41,7 @@ class _PiggyBanksListViewWidgetState extends State<PiggyBanksListViewWidget> {
 
   @override
   void dispose() {
-    _dataStreamSubscription.cancel();
+    _dataStreamSubscription?.cancel();
     //_piggyBankBloc.dispose();
     super.dispose();
   }

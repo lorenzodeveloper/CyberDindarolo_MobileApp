@@ -29,9 +29,9 @@ class _PiggyBankDetailPageState extends State<PiggyBankDetailPage> {
 
   @override
   void initState() {
-    super.initState();
     _piggyBankBloc = BlocProvider.of<PiggyBankBloc>(context);
     _piggyBankBloc.fetchPiggyBank(widget.selectedPiggybank);
+    super.initState();
   }
 
   @override

@@ -155,7 +155,10 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
                   builder: (context) => EntryFormPage(
                         piggyBankInstance: widget.piggyBankInstance,
                         productInstance: selectedProductInstance,
-                        onFormSuccessfullyValidated: () {},
+                        onFormSuccessfullyValidated: () {
+                          // refresh detail widget
+                          _piggyBankBloc.fetchPiggyBank(widget.piggyBankInstance.id);
+                        },
                         onFormCancel: () {},
                       )));
             } else {
