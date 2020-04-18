@@ -3,11 +3,17 @@ import 'dart:convert';
 import 'package:cyberdindaroloapp/models/user_profile_model.dart';
 import 'package:cyberdindaroloapp/models/user_session_model.dart';
 import 'package:cyberdindaroloapp/networking/ApiProvider.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:cyberdindaroloapp/repository/storage_repository.dart';
 
 class UserSessionRepository {
   CyberDindaroloAPIv1Provider _provider = CyberDindaroloAPIv1Provider();
-  final _secure_storage = new FlutterSecureStorage();
+  StorageRepository _storageRepository = StorageRepository();
+
+  _getAuthHeader() async {
+    final stored_token = await _storageRepository.getToken();
+
+    return {'Authorization': 'Token $stored_token'};
+  }
 
   Future<UserSessionModel> login({String username, String password}) async {
     var authBody;
@@ -17,58 +23,35 @@ class UserSessionRepository {
       authBody = {'username': username, 'password': password};
       pwd = password;
     } else {
-      final sessionJson = await _secure_storage
-          .read(key: 'sessionJson')
-          .timeout(const Duration(seconds: 5));
+      final stored_pwd = await _storageRepository.getPassword();
 
-      final stored_pwd = await _secure_storage
-          .read(key: 'password')
-          .timeout(const Duration(seconds: 5));
-
-      if (sessionJson == null || stored_pwd == null)
-        throw Exception("Credentials not stored");
-
-      final stored_username =
-          UserSessionModel.fromJson(json.decode(sessionJson))
-              .user_data
-              .username;
+      final stored_username = (await _storageRepository.getUserData()).username;
 
       authBody = {'username': stored_username, 'password': stored_pwd};
       pwd = stored_pwd;
     }
 
     final response = await _provider.post('login/', body: authBody);
-    _persistUserSession(json.encode(response), pwd);
+
+    _storageRepository.persistUserSession(json.encode(response), pwd);
 
     return UserSessionModel.fromJson(response);
   }
 
-  _persistUserSession(userSessionJson, String password) async {
-    await _secure_storage
-        .write(key: 'sessionJson', value: userSessionJson)
-        .timeout(const Duration(seconds: 5));
-    await _secure_storage
-        .write(key: 'password', value: password)
-        .timeout(const Duration(seconds: 5));
-  }
-
   Future<UserSessionModel> fetchUserSession() async {
-    final sessionJson = await _secure_storage
-        .read(key: 'sessionJson')
-        .timeout(const Duration(seconds: 5));
-
-    if (sessionJson == null)
-      throw Exception("Credentials not stored");
-
-    return UserSessionModel.fromJson(json.decode(sessionJson));
+    return await _storageRepository.getUserSessionModel();
   }
 
   Future<UserSessionModel> logout() async {
-     await _secure_storage
-        .delete(key: 'token')
-        .timeout(const Duration(seconds: 5));
+    final headers = await _getAuthHeader();
 
-    return UserSessionModel(user_data: UserProfileModel(username:'unauth',
-    email: 'unauth@email.com'), token: '');
+    final response = await _provider.get("logout/", headers: headers);
+
+    await _storageRepository.deleteUserSession();
+
+    return UserSessionModel(
+        user_data:
+            UserProfileModel(username: 'unauth', email: 'unauth@email.com'),
+        token: '');
   }
 }

@@ -209,7 +209,7 @@ class PiggyBankTile extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
-            piggybanks[index].getDescription(),
+            '(ID: ${piggybanks[index].id}) - ${piggybanks[index].getDescription()}',
             softWrap: true,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,

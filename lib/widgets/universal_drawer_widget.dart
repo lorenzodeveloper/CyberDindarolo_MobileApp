@@ -29,7 +29,6 @@ class _DefaultDrawerState extends State<DefaultDrawer> {
 
   @override
   void dispose() {
-    //_userSessionBloc.dispose();
     super.dispose();
   }
 
@@ -119,8 +118,8 @@ class _DefaultDrawerState extends State<DefaultDrawer> {
                       leading: Icon(
                         Icons.exit_to_app,
                       ),
-                      onTap: () {
-                        _userSessionBloc.logout();
+                      onTap: () async {
+                        await _userSessionBloc.logout();
                         this.pushIfCan(
                             context: context,
                             current: Voice.LOGOUT,

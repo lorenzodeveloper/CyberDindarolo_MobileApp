@@ -10,9 +10,9 @@ class UserSessionBloc extends BlocBase {
   UserSessionRepository _userSessionRepository;
   StreamController _userSessionListController;
 
-  UserSessionModel _lastValidData;
+  //UserSessionModel _lastValidData;
 
-  UserSessionModel get lastValidData => _lastValidData;
+  //UserSessionModel get lastValidData => _lastValidData;
 
   StreamSink<Response<UserSessionModel>> get userListSink =>
       _userSessionListController.sink;
@@ -25,7 +25,7 @@ class UserSessionBloc extends BlocBase {
   UserSessionBloc() {
     _userSessionListController = StreamController<Response<UserSessionModel>>.broadcast();
     _userSessionRepository = UserSessionRepository();
-    _lastValidData = null;
+    //_lastValidData = null;
   }
 
   login({String username, String password}) async {
@@ -34,7 +34,7 @@ class UserSessionBloc extends BlocBase {
       UserSessionModel us =
       await _userSessionRepository.login(username: username, password: password);
       userListSink.add(Response.completed(us));
-      _lastValidData = us;
+      //_lastValidData = us;
     } catch (e) {
       userListSink.add(Response.error(e.toString()));
       print(e);
@@ -47,7 +47,7 @@ class UserSessionBloc extends BlocBase {
       UserSessionModel us =
       await _userSessionRepository.fetchUserSession();
       userListSink.add(Response.completed(us));
-      _lastValidData = us;
+      //_lastValidData = us;
     } catch (e) {
       userListSink.add(Response.error(e.toString()));
       print(e);
@@ -60,7 +60,7 @@ class UserSessionBloc extends BlocBase {
       UserSessionModel us =
       await _userSessionRepository.logout();
       userListSink.add(Response.completed(us));
-      _lastValidData = us;
+      //_lastValidData = us;
     } catch (e) {
       userListSink.add(Response.error(e.toString()));
       print(e);

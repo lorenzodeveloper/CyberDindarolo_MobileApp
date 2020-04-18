@@ -42,29 +42,35 @@ class LoginFormState extends State<LoginForm> {
 
   final _formKey = GlobalKey<FormState>();
 
-  final unameController = TextEditingController(text: "lorenzo_lamas123");
-  final pwdController = TextEditingController(text: "prova1234");
+  TextEditingController _unameController;
+  TextEditingController _pwdController;
 
   UserSessionBloc _userSessionbloc;
   StreamSubscription _userSessionStreamSubscription;
 
   @override
   void initState() {
-    super.initState();
+    
     _userSessionbloc = BlocProvider.of<UserSessionBloc>(context);
-    //if (_userSessionbloc.isClosed) _userSessionbloc = new UserSessionBloc();
+
+    _unameController = TextEditingController(); //text: "lorenzo_lamas123");
+    _pwdController = TextEditingController(); //text: "prova1234");
+
     _listen();
+
     // Try login with stored credential (if stored)
     if (widget.autoLogin) {
       _userSessionbloc.login();
     }
+
+    super.initState();
   }
 
   @override
   void dispose() {
     // Clean up the controller when the widget is disposed.
-    unameController.dispose();
-    pwdController.dispose();
+    _unameController.dispose();
+    _pwdController.dispose();
     _userSessionStreamSubscription.cancel();
     super.dispose();
   }
@@ -103,7 +109,7 @@ class LoginFormState extends State<LoginForm> {
                 // The validator receives the text that the user has entered.
                 validator: (value) => usernameValidator(value, 30),
                 decoration: InputDecoration(labelText: 'Enter your username'),
-                controller: unameController,
+                controller: _unameController,
               ),
               // Pwd field
               TextFormField(
@@ -111,7 +117,7 @@ class LoginFormState extends State<LoginForm> {
                 validator: (value) => passwordValidator(value, 8, 30),
                 decoration: InputDecoration(labelText: 'Enter your password'),
                 obscureText: true,
-                controller: pwdController,
+                controller: _pwdController,
               ),
 
               RaisedButton(
@@ -119,8 +125,8 @@ class LoginFormState extends State<LoginForm> {
                   // Validate returns true if the form is valid, otherwise false.
                   if (_formKey.currentState.validate()) {
                     _userSessionbloc.login(
-                        username: unameController.text,
-                        password: pwdController.text);
+                        username: _unameController.text,
+                        password: _pwdController.text);
                   }
                 },
                 child: Text('Login'),
