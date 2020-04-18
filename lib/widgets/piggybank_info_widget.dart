@@ -9,6 +9,7 @@ import 'package:cyberdindaroloapp/models/product_model.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
 import 'package:cyberdindaroloapp/pages/entry_form_page.dart';
 import 'package:cyberdindaroloapp/pages/home_page.dart';
+import 'package:cyberdindaroloapp/pages/users_list_page.dart';
 import 'package:cyberdindaroloapp/widgets/composed_floating_button_widget.dart';
 import 'package:cyberdindaroloapp/widgets/error_widget.dart';
 import 'package:cyberdindaroloapp/widgets/loading_widget.dart';
@@ -107,7 +108,7 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
         case ConfirmAction.CANCEL:
           break;
         case ConfirmAction.ACCEPT:
-          // Close request
+        // Close request
           final response = await _piggyBankBloc.closePiggyBank(piggybank_id);
 
           // Handle response
@@ -140,29 +141,30 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
     // Add entry in piggybank
     onAddEntry = (int piggybank_id) async {
       Response<ProductModel> selectedProductResponse =
-          await showProductOptionDialog(context);
+      await showProductOptionDialog(context);
 
       if (selectedProductResponse != null) {
         switch (selectedProductResponse.status) {
           case Status.LOADING:
-            // impossible
+          // impossible
             break;
           case Status.COMPLETED:
             ProductModel selectedProductInstance = selectedProductResponse.data;
 
             if (selectedProductInstance != null) {
               Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => EntryFormPage(
+                  builder: (context) =>
+                      EntryFormPage(
                         piggyBankInstance: widget.piggyBankInstance,
                         productInstance: selectedProductInstance,
                         onFormSuccessfullyValidated: () {
                           // refresh detail widget
-                          _piggyBankBloc.fetchPiggyBank(widget.piggyBankInstance.id);
+                          _piggyBankBloc.fetchPiggyBank(
+                              widget.piggyBankInstance.id);
                         },
                         onFormCancel: () {},
                       )));
             } else {
-              // TODO: REDIRECT TO INSERT NEW PRODUCT
               String name = await showStringInputDialog(context,
                   title: 'New Product',
                   labelText: 'Product Name',
@@ -173,7 +175,7 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
                     title: 'New Product',
                     labelText: 'Product Description',
                     hintText:
-                        'e.g. Hot dish consisting of fried fish in batter served with chips,',
+                    'e.g. Hot dish consisting of fried fish in batter served with chips,',
                     maxLength: 255,
                     empty: true);
 
@@ -190,7 +192,7 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
             }
             break;
           case Status.ERROR:
-            // TODO: Handle this case.
+          // TODO: Handle this error case.
             break;
         }
       }
@@ -232,7 +234,7 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
           print(snapshot.data.data);
           switch (snapshot.data.status) {
             case Status.LOADING:
-              //return Loading(loadingMessage: snapshot.data.message);
+            //return Loading(loadingMessage: snapshot.data.message);
               return CircularProgressIndicator();
               break;
             case Status.COMPLETED:
@@ -256,8 +258,9 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
             case Status.ERROR:
               return Error(
                 errorMessage: snapshot.data.message,
-                onRetryPressed: () => _creditBloc.getCredit(
-                    piggybank: widget.piggyBankInstance.id),
+                onRetryPressed: () =>
+                    _creditBloc.getCredit(
+                        piggybank: widget.piggyBankInstance.id),
               );
               break;
           }
@@ -267,11 +270,10 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
     );
   }
 
-  Expanded _expColumn(
-      {@required int flex,
-      @required List<Widget> children,
-      MainAxisAlignment mAA: MainAxisAlignment.start,
-      CrossAxisAlignment cAA: CrossAxisAlignment.start}) {
+  Expanded _expColumn({@required int flex,
+    @required List<Widget> children,
+    MainAxisAlignment mAA: MainAxisAlignment.start,
+    CrossAxisAlignment cAA: CrossAxisAlignment.start}) {
     return Expanded(
         flex: flex,
         child: Column(
@@ -308,7 +310,8 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
                 collapsed: Padding(
                   padding: const EdgeInsets.fromLTRB(0, 8.0, 0, 0),
                   child: Text(
-                    '(ID: ${widget.piggyBankInstance.id}) - ${widget.piggyBankInstance.getDescription()}',
+                    '(ID: ${widget.piggyBankInstance.id}) - ${widget
+                        .piggyBankInstance.getDescription()}',
                     style: TextStyle(
                         fontStyle: FontStyle.italic, color: Colors.black45),
                     softWrap: true,
@@ -319,7 +322,8 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
                 expanded: Padding(
                   padding: const EdgeInsets.fromLTRB(0, 8.0, 0, 0),
                   child: Text(
-                      '(ID: ${widget.piggyBankInstance.id}) - ${widget.piggyBankInstance.getDescription()}',
+                      '(ID: ${widget.piggyBankInstance.id}) - ${widget
+                          .piggyBankInstance.getDescription()}',
                       style: TextStyle(
                           fontStyle: FontStyle.italic, color: Colors.black45)),
                 ),
@@ -358,15 +362,16 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
               return Padding(
                 padding: const EdgeInsets.all(8.0),
                 child:
-                    Text('You and ${snapshot.data.data.count - 1} other users'),
+                Text('You and ${snapshot.data.data.count - 1} other users'),
               );
               break;
             case Status.ERROR:
               print(snapshot.data.message);
               return Error(
                 errorMessage: snapshot.data.message,
-                onRetryPressed: () => _paginatedParticipantsBloc.fetchUsersData(
-                    piggybank: widget.piggyBankInstance.id),
+                onRetryPressed: () =>
+                    _paginatedParticipantsBloc.fetchUsersData(
+                        piggybank: widget.piggyBankInstance.id),
               );
               break;
           }
@@ -388,10 +393,13 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
         ),
         Column(children: <Widget>[
           IconButton(
-            icon: Icon(Icons.arrow_forward_ios),
-            // TODO: REINDIRIZZAMENTO A PAGINA PARTECIPANTI
-            onPressed: () =>
-                print('REINDIRIZZAMENTO A PAGINA DEI PARTECIPANTI'),
+              icon: Icon(Icons.arrow_forward_ios),
+              // TODO: REINDIRIZZAMENTO A PAGINA PARTECIPANTI
+              onPressed: () =>
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) =>
+                          UsersListViewPage(
+                              piggybankInstance: widget.piggyBankInstance)))
           ),
         ]),
       ],
@@ -438,14 +446,14 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
             // If piggybank is closed, floating button is disabled
             child: !widget.piggyBankInstance.closed
                 ? ComposedFloatingButton(
-                    icons: icons,
-                    functions: functions,
-                    parameters: parameters,
-                  )
+              icons: icons,
+              functions: functions,
+              parameters: parameters,
+            )
                 : FloatingActionButton(
-                    child: Icon(Icons.add),
-                    onPressed: null,
-                  ),
+              child: Icon(Icons.add),
+              onPressed: null,
+            ),
           ),
         ),
       ],
@@ -483,14 +491,13 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
     }
   }
 
-  _createProductAndRedirect(
-      {@required String product_name,
-      @required String product_description,
-      @required int pieces,
-      Future Function() action}) async {
+  _createProductAndRedirect({@required String product_name,
+    @required String product_description,
+    @required int pieces,
+    Future Function() action}) async {
     // Products Bloc
     PaginatedProductsBloc productsBloc =
-        BlocProvider.of<PaginatedProductsBloc>(context);
+    BlocProvider.of<PaginatedProductsBloc>(context);
 
     // Create product
     var response = await productsBloc.createProduct(
@@ -501,12 +508,13 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
 
     switch (response.status) {
       case Status.LOADING:
-        // impossible
+      // impossible
         break;
       case Status.COMPLETED:
         ProductModel productInstance = response.data;
         Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => EntryFormPage(
+            builder: (context) =>
+                EntryFormPage(
                   piggyBankInstance: widget.piggyBankInstance,
                   productInstance: productInstance,
                   onFormSuccessfullyValidated: () {},
@@ -524,3 +532,5 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
     }
   }
 }
+
+

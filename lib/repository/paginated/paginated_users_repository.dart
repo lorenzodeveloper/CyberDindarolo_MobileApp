@@ -10,7 +10,7 @@ class PaginatedUsersRepository {
 
   Future<PaginatedUsersModel> fetchUsers(
       {int page: 1, String pattern}) async {
-    var headers = _getAuthHeader();
+    var headers = await _getAuthHeader();
 
     var response;
 

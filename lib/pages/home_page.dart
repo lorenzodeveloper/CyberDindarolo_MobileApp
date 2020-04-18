@@ -19,19 +19,16 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  //PaginatedPiggyBanksBloc _paginatedPiggyBanksBloc;
   Choice selectedChoice;
 
   @override
   void initState() {
-    //_paginatedPiggyBanksBloc = PaginatedPiggyBanksBloc();
     selectedChoice = Choice.PIGGYBANKS;
     super.initState();
   }
 
   @override
   void dispose() {
-    //_paginatedPiggyBanksBloc.dispose();
     super.dispose();
   }
 
