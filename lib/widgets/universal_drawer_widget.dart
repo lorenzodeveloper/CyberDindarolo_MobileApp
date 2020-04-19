@@ -3,6 +3,7 @@ import 'package:cyberdindaroloapp/blocs/user_session_bloc.dart';
 import 'package:cyberdindaroloapp/models/user_session_model.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
 import 'package:cyberdindaroloapp/pages/login_page.dart';
+import 'package:cyberdindaroloapp/utils.dart';
 import 'package:cyberdindaroloapp/widgets/error_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -68,8 +69,7 @@ class _DefaultDrawerState extends State<DefaultDrawer> {
                     currentAccountPicture: CircleAvatar(
                       backgroundColor: Colors.white70,
                       foregroundColor: Colors.red[800],
-                      child: Image(
-                          image: AssetImage('assets/images/pink_pig.png')),
+                      child: getRandomColOfImage(),
                     ),
                   ),
 

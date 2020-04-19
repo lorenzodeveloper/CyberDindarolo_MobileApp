@@ -5,6 +5,7 @@ import 'package:cyberdindaroloapp/blocs/paginated/paginated_participants_bloc.da
 import 'package:cyberdindaroloapp/blocs/paginated/paginated_users_bloc.dart';
 import 'package:cyberdindaroloapp/models/piggybank_model.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
+import 'package:cyberdindaroloapp/utils.dart';
 import 'package:cyberdindaroloapp/widgets/universal_drawer_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -28,7 +29,9 @@ class UsersListViewPage extends StatelessWidget {
             style: TextStyle(color: Colors.white, fontSize: 20)),
         //backgroundColor: Color(0xFF333333),
       ),
-      drawer: DefaultDrawer(highlitedVoice: Voice.USERS,),
+      drawer: DefaultDrawer(
+        highlitedVoice: Voice.USERS,
+      ),
       body: UsersListViewWidget(
         piggybank_id: piggybankInstance?.id,
       ),
@@ -72,7 +75,7 @@ class _UsersListViewWidgetState extends State<UsersListViewWidget> {
     usersList = new List();
 
     _listenStream();
-    _fetchData();
+    _getMoreData();
 
     super.initState();
   }
@@ -247,11 +250,10 @@ class _UsersListViewWidgetState extends State<UsersListViewWidget> {
         style: TextStyle(fontStyle: FontStyle.italic),
       ),
       leading: CircleAvatar(
-        minRadius: 10,
+        minRadius: 15,
         maxRadius: 30,
-        child: Image(
-          image: AssetImage('assets/images/pink_pig.png'),
-        ),
+        backgroundColor: Colors.transparent,
+        child: getRandomColOfImage()
       ),
     );
   }

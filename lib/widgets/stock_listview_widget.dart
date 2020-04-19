@@ -269,7 +269,7 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
             flex: 2,
             style: TextStyle(fontWeight: FontWeight.bold)),
 
-        // PRODUCT NAME
+        // Buy
         Expanded(
           flex: 1,
           child: Column(
@@ -289,6 +289,20 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
       ],
     );
   }
+
+  /*
+  * GRADIENT
+  *  decoration: new BoxDecoration(
+          gradient: new LinearGradient(
+              colors: [
+                const Color(0xFF3366FF),
+                const Color(0xFF00CCFF),
+              ],
+              begin: const FractionalOffset(0.0, 0.0),
+              end: const FractionalOffset(1.0, 0.0),
+              stops: [0.0, 1.0],
+              tileMode: TileMode.clamp))
+  * */
 
   Widget _buildColumnListDescriptor() {
     return Row(
