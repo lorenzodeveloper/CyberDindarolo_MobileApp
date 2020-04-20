@@ -95,10 +95,15 @@ class _UserDetailPage extends State<UserDetailPage> {
             ? <Widget>[]
             : <Widget>[
                 IconButton(
-                  icon: Icon(Icons.edit),
+                  icon: _operation == Operation.INFO_VIEW
+                      ? Icon(Icons.edit)
+                      : Icon(Icons.cancel),
                   onPressed: () {
                     setState(() {
-                      _operation = Operation.EDIT_VIEW;
+                      if (_operation == Operation.INFO_VIEW)
+                        _operation = Operation.EDIT_VIEW;
+                      else
+                        _operation = Operation.INFO_VIEW;
                     });
                   },
                 )
@@ -243,7 +248,8 @@ class _UserFormState extends State<UserForm> {
                       //if (widget.onFormSuccessfullyValidated != null)
                       //widget.onFormSuccessfullyValidated();
                       await showAlertDialog(context, 'Warning',
-                          'Edit successfully completed, you\'ll be redirected to login page', redirectRoute: '/');
+                          'Edit successfully completed, you\'ll be redirected to login page',
+                          redirectRoute: '/');
                       _userSessionBloc.logout();
 
                       break;
