@@ -8,7 +8,10 @@ class Error extends StatelessWidget {
   final String errorButtonText;
 
   const Error(
-      {Key key, this.errorMessage, this.onRetryPressed, this.errorButtonText})
+      {Key key,
+      @required this.errorMessage,
+      @required this.onRetryPressed,
+      @required this.errorButtonText})
       : super(key: key);
 
   @override

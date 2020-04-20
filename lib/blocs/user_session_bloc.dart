@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'package:cyberdindaroloapp/models/user_profile_model.dart';
 import 'package:cyberdindaroloapp/models/user_session_model.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
 import 'package:cyberdindaroloapp/repository/user_session_repository.dart';
+import 'package:flutter/material.dart';
 
 import '../bloc_provider.dart';
 
@@ -23,7 +25,8 @@ class UserSessionBloc extends BlocBase {
   bool get isClosed => _userSessionListController.isClosed;
 
   UserSessionBloc() {
-    _userSessionListController = StreamController<Response<UserSessionModel>>.broadcast();
+    _userSessionListController =
+        StreamController<Response<UserSessionModel>>.broadcast();
     _userSessionRepository = UserSessionRepository();
     //_lastValidData = null;
   }
@@ -31,8 +34,8 @@ class UserSessionBloc extends BlocBase {
   login({String username, String password}) async {
     userListSink.add(Response.loading('Loggin in.'));
     try {
-      UserSessionModel us =
-      await _userSessionRepository.login(username: username, password: password);
+      UserSessionModel us = await _userSessionRepository.login(
+          username: username, password: password);
       userListSink.add(Response.completed(us));
       //_lastValidData = us;
     } catch (e) {
@@ -44,8 +47,7 @@ class UserSessionBloc extends BlocBase {
   fetchUserSession() async {
     userListSink.add(Response.loading('Fetching user session.'));
     try {
-      UserSessionModel us =
-      await _userSessionRepository.fetchUserSession();
+      UserSessionModel us = await _userSessionRepository.fetchUserSession();
       userListSink.add(Response.completed(us));
       //_lastValidData = us;
     } catch (e) {
@@ -57,8 +59,7 @@ class UserSessionBloc extends BlocBase {
   logout() async {
     userListSink.add(Response.loading('Loggin out.'));
     try {
-      UserSessionModel us =
-      await _userSessionRepository.logout();
+      UserSessionModel us = await _userSessionRepository.logout();
       userListSink.add(Response.completed(us));
       //_lastValidData = us;
     } catch (e) {
@@ -67,9 +68,20 @@ class UserSessionBloc extends BlocBase {
     }
   }
 
+  Future<Response<UserProfileModel>> editProfile(
+      {@required UserProfileModel oldInstance,
+      @required UserProfileModel newInstance, String newPwd}) async {
+    try {
+      UserProfileModel us = await _userSessionRepository.editProfile(
+          oldInstance: oldInstance, newInstance: newInstance, newPwd: newPwd);
+      return Response.completed(us);
+    } catch (e) {
+      print(e);
+      return Response.error(e.toString());
+    }
+  }
+
   dispose() {
     _userSessionListController?.close();
   }
-
-
 }

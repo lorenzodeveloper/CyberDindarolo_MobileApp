@@ -346,6 +346,8 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
           setState(() {
             stockModel.pieces -= quantity;
           });
+          Scaffold.of(context).showSnackBar(SnackBar(
+              content: Text('Product successfully bought')));
           // Parent callback -> for credit update
           widget.onPurchase();
           break;

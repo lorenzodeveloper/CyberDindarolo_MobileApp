@@ -4,6 +4,7 @@ import 'package:cyberdindaroloapp/models/user_profile_model.dart';
 import 'package:cyberdindaroloapp/models/user_session_model.dart';
 import 'package:cyberdindaroloapp/networking/ApiProvider.dart';
 import 'package:cyberdindaroloapp/repository/storage_repository.dart';
+import 'package:flutter/material.dart';
 
 class UserSessionRepository {
   CyberDindaroloAPIv1Provider _provider = CyberDindaroloAPIv1Provider();
@@ -51,7 +52,44 @@ class UserSessionRepository {
 
     return UserSessionModel(
         user_data:
-            UserProfileModel(username: 'unauth', email: 'unauth@email.com'),
+            UserProfileModel(username: 'unauth', email: 'unauth@email.com', first_name: 'Unauth', last_name: 'Unauth'),
         token: '');
+  }
+
+  _getBodyByDifference(
+      UserProfileModel oldInstance, UserProfileModel newInstance,
+      {String newPwd}) {
+    var body = {};
+    if (oldInstance.email != newInstance.email) {
+      body['email'] = newInstance.email;
+    }
+    if (oldInstance.first_name != newInstance.first_name) {
+      body['first_name'] = newInstance.first_name;
+    }
+    if (oldInstance.last_name != newInstance.last_name) {
+      body['last_name'] = newInstance.last_name;
+    }
+    if (newPwd != null && newPwd.isNotEmpty) {
+      body['passwordA'] = newPwd;
+      body['passwordB'] = newPwd;
+    }
+    return body;
+  }
+
+  Future<UserProfileModel> editProfile(
+      {@required UserProfileModel oldInstance,
+      @required UserProfileModel newInstance,
+      String newPwd}) async {
+    final headers = await _getAuthHeader();
+
+    final body = _getBodyByDifference(oldInstance, newInstance, newPwd: newPwd);
+
+    if (body.length == 0)
+      return oldInstance;
+
+    final response = await _provider.patch("users/${oldInstance.auth_user_id}/",
+        headers: headers, body: body);
+
+    return UserProfileModel.fromJson(response);
   }
 }

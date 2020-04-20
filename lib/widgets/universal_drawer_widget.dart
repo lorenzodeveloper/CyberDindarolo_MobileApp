@@ -148,7 +148,9 @@ class _DefaultDrawerState extends State<DefaultDrawer> {
               break;
             case Status.ERROR:
               return Error(
-                  errorMessage: snapshot.data.message, onRetryPressed: () {});
+                  errorButtonText: 'Ok',
+                  errorMessage: snapshot.data?.message,
+                  onRetryPressed: () {});
               break;
           }
         }
