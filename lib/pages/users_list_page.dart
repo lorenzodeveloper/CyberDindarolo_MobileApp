@@ -14,7 +14,11 @@ import '../alerts.dart';
 class UsersListViewPage extends StatelessWidget {
   final PiggyBankModel piggybankInstance;
 
-  const UsersListViewPage({Key key, this.piggybankInstance}) : super(key: key);
+  final bool isInviting;
+
+  const UsersListViewPage(
+      {Key key, this.piggybankInstance, this.isInviting: false})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +38,7 @@ class UsersListViewPage extends StatelessWidget {
       ),
       body: UsersListViewWidget(
         piggybank_id: piggybankInstance?.id,
+        isInviting: isInviting,
       ),
     );
   }
@@ -42,7 +47,11 @@ class UsersListViewPage extends StatelessWidget {
 class UsersListViewWidget extends StatefulWidget {
   final int piggybank_id;
 
-  const UsersListViewWidget({Key key, this.piggybank_id}) : super(key: key);
+  final bool isInviting;
+
+  const UsersListViewWidget(
+      {Key key, this.piggybank_id, this.isInviting: false})
+      : super(key: key);
 
   @override
   _UsersListViewWidgetState createState() {
@@ -56,6 +65,8 @@ class _UsersListViewWidgetState extends State<UsersListViewWidget> {
 
   StreamSubscription _usersDataStreamSubscription;
   StreamSubscription _participantsDataStreamSubscription;
+
+  TextEditingController _searchPatternController;
 
   // State vars
   int nextPage = 1;
@@ -77,11 +88,14 @@ class _UsersListViewWidgetState extends State<UsersListViewWidget> {
     _listenStream();
     _getMoreData();
 
+    _searchPatternController = new TextEditingController();
+
     super.initState();
   }
 
   @override
   void dispose() {
+    _searchPatternController.dispose();
     _usersDataStreamSubscription?.cancel();
     _participantsDataStreamSubscription?.cancel();
     super.dispose();
@@ -89,7 +103,7 @@ class _UsersListViewWidgetState extends State<UsersListViewWidget> {
 
   _listenStream() {
     // participant state or users state
-    if (widget.piggybank_id != null) {
+    if (widget.piggybank_id != null && !widget.isInviting) {
       _listenParticipantStream();
     } else {
       _listenUsersStream();
@@ -164,18 +178,19 @@ class _UsersListViewWidgetState extends State<UsersListViewWidget> {
     });
   }
 
-  _fetchData() {
+  _fetchData({String pattern}) {
     // participant state or users state
-    if (widget.piggybank_id != null) {
-      _paginatedParticipantsBloc.fetchUsersData(piggybank: widget.piggybank_id);
+    if (widget.piggybank_id != null && !widget.isInviting) {
+      _paginatedParticipantsBloc.fetchParticipants(
+          piggybank: widget.piggybank_id);
     } else {
-      _paginatedUsersBloc.fetchUsers();
+      _paginatedUsersBloc.fetchUsers(pattern: pattern);
     }
   }
 
   // Fetch stock and set state to "loading"
   // while fetching
-  Future<void> _getMoreData() async {
+  Future<void> _getMoreData({String pattern}) async {
     if (dataFetchComplete) {
       print("Already fetched all data, exiting.");
       return;
@@ -187,7 +202,7 @@ class _UsersListViewWidgetState extends State<UsersListViewWidget> {
         isLoading = true;
       });
 
-      _fetchData();
+      _fetchData(pattern: pattern);
     }
   }
 
@@ -199,7 +214,7 @@ class _UsersListViewWidgetState extends State<UsersListViewWidget> {
     usersList = new List();
 
     // Need await to handle refresh indicator ending callback
-    await _getMoreData();
+    await _getMoreData(pattern: _searchPatternController.text);
   }
 
   // Callback of scrollNotification listener
@@ -234,7 +249,7 @@ class _UsersListViewWidgetState extends State<UsersListViewWidget> {
     var subtitle = '';
 
     // participant state or users state
-    if (widget.piggybank_id != null) {
+    if (widget.piggybank_id != null && !widget.isInviting) {
       subtitle = 'CR: ${instance.credit.toString()} - ${instance.username}';
     } else {
       subtitle = '${instance.username}';
@@ -250,11 +265,21 @@ class _UsersListViewWidgetState extends State<UsersListViewWidget> {
         style: TextStyle(fontStyle: FontStyle.italic),
       ),
       leading: CircleAvatar(
-        minRadius: 15,
-        maxRadius: 30,
-        backgroundColor: Colors.transparent,
-        child: getRandomColOfImage()
-      ),
+          minRadius: 15,
+          maxRadius: 30,
+          backgroundColor: Colors.transparent,
+          child: getRandomColOfImage()),
+      onTap: () async {
+        if (widget.piggybank_id != null && widget.isInviting) {
+          var res = await asyncConfirmDialog(context,
+              title: 'Invite user',
+              question_message:
+                  'Do you want ${instance.username} to join this PG?');
+          if (res == ConfirmAction.ACCEPT) {
+            Navigator.of(context).pop(instance.auth_user_id);
+          }
+        }
+      },
     );
   }
 
@@ -280,12 +305,32 @@ class _UsersListViewWidgetState extends State<UsersListViewWidget> {
     );
   }
 
+  Widget _buildSearchField() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: TextField(
+        enabled: widget.piggybank_id == null || widget.isInviting,
+        controller: _searchPatternController,
+        decoration: InputDecoration(
+            labelText: 'Search user by username or email...',
+            hintText: 'e.g. user1 or user1@example.com'),
+        onEditingComplete: () {
+          nextPage = 1;
+          usersList = new List();
+          dataFetchComplete = false;
+          _getMoreData(pattern: _searchPatternController.text);
+        },
+      ),
+    );
+  }
+
   // Build widget:
   // LIST AND INFO LABEL
   @override
   Widget build(BuildContext context) {
     return Container(
         child: Column(children: [
+      _buildSearchField(),
       NotificationListener<ScrollNotification>(
         onNotification: (scrollNotification) =>
             _onEndScroll(scrollNotification),

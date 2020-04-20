@@ -28,6 +28,12 @@ class UserProfileModel {
     return data;
   }
 
+  String getInitials() {
+    if (first_name?.isEmpty || last_name?.isEmpty)
+      return 'N/A';
+    return '${first_name[0]} ${last_name[0]}';
+  }
+
   @override
   String toString() {
     return "User #$auth_user_id $username";

@@ -19,6 +19,10 @@ class UserSessionModel {
 		return data;
 	}
 
+	String getInitials() {
+		return user_data.getInitials();
+	}
+
 	@override
   String toString() {
 		return "User: ${user_data.toString()}, with token: $token";

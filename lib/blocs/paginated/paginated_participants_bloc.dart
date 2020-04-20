@@ -24,11 +24,11 @@ class PaginatedParticipantsBloc extends BlocBase {
     _pagUsersRepository = PaginatedUsersRepository();
   }
 
-  fetchUsersData({int page: 1, @required int piggybank}) async {
+  fetchParticipants({int page: 1, @required int piggybank}) async {
     pagParticipantsListSink.add(Response.loading('Getting participants.'));
     try {
       PaginatedParticipantsModel paginatedUsers =
-      await _pagUsersRepository.fetchUsersInsidePiggyBank(page: page, piggybank: piggybank);
+      await _pagUsersRepository.fetchParticipants(page: page, piggybank: piggybank);
       pagParticipantsListSink.add(Response.completed(paginatedUsers));
     } catch (e) {
       pagParticipantsListSink.add(Response.error(e.toString()));

@@ -67,10 +67,20 @@ class _DefaultDrawerState extends State<DefaultDrawer> {
                     accountEmail: Text(snapshot.data.data.user_data.email),
                     accountName: Text(snapshot.data.data.user_data.username),
                     currentAccountPicture: CircleAvatar(
-                      backgroundColor: Colors.white70,
-                      foregroundColor: Colors.red[800],
-                      child: getRandomColOfImage(),
-                    ),
+                        backgroundColor: Colors.white70,
+                        foregroundColor: Colors.red[800],
+                        child: Stack(
+                          children: <Widget>[
+                            getRandomColOfImage(),
+                            Container(
+                              padding: EdgeInsets.fromLTRB(18, 0, 0, 0),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  '${snapshot.data.data.getInitials()}',
+                                  style: TextStyle(color: Colors.white, fontSize: 27),
+                                )),
+                          ],
+                        )),
                   ),
 
                   // PiggyBanks

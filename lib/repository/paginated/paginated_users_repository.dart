@@ -14,7 +14,7 @@ class PaginatedUsersRepository {
 
     var response;
 
-    if (pattern == null) {
+    if (pattern == null || pattern.isEmpty) {
       response = await _provider.get("users/?page=$page", headers: headers);
     } else {
       response = await _provider.get("users/search/$pattern/?page=$page",
@@ -23,7 +23,7 @@ class PaginatedUsersRepository {
     return PaginatedUsersModel.fromJson(response);
   }
 
-  Future<PaginatedParticipantsModel> fetchUsersInsidePiggyBank(
+  Future<PaginatedParticipantsModel> fetchParticipants(
       {int page: 1, @required int piggybank}) async {
     var headers = await _getAuthHeader();
     final response = await _provider.get("users/inside/$piggybank/?page=$page",

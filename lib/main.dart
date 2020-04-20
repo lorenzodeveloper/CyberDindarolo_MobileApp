@@ -1,5 +1,6 @@
 import 'package:cyberdindaroloapp/bloc_provider.dart';
 import 'package:cyberdindaroloapp/blocs/credit_bloc.dart';
+import 'package:cyberdindaroloapp/blocs/paginated/paginated_invitations_bloc.dart';
 import 'package:cyberdindaroloapp/blocs/paginated/paginated_users_bloc.dart';
 import 'package:cyberdindaroloapp/blocs/piggybank_bloc.dart';
 import 'package:cyberdindaroloapp/blocs/user_session_bloc.dart';
@@ -45,7 +46,9 @@ class GlobalBlocs extends StatelessWidget {
                                 bloc: CreditBloc(),
                                 child: BlocProvider(
                                     bloc: PaginatedPurchasesBloc(),
-                                    child: child),
+                                    child: BlocProvider(
+                                        bloc: PaginatedInvitationsBloc(),
+                                        child: child)),
                               ),
                             )))))),
       ),
