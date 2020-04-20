@@ -1,5 +1,6 @@
 import 'package:cyberdindaroloapp/models/paginated/paginated_participants_model.dart';
 import 'package:cyberdindaroloapp/models/paginated/paginated_users_model.dart';
+import 'package:cyberdindaroloapp/models/user_profile_model.dart';
 import 'package:cyberdindaroloapp/networking/ApiProvider.dart';
 import 'package:cyberdindaroloapp/repository/storage_repository.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,13 @@ import 'package:flutter/material.dart';
 class PaginatedUsersRepository {
   CyberDindaroloAPIv1Provider _provider = CyberDindaroloAPIv1Provider();
   StorageRepository _storageRepository = StorageRepository();
+
+  _getAuthHeader() async {
+    final stored_token = await _storageRepository.getToken();
+
+    return {'Authorization': 'Token $stored_token'};
+
+  }
 
   Future<PaginatedUsersModel> fetchUsers(
       {int page: 1, String pattern}) async {
@@ -31,10 +39,10 @@ class PaginatedUsersRepository {
     return PaginatedParticipantsModel.fromJson(response);
   }
 
-  _getAuthHeader() async {
-    final stored_token = await _storageRepository.getToken();
-
-    return {'Authorization': 'Token $stored_token'};
-
+  getUser({@required int id}) async {
+    var headers = await _getAuthHeader();
+    final response = await _provider.get("users/$id/",
+        headers: headers);
+    return UserProfileModel.fromJson(response);
   }
 }

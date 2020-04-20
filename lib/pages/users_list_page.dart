@@ -3,8 +3,11 @@ import 'dart:async';
 import 'package:cyberdindaroloapp/bloc_provider.dart';
 import 'package:cyberdindaroloapp/blocs/paginated/paginated_participants_bloc.dart';
 import 'package:cyberdindaroloapp/blocs/paginated/paginated_users_bloc.dart';
+import 'package:cyberdindaroloapp/models/participant_model.dart';
 import 'package:cyberdindaroloapp/models/piggybank_model.dart';
+import 'package:cyberdindaroloapp/models/user_profile_model.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
+import 'package:cyberdindaroloapp/pages/user_detail_page.dart';
 import 'package:cyberdindaroloapp/utils.dart';
 import 'package:cyberdindaroloapp/widgets/universal_drawer_widget.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +30,7 @@ class UsersListViewPage extends StatelessWidget {
       appBar: AppBar(
         elevation: 0.0,
         title: Text(
-            piggybankInstance == null
+            piggybankInstance == null || isInviting
                 ? 'Users list'
                 : 'Participants of \'${piggybankInstance.pbName}\'',
             style: TextStyle(color: Colors.white, fontSize: 20)),
@@ -270,6 +273,7 @@ class _UsersListViewWidgetState extends State<UsersListViewWidget> {
           backgroundColor: Colors.transparent,
           child: getRandomColOfImage()),
       onTap: () async {
+        // if participants / user list view
         if (widget.piggybank_id != null && widget.isInviting) {
           var res = await asyncConfirmDialog(context,
               title: 'Invite user',
@@ -278,6 +282,29 @@ class _UsersListViewWidgetState extends State<UsersListViewWidget> {
           if (res == ConfirmAction.ACCEPT) {
             Navigator.of(context).pop(instance.auth_user_id);
           }
+        } else {
+          UserProfileModel convertedInstance;
+          if (instance is UserProfileModel) {
+            convertedInstance = instance;
+          } else if (instance is ParticipantModel) {
+            final response = await _paginatedUsersBloc.getUser(id: instance.auth_user_id);
+            switch (response.status) {
+              case Status.LOADING:
+                // impossible
+                break;
+              case Status.COMPLETED:
+                convertedInstance = response.data;
+                break;
+              case Status.ERROR:
+                throw Exception(response.message);
+                break;
+            }
+          } else {
+            throw Exception('Can\'t convert user instance.');
+          }
+
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => UserDetailPage(userInstance: convertedInstance,)));
         }
       },
     );

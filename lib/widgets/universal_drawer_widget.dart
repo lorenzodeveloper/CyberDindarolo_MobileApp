@@ -3,6 +3,7 @@ import 'package:cyberdindaroloapp/blocs/user_session_bloc.dart';
 import 'package:cyberdindaroloapp/models/user_session_model.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
 import 'package:cyberdindaroloapp/pages/login_page.dart';
+import 'package:cyberdindaroloapp/pages/user_detail_page.dart';
 import 'package:cyberdindaroloapp/utils.dart';
 import 'package:cyberdindaroloapp/widgets/error_widget.dart';
 import 'package:flutter/material.dart';
@@ -64,6 +65,12 @@ class _DefaultDrawerState extends State<DefaultDrawer> {
               return Drawer(
                 child: ListView(padding: EdgeInsets.zero, children: <Widget>[
                   UserAccountsDrawerHeader(
+                    onDetailsPressed: () =>
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => UserDetailPage(
+                                  userInstance: snapshot.data.data.user_data,
+                                  canEdit: true,
+                                ))),
                     accountEmail: Text(snapshot.data.data.user_data.email),
                     accountName: Text(snapshot.data.data.user_data.username),
                     currentAccountPicture: CircleAvatar(
@@ -73,11 +80,12 @@ class _DefaultDrawerState extends State<DefaultDrawer> {
                           children: <Widget>[
                             getRandomColOfImage(),
                             Container(
-                              padding: EdgeInsets.fromLTRB(18, 0, 0, 0),
+                                padding: EdgeInsets.fromLTRB(18, 0, 0, 0),
                                 alignment: Alignment.center,
                                 child: Text(
                                   '${snapshot.data.data.getInitials()}',
-                                  style: TextStyle(color: Colors.white, fontSize: 27),
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 27),
                                 )),
                           ],
                         )),

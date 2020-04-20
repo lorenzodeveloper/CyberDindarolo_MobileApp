@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:cyberdindaroloapp/bloc_provider.dart';
 import 'package:cyberdindaroloapp/models/paginated/paginated_users_model.dart';
+import 'package:cyberdindaroloapp/models/user_profile_model.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
 import 'package:cyberdindaroloapp/repository/paginated/paginated_users_repository.dart';
+import 'package:flutter/material.dart';
 
 
 class PaginatedUsersBloc extends BlocBase {
@@ -32,6 +34,17 @@ class PaginatedUsersBloc extends BlocBase {
     } catch (e) {
       pagUsersListSink.add(Response.error(e.toString()));
       print(e);
+    }
+  }
+
+  Future<Response<UserProfileModel>> getUser({@required int id}) async {
+    try {
+      UserProfileModel userProfileModel =
+          await _pagUsersRepository.getUser(id: id);
+      return Response.completed(userProfileModel);
+    } catch (e) {
+      print(e);
+      return Response.error(e.toString());
     }
   }
 
