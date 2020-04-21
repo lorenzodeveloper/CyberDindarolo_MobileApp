@@ -59,7 +59,7 @@ class _EntryFormPageState extends State<EntryFormPage> {
     _paginatedEntriesBloc = BlocProvider.of<PaginatedEntriesBloc>(context);
     //_paginatedProductsBloc = BlocProvider.of<PaginatedProductsBloc>(context);
 
-    _quantityFieldController = TextEditingController();
+    _quantityFieldController = TextEditingController(text: '1');
     _setPriceController = TextEditingController();
 
     super.initState();

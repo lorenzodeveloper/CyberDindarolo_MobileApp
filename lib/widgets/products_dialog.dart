@@ -136,36 +136,39 @@ class ProductsDialogState extends State<ProductsDialog> {
                   // Generate list of product
                   children: [
                     _getSearchTextField(),
-                    ListView.builder(
-                        shrinkWrap: true,
-                        physics: ClampingScrollPhysics(),
-                        itemCount: snapshot.data.data.results.length + 1,
-                        itemBuilder: (context, index) {
-                          // First tile is reserved for 'add new product'
-                          if (index != 0) {
-                            ProductModel productInstance =
-                                snapshot.data.data.results[index - 1];
-                            return SimpleDialogOption(
-                              onPressed: () {
-                                Navigator.pop(context,
-                                    Response.completed(productInstance));
-                              },
-                              child: _getProductTile(productInstance),
-                            );
-                          } else {
-                            return SimpleDialogOption(
+                    Container(
+                      width: double.maxFinite,
+                      child: ListView.builder(
+                          shrinkWrap: true,
+                          physics: ClampingScrollPhysics(),
+                          itemCount: snapshot.data.data.results.length + 1,
+                          itemBuilder: (context, index) {
+                            // First tile is reserved for 'add new product'
+                            if (index != 0) {
+                              ProductModel productInstance =
+                                  snapshot.data.data.results[index - 1];
+                              return SimpleDialogOption(
                                 onPressed: () {
-                                  // -1 = Insert new product,
-                                  // null = operation canceled
-                                  Navigator.pop(
-                                      context, Response.completed(null));
+                                  Navigator.pop(context,
+                                      Response.completed(productInstance));
                                 },
-                                child: ListTile(
-                                  title: Text('Add new product'),
-                                  leading: Icon(Icons.add),
-                                ));
-                          }
-                        }),
+                                child: _getProductTile(productInstance),
+                              );
+                            } else {
+                              return SimpleDialogOption(
+                                  onPressed: () {
+                                    // -1 = Insert new product,
+                                    // null = operation canceled
+                                    Navigator.pop(
+                                        context, Response.completed(null));
+                                  },
+                                  child: ListTile(
+                                    title: Text('Add new product'),
+                                    leading: Icon(Icons.add),
+                                  ));
+                            }
+                          }),
+                    ),
                     _getFootersButtons()
                   ],
                 );
