@@ -204,6 +204,55 @@ Future<String> showStringInputDialog(BuildContext context,
   );
 }
 
+enum ThreeConfirmAction { CANCEL, ACCEPT, DECLINE }
+
+Future<ThreeConfirmAction> asyncThreeConfirmDialog(BuildContext context,
+    {@required String title,
+    @required String question_message,
+    String redirectRoute}) async {
+  return showDialog<ThreeConfirmAction>(
+    context: context,
+    barrierDismissible: false, // user must tap button for close dialog!
+    builder: (BuildContext context) {
+      return WillPopScope(
+        onWillPop: () async => false,
+        child: AlertDialog(
+          title: Text(title),
+          content: Text(question_message),
+          actions: <Widget>[
+            FlatButton(
+              child: const Text('CANCEL'),
+              onPressed: () {
+                Navigator.of(context).pop(ThreeConfirmAction.CANCEL);
+              },
+            ),
+            FlatButton(
+              child: const Text('ACCEPT'),
+              onPressed: () {
+                //onConfirmation();
+                Navigator.of(context).pop(ThreeConfirmAction.ACCEPT);
+                if (redirectRoute != null) {
+                  Navigator.of(context).pushReplacementNamed(redirectRoute);
+                }
+              },
+            ),
+            FlatButton(
+              child: const Text('DECLINE'),
+              onPressed: () {
+                //onConfirmation();
+                Navigator.of(context).pop(ThreeConfirmAction.DECLINE);
+                if (redirectRoute != null) {
+                  Navigator.of(context).pushReplacementNamed(redirectRoute);
+                }
+              },
+            )
+          ],
+        ),
+      );
+    },
+  );
+}
+
 class StringInputDialog extends StatefulWidget {
   final String title;
   final String labelText;
@@ -227,7 +276,6 @@ class StringInputDialog extends StatefulWidget {
 }
 
 class _StringInputDialogState extends State<StringInputDialog> {
-
   String choice = '';
 
   final _formKey = GlobalKey<FormState>();
@@ -255,19 +303,21 @@ class _StringInputDialogState extends State<StringInputDialog> {
       content: new Row(
         children: <Widget>[
           Expanded(
-            child: Form( //TODO: SET GLOBAL KEY
+            child: Form(
+                //TODO: SET GLOBAL KEY
                 key: _formKey,
                 child: new TextFormField(
-              controller: _fieldController,
-              validator: widget.empty
-                  ? (value) => gpEmptyStringValidator(value, widget.maxLength)
-                  : (value) => gpStringValidator(value, widget.maxLength),
-              autofocus: true,
-              decoration: new InputDecoration(
-                labelText: widget.labelText,
-                hintText: widget.hintText,
-              ),
-            )),
+                  controller: _fieldController,
+                  validator: widget.empty
+                      ? (value) =>
+                          gpEmptyStringValidator(value, widget.maxLength)
+                      : (value) => gpStringValidator(value, widget.maxLength),
+                  autofocus: true,
+                  decoration: new InputDecoration(
+                    labelText: widget.labelText,
+                    hintText: widget.hintText,
+                  ),
+                )),
           )
         ],
       ),

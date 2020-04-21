@@ -55,4 +55,37 @@ class PaginatedInvitationsBloc extends BlocBase {
   dispose() {
     _pagInvitationsListController?.close();
   }
+
+  Future<Response<bool>> acceptInvitation({@required int id}) async {
+    try {
+      final bool success =
+      await _pagInvitationsRepository.acceptInvitation(
+          id: id,);
+      return Response.completed(success);
+    } catch (e) {
+      return Response.error(e.toString());
+    }
+  }
+
+  Future<Response<bool>> declineInvitation({@required int id}) async {
+    try {
+      final bool success =
+      await _pagInvitationsRepository.declineInvitation(
+        id: id,);
+      return Response.completed(success);
+    } catch (e) {
+      return Response.error(e.toString());
+    }
+  }
+
+  Future<Response<bool>> deleteInvitation({@required int id}) async {
+    try {
+      final bool success =
+      await _pagInvitationsRepository.deleteInvitation(
+        id: id,);
+      return Response.completed(success);
+    } catch (e) {
+      return Response.error(e.toString());
+    }
+  }
 }

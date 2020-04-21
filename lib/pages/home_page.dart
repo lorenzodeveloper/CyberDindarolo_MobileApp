@@ -1,4 +1,5 @@
 import 'package:cyberdindaroloapp/pages/insert_or_edit_piggybank_page.dart';
+import 'package:cyberdindaroloapp/widgets/notifications_widget.dart';
 import 'package:cyberdindaroloapp/widgets/piggybanks_listview_widget.dart';
 import 'package:cyberdindaroloapp/widgets/universal_drawer_widget.dart';
 import 'package:flutter/material.dart';
@@ -38,10 +39,24 @@ class _HomePageState extends State<HomePage> {
         return PiggyBanksListViewWidget();
         break;
       case Choice.NOTIFICATIONS:
-        // TODO: Handle NOTIFICATIONS case.
+        return NotificationsWidget();
         break;
       case Choice.HISTORY:
         // TODO: Handle HISTORY case.
+        break;
+    }
+  }
+
+  Widget _getTitle() {
+    switch (selectedChoice) {
+      case Choice.PIGGYBANKS:
+        return Text('PiggyBanks');
+        break;
+      case Choice.NOTIFICATIONS:
+        return Text('Invitations');
+        break;
+      case Choice.HISTORY:
+        return Text('History');
         break;
     }
   }
@@ -57,7 +72,7 @@ class _HomePageState extends State<HomePage> {
           },
         ),
         appBar: AppBar(
-          title: const Text('PiggyBanks'),
+          title: _getTitle(),
           actions: <Widget>[
             IconButton(
               icon: Icon(Icons.android),

@@ -60,6 +60,10 @@ class StorageRepository {
     await _secure_storage
         .delete(key: 'sessionJson')
         .timeout(const Duration(seconds: 5));
+
+    await _secure_storage
+        .delete(key: 'password')
+        .timeout(const Duration(seconds: 5));
   }
 
 

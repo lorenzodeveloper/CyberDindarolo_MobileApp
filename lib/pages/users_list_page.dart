@@ -3,9 +3,11 @@ import 'dart:async';
 import 'package:cyberdindaroloapp/bloc_provider.dart';
 import 'package:cyberdindaroloapp/blocs/paginated/paginated_participants_bloc.dart';
 import 'package:cyberdindaroloapp/blocs/paginated/paginated_users_bloc.dart';
+import 'package:cyberdindaroloapp/blocs/user_session_bloc.dart';
 import 'package:cyberdindaroloapp/models/participant_model.dart';
 import 'package:cyberdindaroloapp/models/piggybank_model.dart';
 import 'package:cyberdindaroloapp/models/user_profile_model.dart';
+import 'package:cyberdindaroloapp/models/user_session_model.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
 import 'package:cyberdindaroloapp/pages/user_detail_page.dart';
 import 'package:cyberdindaroloapp/utils.dart';
@@ -66,6 +68,8 @@ class _UsersListViewWidgetState extends State<UsersListViewWidget> {
   PaginatedParticipantsBloc _paginatedParticipantsBloc;
   PaginatedUsersBloc _paginatedUsersBloc;
 
+  UserSessionBloc _userSessionBloc;
+
   StreamSubscription _usersDataStreamSubscription;
   StreamSubscription _participantsDataStreamSubscription;
 
@@ -85,6 +89,9 @@ class _UsersListViewWidgetState extends State<UsersListViewWidget> {
     _paginatedParticipantsBloc =
         BlocProvider.of<PaginatedParticipantsBloc>(context);
     _paginatedUsersBloc = BlocProvider.of<PaginatedUsersBloc>(context);
+
+    _userSessionBloc =
+        BlocProvider.of<UserSessionBloc>(context);
 
     usersList = new List();
 
@@ -303,8 +310,25 @@ class _UsersListViewWidgetState extends State<UsersListViewWidget> {
             throw Exception('Can\'t convert user instance.');
           }
 
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => UserDetailPage(userInstance: convertedInstance,)));
+          Response<UserSessionModel> response =
+          await _userSessionBloc.fetchUserSessionWithoutStream();
+
+          switch (response.status) {
+            case Status.LOADING:
+            // impossible
+              break;
+            case Status.COMPLETED:
+              if (convertedInstance.auth_user_id != response.data.user_data.auth_user_id) {
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => UserDetailPage(userInstance: convertedInstance,)));
+              } else {
+                Scaffold.of(context).showSnackBar(SnackBar(content: Text('You'),));
+              }
+              break;
+            case Status.ERROR:
+              throw Exception(response.message);
+              break;
+          }
         }
       },
     );

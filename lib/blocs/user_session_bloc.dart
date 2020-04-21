@@ -56,6 +56,16 @@ class UserSessionBloc extends BlocBase {
     }
   }
 
+  fetchUserSessionWithoutStream() async {
+    try {
+      UserSessionModel us = await _userSessionRepository.fetchUserSession();
+      return Response.completed(us);
+    } catch (e) {
+      print(e);
+      return Response.error(e.toString());
+    }
+  }
+
   logout() async {
     userListSink.add(Response.loading('Loggin out.'));
     try {
