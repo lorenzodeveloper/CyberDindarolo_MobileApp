@@ -103,7 +103,7 @@ class _UserFormState extends State<UserForm> {
             TextFormField(
               decoration: InputDecoration(labelText: 'Email'),
               controller: _emailController,
-              validator: (value) => gpStringValidator(value, 255),
+              validator: (value) => emailValidator(value),
             ),
             TextFormField(
               decoration: InputDecoration(

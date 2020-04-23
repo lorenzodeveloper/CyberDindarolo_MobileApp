@@ -103,6 +103,7 @@ class UserSessionBloc extends BlocBase {
       return Response.error(e.toString());
     }
   }
+
   Future<Response<bool>> deleteAccount({@required int id}) async {
     try {
       final bool success = await _userSessionRepository.deleteAccount(id: id);
@@ -113,6 +114,18 @@ class UserSessionBloc extends BlocBase {
       return Response.error(e.toString());
     }
   }
+
+  Future<Response<bool>> resetPwd({@required String email}) async {
+    try {
+      final bool success = await _userSessionRepository.resetPwd(email: email);
+
+      return Response.completed(success);
+    } catch (e) {
+      print(e);
+      return Response.error(e.toString());
+    }
+  }
+
   dispose() {
     _userSessionListController?.close();
   }

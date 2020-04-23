@@ -97,7 +97,6 @@ class UserSessionRepository {
 
   Future<UserProfileModel> createUser(
       {@required UserProfileModel instance, @required String pwd}) async {
-
     var body = {};
 
     body['username'] = instance.username;
@@ -112,14 +111,25 @@ class UserSessionRepository {
     return UserProfileModel.fromJson(response);
   }
 
-  deleteAccount({@required int id}) async {
+  Future<bool> deleteAccount({@required int id}) async {
     final headers = await _getAuthHeader();
 
-    final response =
-        await _provider.delete("users/$id/", headers: headers);
+    final response = await _provider.delete("users/$id/", headers: headers);
 
     await _storageRepository.deleteUserSession();
 
     return response['success'];
+  }
+
+  Future<bool> resetPwd({@required String email}) async {
+
+    final body = {'email': email};
+
+    final response =
+        await _provider.post("forgot_password/", body: body, seconds: 15);
+
+    await _storageRepository.deleteUserSession();
+
+    return response['message'] != null;
   }
 }

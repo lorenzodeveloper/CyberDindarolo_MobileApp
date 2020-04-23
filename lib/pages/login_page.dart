@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 
 import '../alerts.dart';
 import '../bloc_provider.dart';
+import 'forgot_password_page.dart';
 
 class LoginPage extends StatelessWidget {
   final bool autoLogin;
@@ -129,8 +130,8 @@ class LoginFormState extends State<LoginForm> {
                                 decoration: TextDecoration.underline,
                                 color: Colors.blue)),
                         onTap: () {
-//                          Navigator.of(context).push(MaterialPageRoute(
-//                              builder: (context) => ForgotPassword()));
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => ForgotPasswordPage()));
                         }),
                     GestureDetector(
                         child: Text('Sign-up',

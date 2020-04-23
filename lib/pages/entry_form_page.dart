@@ -68,6 +68,8 @@ class _EntryFormPageState extends State<EntryFormPage> {
   @override
   void dispose() {
     // Clean up the controller when the widget is disposed.
+    _quantityFieldController.dispose();
+    _setPriceController.dispose();
     super.dispose();
   }
 
@@ -233,7 +235,7 @@ class _EntryFormPageState extends State<EntryFormPage> {
                     RaisedButton(
                       onPressed: () async {
                         if (widget.onFormCancel != null) widget.onFormCancel();
-                        Navigator.of(context).pop();
+
                       },
                       child: Text('Cancel'),
                     ),

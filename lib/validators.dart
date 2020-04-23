@@ -16,6 +16,25 @@ Function(String, int) usernameValidator = (String value, int maxLength) {
   return null;
 };
 
+Function(String) emailValidator = (String value) {
+  if (value.isEmpty) {
+    return 'Please enter some text';
+  }
+
+  if (value.length > 255) return 'Max 255 chars';
+
+  final emailRegEx = RegExp(r'^[-a-zA-Z0-9_.]+@[-a-zA-Z0-9_]+.[-a-zA-Z0-9_@.]+$');
+
+  if (!emailRegEx.hasMatch(value)) {
+    return 'Invalid email.';
+  }
+
+  if (value.length < 3) {
+    return 'At least 3 chars';
+  }
+  return null;
+};
+
 Function(String, int) gpStringValidator = (String value, int maxLength) {
   if (value.isEmpty) {
     return 'Please enter some text';
