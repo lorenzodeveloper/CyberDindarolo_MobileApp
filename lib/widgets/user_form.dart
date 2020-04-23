@@ -29,7 +29,7 @@ class _UserFormState extends State<UserForm> {
   TextEditingController _pwdBController;
   TextEditingController _usernameController;
 
-  String _pwdErrorMessage = null;
+  String _pwdErrorMessage;
 
   @override
   void initState() {

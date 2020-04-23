@@ -38,7 +38,6 @@ class _NotificationsWidgetState extends State<NotificationsWidget> {
         BlocProvider.of<PaginatedInvitationsBloc>(context);
 
     _userSessionBloc = BlocProvider.of<UserSessionBloc>(context);
-    ;
 
     _listen();
     _getMoreData();

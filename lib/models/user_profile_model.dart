@@ -28,8 +28,10 @@ class UserProfileModel {
     return data;
   }
 
+  bool _isNullOrEmpty(String text) => text?.isEmpty ?? true;
+
   String getInitials() {
-    if (first_name?.isEmpty || last_name?.isEmpty)
+    if (_isNullOrEmpty(first_name) || _isNullOrEmpty(last_name))
       return 'N/A';
     return '${first_name[0]} ${last_name[0]}';
   }

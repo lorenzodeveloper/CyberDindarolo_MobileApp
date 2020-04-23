@@ -46,7 +46,7 @@ class UserSessionRepository {
   Future<UserSessionModel> logout() async {
     final headers = await _getAuthHeader();
 
-    final response = await _provider.get("logout/", headers: headers);
+    await _provider.get("logout/", headers: headers);
 
     await _storageRepository.deleteUserSession();
 

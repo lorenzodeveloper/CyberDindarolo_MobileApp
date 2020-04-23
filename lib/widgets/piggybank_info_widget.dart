@@ -402,6 +402,7 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
                 errorMessage: snapshot.data.message,
                 onRetryPressed: () => _paginatedParticipantsBloc
                     .fetchParticipants(piggybank: widget.piggyBankInstance.id),
+                errorButtonText: 'Retry',
               );
               break;
           }
