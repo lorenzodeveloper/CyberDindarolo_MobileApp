@@ -3,12 +3,12 @@ import 'dart:async';
 import 'package:cyberdindaroloapp/blocs/user_session_bloc.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
 import 'package:cyberdindaroloapp/pages/home_page.dart';
+import 'package:cyberdindaroloapp/pages/signup_page.dart';
 import 'package:cyberdindaroloapp/validators.dart';
 import 'package:flutter/material.dart';
 
 import '../alerts.dart';
 import '../bloc_provider.dart';
-
 
 class LoginPage extends StatelessWidget {
   final bool autoLogin;
@@ -39,7 +39,6 @@ class LoginForm extends StatefulWidget {
 }
 
 class LoginFormState extends State<LoginForm> {
-
   final _formKey = GlobalKey<FormState>();
 
   TextEditingController _unameController;
@@ -50,7 +49,6 @@ class LoginFormState extends State<LoginForm> {
 
   @override
   void initState() {
-    
     _userSessionbloc = BlocProvider.of<UserSessionBloc>(context);
 
     _unameController = TextEditingController(); //text: "lorenzo_lamas123");
@@ -119,7 +117,33 @@ class LoginFormState extends State<LoginForm> {
                 obscureText: true,
                 controller: _pwdController,
               ),
-
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0, 15.0, 0, 15.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisSize: MainAxisSize.max,
+                  children: <Widget>[
+                    GestureDetector(
+                        child: Text('Forgot your password?',
+                            style: TextStyle(
+                                decoration: TextDecoration.underline,
+                                color: Colors.blue)),
+                        onTap: () {
+//                          Navigator.of(context).push(MaterialPageRoute(
+//                              builder: (context) => ForgotPassword()));
+                        }),
+                    GestureDetector(
+                        child: Text('Sign-up',
+                            style: TextStyle(
+                                decoration: TextDecoration.underline,
+                                color: Colors.blue)),
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => SignUpPage()));
+                        })
+                  ],
+                ),
+              ),
               RaisedButton(
                 onPressed: () async {
                   // Validate returns true if the form is valid, otherwise false.

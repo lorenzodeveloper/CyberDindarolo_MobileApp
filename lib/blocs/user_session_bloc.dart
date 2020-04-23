@@ -80,7 +80,8 @@ class UserSessionBloc extends BlocBase {
 
   Future<Response<UserProfileModel>> editProfile(
       {@required UserProfileModel oldInstance,
-      @required UserProfileModel newInstance, String newPwd}) async {
+      @required UserProfileModel newInstance,
+      String newPwd}) async {
     try {
       UserProfileModel us = await _userSessionRepository.editProfile(
           oldInstance: oldInstance, newInstance: newInstance, newPwd: newPwd);
@@ -91,6 +92,27 @@ class UserSessionBloc extends BlocBase {
     }
   }
 
+  Future<Response<UserProfileModel>> createUser(
+      {@required UserProfileModel instance, @required String pwd}) async {
+    try {
+      UserProfileModel us =
+          await _userSessionRepository.createUser(instance: instance, pwd: pwd);
+      return Response.completed(us);
+    } catch (e) {
+      print(e);
+      return Response.error(e.toString());
+    }
+  }
+  Future<Response<bool>> deleteAccount({@required int id}) async {
+    try {
+      final bool success = await _userSessionRepository.deleteAccount(id: id);
+
+      return Response.completed(success);
+    } catch (e) {
+      print(e);
+      return Response.error(e.toString());
+    }
+  }
   dispose() {
     _userSessionListController?.close();
   }

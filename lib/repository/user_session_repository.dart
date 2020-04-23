@@ -51,8 +51,11 @@ class UserSessionRepository {
     await _storageRepository.deleteUserSession();
 
     return UserSessionModel(
-        user_data:
-            UserProfileModel(username: 'unauth', email: 'unauth@email.com', first_name: 'Unauth', last_name: 'Unauth'),
+        user_data: UserProfileModel(
+            username: 'unauth',
+            email: 'unauth@email.com',
+            first_name: 'Unauth',
+            last_name: 'Unauth'),
         token: '');
   }
 
@@ -84,12 +87,39 @@ class UserSessionRepository {
 
     final body = _getBodyByDifference(oldInstance, newInstance, newPwd: newPwd);
 
-    if (body.length == 0)
-      return oldInstance;
+    if (body.length == 0) return oldInstance;
 
     final response = await _provider.patch("users/${oldInstance.auth_user_id}/",
         headers: headers, body: body);
 
     return UserProfileModel.fromJson(response);
+  }
+
+  Future<UserProfileModel> createUser(
+      {@required UserProfileModel instance, @required String pwd}) async {
+
+    var body = {};
+
+    body['username'] = instance.username;
+    body['email'] = instance.email;
+    body['first_name'] = instance.first_name;
+    body['last_name'] = instance.last_name;
+    body['passwordA'] = pwd;
+    body['passwordB'] = pwd;
+
+    final response = await _provider.post("register/", body: body, seconds: 15);
+
+    return UserProfileModel.fromJson(response);
+  }
+
+  deleteAccount({@required int id}) async {
+    final headers = await _getAuthHeader();
+
+    final response =
+        await _provider.delete("users/$id/", headers: headers);
+
+    await _storageRepository.deleteUserSession();
+
+    return response['success'];
   }
 }

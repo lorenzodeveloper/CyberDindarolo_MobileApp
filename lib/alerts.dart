@@ -12,7 +12,7 @@ showAlertDialog(BuildContext context, String title, String message,
     child: Text("OK"),
     onPressed: () {
       //Navigator.of(context).popAndPushNamed(redirectRoute);
-      Navigator.of(context).pop();
+      Navigator.of(context).popUntil((route) => route.isFirst);
       if (redirectRoute != null) {
         Navigator.of(context).pushReplacementNamed(redirectRoute);
       }

@@ -292,6 +292,7 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
                 errorMessage: snapshot.data.message,
                 onRetryPressed: () => _creditBloc.getCredit(
                     piggybank: widget.piggyBankInstance.id),
+                errorButtonText: 'Retry',
               );
               break;
           }
@@ -523,11 +524,11 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
       @required int pieces,
       Future Function() action}) async {
     // Products Bloc
-    PaginatedProductsBloc productsBloc =
+    PaginatedProductsBloc _productsBloc =
         BlocProvider.of<PaginatedProductsBloc>(context);
 
     // Create product
-    var response = await productsBloc.createProduct(
+    var response = await _productsBloc.createProduct(
         product_name: product_name,
         product_description: product_description,
         valid_for_piggybank: widget.piggyBankInstance.id,
@@ -543,7 +544,13 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
             builder: (context) => EntryFormPage(
                   piggyBankInstance: widget.piggyBankInstance,
                   productInstance: productInstance,
-                  onFormSuccessfullyValidated: () {},
+                  onFormSuccessfullyValidated: () {
+                    // refresh detail widget
+                    _piggyBankBloc.fetchPiggyBank(widget.piggyBankInstance.id);
+                    // TODO: FIX REFRESH BUG
+                    _creditBloc.getCredit(
+                        piggybank: widget.piggyBankInstance.id);
+                  },
                   onFormCancel: () {},
                 )));
         break;
