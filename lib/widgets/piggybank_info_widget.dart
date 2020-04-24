@@ -224,7 +224,16 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
             }
             break;
           case Status.ERROR:
-            // TODO: Handle this error case.
+            // Show error message
+            if (selectedProductResponse.message
+                .toLowerCase()
+                .contains('token')) {
+              showAlertDialog(context, 'Error', selectedProductResponse.message,
+                  redirectRoute: '/');
+            } else {
+              showAlertDialog(
+                  context, 'Error', selectedProductResponse.message);
+            }
             break;
         }
       }
@@ -425,7 +434,6 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
         Column(children: <Widget>[
           IconButton(
               icon: Icon(Icons.arrow_forward_ios),
-              // TODO: REINDIRIZZAMENTO A PAGINA PARTECIPANTI
               onPressed: () => Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => UsersListViewPage(
                       piggybankInstance: widget.piggyBankInstance)))),
@@ -548,9 +556,6 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
                   onFormSuccessfullyValidated: () {
                     // refresh detail widget
                     _piggyBankBloc.fetchPiggyBank(widget.piggyBankInstance.id);
-                    // TODO: FIX REFRESH BUG
-                    _creditBloc.getCredit(
-                        piggybank: widget.piggyBankInstance.id);
                   },
                   onFormCancel: () {},
                 )));

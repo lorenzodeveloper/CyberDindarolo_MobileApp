@@ -56,6 +56,9 @@ class GlobalBlocs extends StatelessWidget {
   }
 }
 
+// TODO: Products page (delete product + edit (maybe))
+
+
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

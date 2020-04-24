@@ -240,20 +240,9 @@ class _NotificationsWidgetState extends State<NotificationsWidget> {
             if (snapshot.hasData) {
               bool isInviterRes = snapshot.data;
               if (isInviterRes)
-                return Column(
-                  children: <Widget>[
-                    Icon(Icons.notifications_active),
-                    Text(
-                      'You',
-                      style: TextStyle(
-                          color: Colors.red,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20),
-                    ),
-                  ],
-                );
+                return Icon(Icons.send,);
               else
-                return Icon(Icons.notifications_active);
+                return Icon(Icons.notifications_active, color: Colors.green);
             }
             return CircularProgressIndicator();
           },
@@ -293,8 +282,8 @@ class _NotificationsWidgetState extends State<NotificationsWidget> {
                   break;
               }
             }
-            _manageResponse(response);
           }
+          _manageResponse(response);
         });
   }
 

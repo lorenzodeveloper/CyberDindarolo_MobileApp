@@ -305,7 +305,6 @@ class _StringInputDialogState extends State<StringInputDialog> {
         children: <Widget>[
           Expanded(
             child: Form(
-                //TODO: SET GLOBAL KEY
                 key: _formKey,
                 child: new TextFormField(
                   controller: _fieldController,
