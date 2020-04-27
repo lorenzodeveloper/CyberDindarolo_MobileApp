@@ -11,7 +11,7 @@ class PaginatedPurchasesRepository {
   Future<PaginatedPurchasesModel> fetchPurchases({int page: 1}) async {
     var headers = await _getAuthHeader();
     final response =
-    await _provider.get("purchases/?page=$page", headers: headers);
+        await _provider.get("purchases/?page=$page", headers: headers);
     return PaginatedPurchasesModel.fromJson(response);
   }
 
@@ -21,9 +21,10 @@ class PaginatedPurchasesRepository {
     return {'Authorization': 'Token $stored_token'};
   }
 
-  buyProductFromStock({@required int product,
-    @required int piggybank,
-    @required int pieces}) async {
+  buyProductFromStock(
+      {@required int product,
+      @required int piggybank,
+      @required int pieces}) async {
     var headers = await _getAuthHeader();
     var requestBody = {
       'product': product.toString(),
@@ -32,7 +33,15 @@ class PaginatedPurchasesRepository {
     };
 
     final response =
-    await _provider.post("purchases/", headers: headers, body: requestBody);
+        await _provider.post("purchases/", headers: headers, body: requestBody);
     return PurchaseModel.fromJson(response);
+  }
+
+  Future<bool> deletePurchase({int id}) async {
+    final headers = await _getAuthHeader();
+
+    final response = await _provider.delete("purchases/$id/", headers: headers);
+
+    return response['success'];
   }
 }

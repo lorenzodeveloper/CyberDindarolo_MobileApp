@@ -1,4 +1,5 @@
 import 'package:cyberdindaroloapp/pages/insert_or_edit_piggybank_page.dart';
+import 'package:cyberdindaroloapp/widgets/history_widget.dart';
 import 'package:cyberdindaroloapp/widgets/notifications_widget.dart';
 import 'package:cyberdindaroloapp/widgets/piggybanks_listview_widget.dart';
 import 'package:cyberdindaroloapp/widgets/universal_drawer_widget.dart';
@@ -42,7 +43,7 @@ class _HomePageState extends State<HomePage> {
         return NotificationsWidget();
         break;
       case Choice.HISTORY:
-        // TODO: Handle HISTORY case.
+        return HistoryWidget();
         break;
     }
   }
@@ -64,13 +65,13 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        floatingActionButton: FloatingActionButton(
+        floatingActionButton: selectedChoice == Choice.PIGGYBANKS ? FloatingActionButton(
           child: Icon(Icons.add),
           onPressed: () {
             Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) => PiggyBankFormPage()));
           },
-        ),
+        ) : null,
         appBar: AppBar(
           title: _getTitle(),
           actions: <Widget>[

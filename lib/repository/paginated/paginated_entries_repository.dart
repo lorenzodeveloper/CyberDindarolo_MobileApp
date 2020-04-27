@@ -41,7 +41,17 @@ class PaginatedEntriesRepository {
     return EntryModel.fromJson(response);
   }
 
-  /*buyProductFromStock({@required int product,
+  Future<bool> deleteEntry({int id}) async {
+    final headers = await _getAuthHeader();
+
+    final response =
+    await _provider.delete("entries/$id/", headers: headers);
+
+    return response['success'];
+  }
+
+
+/*buyProductFromStock({@required int product,
     @required int piggybank,
     @required int pieces}) async {
     var headers = await _getAuthHeader();

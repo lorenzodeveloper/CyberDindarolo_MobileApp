@@ -22,7 +22,7 @@ void main() => runApp(MyApp());
 class GlobalBlocs extends StatelessWidget {
   final Widget child;
 
-  GlobalBlocs({Key key, this.child}) : super(key: key);
+  GlobalBlocs({Key key, @required this.child}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +57,7 @@ class GlobalBlocs extends StatelessWidget {
 }
 
 // TODO: Products page (delete product + edit (maybe))
+// TODO: Test mail change
 
 
 class MyApp extends StatelessWidget {

@@ -63,16 +63,26 @@ class PaginatedEntriesBloc extends BlocBase {
       @required int set_quantity,
       @required Decimal single_set_price}) async {
     try {
-      EntryModel entryModel =
-          await _pagEntriesRepository.insertEntry(
-            piggybank_id: piggybank_id,
-            product_id: product_id,
-            set_quantity: set_quantity,
-            single_set_price: single_set_price,)
-      ;
+      EntryModel entryModel = await _pagEntriesRepository.insertEntry(
+        piggybank_id: piggybank_id,
+        product_id: product_id,
+        set_quantity: set_quantity,
+        single_set_price: single_set_price,
+      );
 
       return Response.completed(entryModel);
     } catch (e) {
+      return Response.error(e.toString());
+    }
+  }
+
+  Future<Response<bool>> deleteEntry({@required int id}) async {
+    try {
+      final bool success = await _pagEntriesRepository.deleteEntry(id: id);
+
+      return Response.completed(success);
+    } catch (e) {
+      print(e);
       return Response.error(e.toString());
     }
   }

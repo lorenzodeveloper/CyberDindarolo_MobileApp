@@ -55,4 +55,15 @@ class PaginatedPurchasesBloc extends BlocBase {
   dispose() {
     _pagPurchasesListController?.close();
   }
+
+  Future<Response<bool>> deletePurchase({@required int id}) async {
+    try {
+      final bool success = await _pagPurchasesRepository.deletePurchase(id: id);
+
+      return Response.completed(success);
+    } catch (e) {
+      print(e);
+      return Response.error(e.toString());
+    }
+  }
 }
