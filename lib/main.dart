@@ -59,20 +59,23 @@ class GlobalBlocs extends StatelessWidget {
 // TODO: Products page (delete product + edit (maybe))
 // TODO: Test mail change
 
-
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlobalBlocs(
       child: MaterialApp(
-        title: 'CyberDindarolo',
-        initialRoute: '/',
-        routes: {
-          '/': (BuildContext context) => LoginPage(),
-          '/home': (BuildContext context) => HomePage(),
-          '/users': (BuildContext context) => UsersListViewPage(),
-        },
-      ),
+          title: 'CyberDindarolo',
+          initialRoute: '/',
+          routes: {
+            '/': (BuildContext context) => LoginPage(),
+            '/home': (BuildContext context) => HomePage(),
+            '/users': (BuildContext context) => UsersListViewPage(),
+          },
+          theme: ThemeData(
+              textTheme: Theme.of(context).textTheme.apply(
+                fontSizeFactor: 1.1,
+                fontSizeDelta: 2.0,
+              ))),
     );
   }
 }

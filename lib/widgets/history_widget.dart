@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:cyberdindaroloapp/blocs/paginated/paginated_entries_bloc.dart';
 import 'package:cyberdindaroloapp/blocs/paginated/paginated_purchases_bloc.dart';
-import 'package:cyberdindaroloapp/blocs/user_session_bloc.dart';
 import 'package:cyberdindaroloapp/models/entry_model.dart';
 import 'package:cyberdindaroloapp/models/purchase_model.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
@@ -31,8 +30,6 @@ class _HistoryWidgetState extends State<HistoryWidget> {
   PaginatedEntriesBloc _paginatedEntriesBloc;
   PaginatedPurchasesBloc _paginatedPurchasesBloc;
 
-  UserSessionBloc _userSessionBloc;
-
   int _nextPage = 1;
 
   bool _isLoading = false;
@@ -47,8 +44,6 @@ class _HistoryWidgetState extends State<HistoryWidget> {
 
     _paginatedEntriesBloc = BlocProvider.of<PaginatedEntriesBloc>(context);
     _paginatedPurchasesBloc = BlocProvider.of<PaginatedPurchasesBloc>(context);
-
-    _userSessionBloc = BlocProvider.of<UserSessionBloc>(context);
 
     _listen();
     _getMoreData();
@@ -228,7 +223,7 @@ class _HistoryWidgetState extends State<HistoryWidget> {
                     style: TextStyle(fontWeight: FontWeight.bold)),
                 TextSpan(text: ' into piggybank '),
                 TextSpan(
-                    text: '${entry.piggybank_name}',
+                    text: '${entry.piggybank_name}.',
                     style: TextStyle(fontWeight: FontWeight.bold)),
                 TextSpan(
                     text: '\n\n${priceTot} PGM = ${entry.entry_price} PGM '
@@ -275,7 +270,7 @@ class _HistoryWidgetState extends State<HistoryWidget> {
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   TextSpan(text: ' from piggybank '),
                   TextSpan(
-                      text: '${purchase.piggybank_name}',
+                      text: '${purchase.piggybank_name}.',
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   TextSpan(
                       text:
@@ -386,14 +381,24 @@ class _HistoryWidgetState extends State<HistoryWidget> {
   }
 
   _deletePurchase(PurchaseModel purchase) async {
-    final response =
-        await _paginatedPurchasesBloc.deletePurchase(id: purchase.id);
-    _manageResponse(response);
+    final confirmation = await asyncConfirmDialog(context,
+        title: 'Delete Movement',
+        question_message: 'Do you really want to delete this movement?');
+    if (confirmation != null && confirmation == ConfirmAction.ACCEPT) {
+      final response =
+      await _paginatedPurchasesBloc.deletePurchase(id: purchase.id);
+      _manageResponse(response);
+    }
   }
 
   _deleteEntry(EntryModel entry) async {
-    final response = await _paginatedEntriesBloc.deleteEntry(id: entry.id);
-    _manageResponse(response);
+    final confirmation = await asyncConfirmDialog(context,
+        title: 'Delete Movement',
+        question_message: 'Do you really want to delete this movement?');
+    if (confirmation != null && confirmation == ConfirmAction.ACCEPT) {
+      final response = await _paginatedEntriesBloc.deleteEntry(id: entry.id);
+      _manageResponse(response);
+    }
   }
 
   _manageResponse(Response<bool> response) {
