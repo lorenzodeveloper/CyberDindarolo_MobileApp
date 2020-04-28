@@ -47,8 +47,6 @@ class _EntryFormPageState extends State<EntryFormPage> {
   // Blocs
   PaginatedEntriesBloc _paginatedEntriesBloc;
 
-  //PaginatedProductsBloc _paginatedProductsBloc;
-
   final _amountValidator = RegExInputFormatter.withRegex(
       '^\$|^(0|([1-9][0-9]{0,}))(\\.[0-9]{0,})?\$');
   final _amountValidator2Digits =

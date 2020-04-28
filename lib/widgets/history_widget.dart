@@ -226,7 +226,7 @@ class _HistoryWidgetState extends State<HistoryWidget> {
                     text: '${entry.piggybank_name}.',
                     style: TextStyle(fontWeight: FontWeight.bold)),
                 TextSpan(
-                    text: '\n\n${priceTot} PGM = ${entry.entry_price} PGM '
+                    text: '\n\n$priceTot PGM = ${entry.entry_price} PGM '
                         'x ${entry.set_quantity} packs.',
                     style: TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.green)),
@@ -274,7 +274,7 @@ class _HistoryWidgetState extends State<HistoryWidget> {
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   TextSpan(
                       text:
-                          '\n\n${priceTot} PGM = ${purchase.unitary_purchase_price}'
+                          '\n\n$priceTot PGM = ${purchase.unitary_purchase_price}'
                           ' PGM x ${purchase.pieces} pieces.',
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.red)),
