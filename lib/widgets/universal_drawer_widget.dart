@@ -8,7 +8,7 @@ import 'package:cyberdindaroloapp/utils.dart';
 import 'package:cyberdindaroloapp/widgets/error_widget.dart';
 import 'package:flutter/material.dart';
 
-enum Voice { PIGGYBANKS, USERS, PRODUCTS, LOGOUT }
+enum Voice { PIGGYBANKS, USERS, PRODUCTS, ABOUT, LOGOUT }
 
 class DefaultDrawer extends StatefulWidget {
   final Voice highlitedVoice;
@@ -126,6 +126,20 @@ class _DefaultDrawerState extends State<DefaultDrawer> {
                           context: context,
                           current: Voice.PRODUCTS,
                           route: '/products')),
+
+                  // About
+                  ListTile(
+                      selected: widget.highlitedVoice == Voice.ABOUT,
+                      title: Text('About'),
+                      leading: Icon(
+                        Icons.info,
+                      ),
+                      onTap: () {
+                        this.pushIfCan(
+                            context: context,
+                            current: Voice.ABOUT,
+                            route: '/about');
+                      }),
 
                   Divider(),
 

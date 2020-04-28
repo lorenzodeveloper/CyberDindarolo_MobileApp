@@ -4,6 +4,7 @@ import 'package:cyberdindaroloapp/blocs/paginated/paginated_invitations_bloc.dar
 import 'package:cyberdindaroloapp/blocs/paginated/paginated_users_bloc.dart';
 import 'package:cyberdindaroloapp/blocs/piggybank_bloc.dart';
 import 'package:cyberdindaroloapp/blocs/user_session_bloc.dart';
+import 'package:cyberdindaroloapp/pages/about_page.dart';
 import 'package:cyberdindaroloapp/pages/home_page.dart';
 import 'package:cyberdindaroloapp/pages/login_page.dart';
 import 'package:cyberdindaroloapp/pages/products_page.dart';
@@ -57,8 +58,6 @@ class GlobalBlocs extends StatelessWidget {
   }
 }
 
-// TODO: Products page (delete product + edit (maybe))
-
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -71,12 +70,13 @@ class MyApp extends StatelessWidget {
             '/home': (BuildContext context) => HomePage(),
             '/users': (BuildContext context) => UsersListViewPage(),
             '/products': (BuildContext context) => ProductsPage(),
+            '/about': (BuildContext context) => AboutPage(),
           },
           theme: ThemeData(
               textTheme: Theme.of(context).textTheme.apply(
-                fontSizeFactor: 1.1,
-                fontSizeDelta: 2.0,
-              ))),
+                    fontSizeFactor: 1.1,
+                    fontSizeDelta: 2.0,
+                  ))),
     );
   }
 }
