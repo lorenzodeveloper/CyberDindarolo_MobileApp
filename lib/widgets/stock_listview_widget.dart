@@ -11,6 +11,13 @@ import 'package:flutter/material.dart';
 
 import '../alerts.dart';
 
+/*
+* This class is the one responsible to build the stock listview
+* - fetch of products in stock
+* - buy products in stock
+* - ...
+* */
+
 class StockListViewWidget extends StatefulWidget {
   final int piggybank_id;
   final bool closed;
@@ -184,23 +191,75 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
   Expanded _textInExpColumn(
       {@required String text,
       @required int flex,
+      bool hasBorder: false,
       TextStyle style,
       Function() onTap}) {
     // returns a Text widget inside an expanded column
+    if (!hasBorder)
+      return Expanded(
+        flex: flex,
+        child: Column(
+          children: <Widget>[
+            InkWell(
+              child: Text(
+                text,
+                style: style,
+              ),
+              onTap: onTap,
+            ),
+          ],
+        ),
+      );
+
     return Expanded(
       flex: flex,
       child: Column(
         children: <Widget>[
-          InkWell(
-            child: Text(
-              text,
-              style: style,
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.blueAccent),
+              borderRadius: BorderRadius.circular(5),
             ),
-            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: InkWell(
+                child: Text(
+                  text,
+                  style: style,
+                ),
+                onTap: onTap,
+              ),
+            ),
           ),
         ],
       ),
     );
+  }
+
+  _showProductSnackBar(StockModel stockModel, ProductModel productModel) {
+    // Show product info in snackbar
+    Scaffold.of(context).showSnackBar(SnackBar(
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            productModel.name,
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          Text(
+            productModel.getDescription(),
+            style: TextStyle(fontStyle: FontStyle.italic),
+          ),
+          Text('${productModel.pieces} pieces per set'),
+          Divider(),
+          Text('Originally inserted by ${stockModel.entered_by_username}'
+              ' in date ${stockModel.entry_date.toString()}'
+              ' for piggybank with id '
+              '${productModel.validForPiggyBank}'),
+        ],
+      ),
+    ));
   }
 
   Widget _getStockTile(StockModel stockModel) {
@@ -208,6 +267,7 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
       children: <Widget>[
         // PRODUCT NAME
         _textInExpColumn(
+            hasBorder: true,
             text: stockModel.product_name,
             flex: 2,
             style: TextStyle(fontWeight: FontWeight.bold),
@@ -220,28 +280,7 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
                   break;
                 case Status.COMPLETED:
                   // Show toast with product info
-                  Scaffold.of(context).showSnackBar(SnackBar(
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          response.data.name,
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          response.data.description == null
-                              ? 'No description'
-                              : response.data.description,
-                          style: TextStyle(fontStyle: FontStyle.italic),
-                        ),
-                        Text('${response.data.pieces} pieces per set'),
-                        Divider(),
-                        Text(
-                            'Originally inserted by ${stockModel.entered_by_username} in date ${stockModel.entry_date.toString()} for piggybank with id ${response.data.validForPiggyBank}'),
-                      ],
-                    ),
-                  ));
+                  _showProductSnackBar(stockModel, response.data);
                   break;
                 case Status.ERROR:
                   if (response.message.toLowerCase().contains('token')) {
@@ -290,20 +329,6 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
     );
   }
 
-  /*
-  * GRADIENT
-  *  decoration: new BoxDecoration(
-          gradient: new LinearGradient(
-              colors: [
-                const Color(0xFF3366FF),
-                const Color(0xFF00CCFF),
-              ],
-              begin: const FractionalOffset(0.0, 0.0),
-              end: const FractionalOffset(1.0, 0.0),
-              stops: [0.0, 1.0],
-              tileMode: TileMode.clamp))
-  * */
-
   Widget _buildColumnListDescriptor() {
     return Row(
       mainAxisSize: MainAxisSize.max,
@@ -346,8 +371,8 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
           setState(() {
             stockModel.pieces -= quantity;
           });
-          Scaffold.of(context).showSnackBar(SnackBar(
-              content: Text('Product successfully bought')));
+          Scaffold.of(context).showSnackBar(
+              SnackBar(content: Text('Product successfully bought')));
           // Parent callback -> for credit update
           widget.onPurchase();
           break;
@@ -379,9 +404,10 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
             child: ConstrainedBox(
                 constraints: new BoxConstraints(
                   minHeight: 200.0,
-                  maxHeight: 350.0,
+                  maxHeight: 450.0,
                 ),
-                child: _buildList()),
+                child: _buildList()
+            ),
             onRefresh: () => _handleRefresh(),
           ),
         ),

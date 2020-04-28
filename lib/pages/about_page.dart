@@ -1,6 +1,13 @@
-
 import 'package:cyberdindaroloapp/widgets/universal_drawer_widget.dart';
 import 'package:flutter/material.dart';
+
+/*
+* This class shows app info:
+* - Author
+* - Goal
+* - ...
+* */
+
 
 class AboutPage extends StatelessWidget {
   @override
@@ -30,6 +37,9 @@ class AboutPage extends StatelessWidget {
                   '\n\nThis is a project with educational purposes only as it\'s the result of \"Mobile & Web Applications\" class.',
                   style: TextStyle(fontStyle: FontStyle.italic),
                 ),
+                subtitle: Text(
+                    '\n\nThere is no specific currency used in this app '
+                        'so money is addressed as PGM = PiggyBank Money.'),
               ),
             ],
           ),

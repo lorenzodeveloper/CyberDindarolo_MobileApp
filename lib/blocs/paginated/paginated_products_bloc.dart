@@ -78,12 +78,13 @@ class PaginatedProductsBloc extends BlocBase {
     }
   }
 
-  Future<Response<ProductModel>> editProduct({@required ProductModel oldInstance, @required String newName, @required String newDesc}) async {
+  Future<Response<ProductModel>> editProduct(
+      {@required ProductModel oldInstance,
+      @required String newName,
+      @required String newDesc}) async {
     try {
       ProductModel product = await _pagProductsRepository.editProduct(
-          oldInstance: oldInstance,
-          newName: newName,
-          newDesc: newDesc);
+          oldInstance: oldInstance, newName: newName, newDesc: newDesc);
       return Response.completed(product);
     } catch (e) {
       return Response.error(e.toString());

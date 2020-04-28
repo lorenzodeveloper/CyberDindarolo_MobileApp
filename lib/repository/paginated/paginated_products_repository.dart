@@ -74,20 +74,19 @@ class PaginatedProductsRepository {
   }
 
   Future<ProductModel> editProduct(
-      {@required ProductModel oldInstance, @required String newName, @required String newDesc}) async {
+      {@required ProductModel oldInstance,
+      @required String newName,
+      @required String newDesc}) async {
     final headers = await _getAuthHeader();
 
     var body = {};
-    if (newName != oldInstance.name)
-      body['name'] = newName;
-    if (newDesc != '')
-      body['description'] = newDesc;
+    if (newName != oldInstance.name) body['name'] = newName;
+    if (newDesc != '') body['description'] = newDesc;
 
-    if (body.length == 0)
-      return oldInstance;
+    if (body.length == 0) return oldInstance;
 
-    final response =
-    await _provider.patch("products/${oldInstance.id}/", headers: headers, body: body);
+    final response = await _provider.patch("products/${oldInstance.id}/",
+        headers: headers, body: body);
 
     return ProductModel.fromJson(response);
   }

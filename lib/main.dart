@@ -20,8 +20,8 @@ import 'blocs/paginated/paginated_stock_bloc.dart';
 
 void main() => runApp(MyApp());
 
-// Provide Bloc Tree to all the app widgets
 class GlobalBlocs extends StatelessWidget {
+  // Provide Blocs to all the app widgets
   final Widget child;
 
   GlobalBlocs({Key key, @required this.child}) : super(key: key);

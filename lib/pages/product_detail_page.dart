@@ -12,6 +12,13 @@ import 'package:flutter/widgets.dart';
 import '../alerts.dart';
 import '../bloc_provider.dart';
 
+/*
+* This file contains the classes responsible to build the product detail info
+* view or form view
+* ...
+* */
+
+
 class ProductDetailPage extends StatefulWidget {
   final ProductModel productInstance;
 
@@ -104,6 +111,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     );
   }
 }
+
+//--------------- EDIT VIEW ---------------------------
 
 class ProductForm extends StatefulWidget {
   final ProductModel productInstance;
