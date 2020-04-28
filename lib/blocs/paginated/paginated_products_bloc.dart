@@ -66,4 +66,27 @@ class PaginatedProductsBloc extends BlocBase {
       return Response.error(e.toString());
     }
   }
+
+  Future<Response<bool>> deleteProduct({@required int id}) async {
+    try {
+      final bool success = await _pagProductsRepository.deleteProduct(id: id);
+
+      return Response.completed(success);
+    } catch (e) {
+      print(e);
+      return Response.error(e.toString());
+    }
+  }
+
+  Future<Response<ProductModel>> editProduct({@required ProductModel oldInstance, @required String newName, @required String newDesc}) async {
+    try {
+      ProductModel product = await _pagProductsRepository.editProduct(
+          oldInstance: oldInstance,
+          newName: newName,
+          newDesc: newDesc);
+      return Response.completed(product);
+    } catch (e) {
+      return Response.error(e.toString());
+    }
+  }
 }

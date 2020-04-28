@@ -1,3 +1,4 @@
+import 'package:cyberdindaroloapp/bloc_provider.dart';
 import 'package:cyberdindaroloapp/blocs/paginated/paginated_products_bloc.dart';
 import 'package:cyberdindaroloapp/models/paginated/paginated_products_model.dart';
 import 'package:cyberdindaroloapp/models/product_model.dart';
@@ -8,15 +9,15 @@ import 'package:flutter/widgets.dart';
 
 class ProductsDialog extends StatefulWidget {
   @override
-  ProductsDialogState createState() {
-    return ProductsDialogState();
+  _ProductsDialogState createState() {
+    return _ProductsDialogState();
   }
 }
 
-class ProductsDialogState extends State<ProductsDialog> {
-  int currentPage = 1;
-  int nextPage = -1;
-  int prevPage = -1;
+class _ProductsDialogState extends State<ProductsDialog> {
+  int _currentPage = 1;
+  int _nextPage = -1;
+  int _prevPage = -1;
 
   PaginatedProductsBloc _paginatedProductsBloc;
   TextEditingController _searchFieldController;
@@ -25,7 +26,7 @@ class ProductsDialogState extends State<ProductsDialog> {
 
   @override
   void initState() {
-    _paginatedProductsBloc = new PaginatedProductsBloc();
+    _paginatedProductsBloc = BlocProvider.of<PaginatedProductsBloc>(context);
     _searchFieldController = new TextEditingController();
     _paginatedProductsBloc.fetchProducts();
     super.initState();
@@ -33,7 +34,6 @@ class ProductsDialogState extends State<ProductsDialog> {
 
   @override
   void dispose() {
-    _paginatedProductsBloc.dispose();
     _searchFieldController.dispose();
     super.dispose();
   }
@@ -52,7 +52,7 @@ class ProductsDialogState extends State<ProductsDialog> {
               decoration: InputDecoration(
                   labelText: 'Search for a product (e.g. \'Chicken\')'),
               onEditingComplete: () {
-                currentPage = 1;
+                _currentPage = 1;
                 _paginatedProductsBloc.fetchProducts(
                     pattern: _searchFieldController.text);
               },
@@ -69,22 +69,22 @@ class ProductsDialogState extends State<ProductsDialog> {
       children: <Widget>[
         RaisedButton(
           child: Text('Prev'),
-          onPressed: prevPage <= 0
+          onPressed: _prevPage <= 0
               ? null
               : () {
-                  currentPage--;
+                  _currentPage--;
                   _paginatedProductsBloc.fetchProducts(
-                      pattern: _searchFieldController.text, page: prevPage);
+                      pattern: _searchFieldController.text, page: _prevPage);
                 },
         ),
         RaisedButton(
           child: Text('Next'),
-          onPressed: nextPage <= 0
+          onPressed: _nextPage <= 0
               ? null
               : () {
-                  currentPage++;
+                  _currentPage++;
                   _paginatedProductsBloc.fetchProducts(
-                      pattern: _searchFieldController.text, page: nextPage);
+                      pattern: _searchFieldController.text, page: _nextPage);
                 },
         ),
       ],
@@ -120,15 +120,15 @@ class ProductsDialogState extends State<ProductsDialog> {
               case Status.COMPLETED:
                 // Next page and prevoius page setting..
                 if (snapshot.data.data.previous == null) {
-                  prevPage = -1;
+                  _prevPage = -1;
                 } else {
-                  prevPage = currentPage - 1;
+                  _prevPage = _currentPage - 1;
                 }
 
                 if (snapshot.data.data.next == null) {
-                  nextPage = -1;
+                  _nextPage = -1;
                 } else {
-                  nextPage = currentPage + 1;
+                  _nextPage = _currentPage + 1;
                 }
 
                 return SimpleDialog(

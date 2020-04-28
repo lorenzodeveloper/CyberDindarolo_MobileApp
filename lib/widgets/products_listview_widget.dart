@@ -1,39 +1,42 @@
 import 'dart:async';
 
-import 'package:cyberdindaroloapp/blocs/paginated/paginated_piggybanks_bloc.dart';
+import 'package:cyberdindaroloapp/blocs/paginated/paginated_products_bloc.dart';
+import 'package:cyberdindaroloapp/models/product_model.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
-import 'package:cyberdindaroloapp/pages/piggybank_detail_page.dart';
+import 'package:cyberdindaroloapp/pages/product_detail_page.dart';
+import 'package:cyberdindaroloapp/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import '../alerts.dart';
 import '../bloc_provider.dart';
 
-class PiggyBanksListViewWidget extends StatefulWidget {
-  const PiggyBanksListViewWidget({Key key}) : super(key: key);
-
+class ProductsListViewWidget extends StatefulWidget {
   @override
-  _PiggyBanksListViewWidgetState createState() =>
-      _PiggyBanksListViewWidgetState();
+  _ProductsListViewWidgetState createState() {
+    return _ProductsListViewWidgetState();
+  }
 }
 
-class _PiggyBanksListViewWidgetState extends State<PiggyBanksListViewWidget> {
+class _ProductsListViewWidgetState extends State<ProductsListViewWidget> {
   StreamSubscription _dataStreamSubscription;
 
-  PaginatedPiggyBanksBloc _paginatedPiggyBanksBloc;
+  int _nextPage = 1;
 
-  int nextPage = 1;
+  bool _isLoading = false;
 
-  bool isLoading = false;
+  List _products = new List();
 
-  List piggybanks = new List();
+  bool _dataFetchComplete = false;
 
-  bool dataFetchComplete = false;
+  PaginatedProductsBloc _paginatedProductsBloc;
+  TextEditingController _searchFieldController;
 
   @override
   void initState() {
-    _paginatedPiggyBanksBloc =
-        BlocProvider.of<PaginatedPiggyBanksBloc>(context);
-    //if (_piggyBankBloc.isClosed) _piggyBankBloc = new PaginatedPiggyBanksBloc();
+    _paginatedProductsBloc = BlocProvider.of<PaginatedProductsBloc>(context);
+    _searchFieldController = new TextEditingController();
+
     _listen();
     _getMoreData();
     super.initState();
@@ -41,51 +44,52 @@ class _PiggyBanksListViewWidgetState extends State<PiggyBanksListViewWidget> {
 
   @override
   void dispose() {
+    _searchFieldController.dispose();
     _dataStreamSubscription?.cancel();
-    //_piggyBankBloc.dispose();
     super.dispose();
   }
 
-  // Fetch piggybanks and set state to "loading"
+  // Fetch invitations and set state to "loading"
   // while fetching
   Future<void> _getMoreData() async {
-    if (dataFetchComplete) {
+    if (_dataFetchComplete) {
       print("Already fetched all data, exiting.");
       return;
     }
 
     // Set state to loading
-    if (!isLoading) {
+    if (!_isLoading) {
       setState(() {
-        isLoading = true;
+        _isLoading = true;
       });
 
-      _paginatedPiggyBanksBloc.fetchPiggyBanks(page: nextPage);
+      _paginatedProductsBloc.fetchProducts(
+          page: _nextPage, pattern: _searchFieldController.text);
     }
   }
 
-  // Listen for piggybanks changes and set state to "complete"
+  // Listen for invitation changes and set state to "complete"
   _listen() {
     // Subscribe to datas_tream
     _dataStreamSubscription =
-        _paginatedPiggyBanksBloc.pbListStream.listen((event) {
+        _paginatedProductsBloc.pagProductsListStream.listen((event) {
       switch (event.status) {
         case Status.LOADING:
           break;
 
         case Status.COMPLETED:
           // Add data to piggybanks list
-          piggybanks.addAll(event.data.results);
+          _products.addAll(event.data.results);
           //print(piggybanks[0].pbName);
           // If there is a next page, then set nextPage += 1
           if (event.data.next != null)
-            nextPage++;
+            _nextPage++;
           else
-            dataFetchComplete = true;
+            _dataFetchComplete = true;
 
           // Fetch is now complete
           setState(() {
-            isLoading = false;
+            _isLoading = false;
           });
           break;
 
@@ -105,10 +109,10 @@ class _PiggyBanksListViewWidgetState extends State<PiggyBanksListViewWidget> {
 
   // If refresh triggered, fetch data from page 1
   _handleRefresh() async {
-    dataFetchComplete = false;
-    nextPage = 1;
+    _dataFetchComplete = false;
+    _nextPage = 1;
 
-    piggybanks = new List();
+    _products = new List();
 
     // Need await to handle refresh indicator ending callback
     await _getMoreData();
@@ -134,14 +138,61 @@ class _PiggyBanksListViewWidgetState extends State<PiggyBanksListViewWidget> {
       padding: const EdgeInsets.all(8.0),
       child: new Center(
         child: new Opacity(
-          opacity: isLoading ? 1.0 : 00,
+          opacity: _isLoading ? 1.0 : 00,
           child: new CircularProgressIndicator(),
         ),
       ),
     );
   }
 
-  // ListView builder of piggybanks
+  Row _buildSearchTextField() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: <Widget>[
+        // Search textField
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _searchFieldController,
+              decoration: InputDecoration(
+                  labelText: 'Search for a product (e.g. \'Chicken\')'),
+              onEditingComplete: () {
+                _handleRefresh();
+              },
+            ),
+          ),
+        )
+      ],
+    );
+  }
+
+  ListTile _buildProductTile(ProductModel productInstance) {
+    return ListTile(
+      leading: Icon(
+        Icons.bubble_chart,
+        color: UniqueColorGenerator.getRandomPrimaryColor(),
+      ),
+      title: Text(
+        '${productInstance.name} '
+        '(PG_ID: ${productInstance.validForPiggyBank})',
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+      subtitle: Text(
+        productInstance.getDescription(),
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      ),
+      onTap: () {
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) =>
+                ProductDetailPage(productInstance: productInstance)));
+      },
+    );
+  }
+
+  // ListView builder of invitations
   Widget _buildList() {
     return ListView.separated(
       separatorBuilder: (context, index) {
@@ -151,12 +202,12 @@ class _PiggyBanksListViewWidgetState extends State<PiggyBanksListViewWidget> {
         );
       },
       //+1 for progressbar
-      itemCount: piggybanks.length + 1,
+      itemCount: _products.length + 1,
       itemBuilder: (BuildContext context, int index) {
-        if (index == piggybanks.length) {
+        if (index == _products.length) {
           return _buildProgressIndicator();
         } else {
-          return PiggyBankTile(piggybanks: piggybanks, index: index);
+          return _buildProductTile(_products[index]);
         }
       },
       physics: const AlwaysScrollableScrollPhysics(),
@@ -169,6 +220,7 @@ class _PiggyBanksListViewWidgetState extends State<PiggyBanksListViewWidget> {
   Widget build(BuildContext context) {
     return Container(
         child: Column(children: [
+      _buildSearchTextField(),
       NotificationListener<ScrollNotification>(
         onNotification: (scrollNotification) =>
             _onEndScroll(scrollNotification),
@@ -180,56 +232,11 @@ class _PiggyBanksListViewWidgetState extends State<PiggyBanksListViewWidget> {
       ),
       Center(
           child: Padding(
-        child: Text(dataFetchComplete
+        child: Text(_dataFetchComplete
             ? "All data is shown"
             : "Scroll down to fetch more data"),
         padding: new EdgeInsets.all(8),
       )),
     ]));
-  }
-}
-
-class PiggyBankTile extends StatelessWidget {
-  const PiggyBankTile(
-      {Key key, @required this.piggybanks, @required this.index})
-      : super(key: key);
-
-  final List piggybanks;
-  final int index;
-
-  @override
-  Widget build(BuildContext context) {
-    return new ListTile(
-      title: Text(
-        piggybanks[index].pbName,
-        style: TextStyle(fontWeight: FontWeight.bold),
-      ),
-      subtitle: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            '(ID: ${piggybanks[index].id}) - ${piggybanks[index].getDescription()}',
-            softWrap: true,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          Text(piggybanks[index].closed ? 'CLOSED' : 'OPEN',
-              style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: piggybanks[index].closed ? Colors.red : Colors.green))
-        ],
-      ),
-      leading: Image(
-        image: AssetImage('assets/images/pink_pig.png'),
-        width: 30,
-        height: 30,
-      ),
-      onTap: () async {
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => PiggyBankDetailPage(
-                piggybanks[index].id)));
-      },
-    );
   }
 }

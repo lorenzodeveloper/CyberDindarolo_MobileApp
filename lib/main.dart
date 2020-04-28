@@ -6,6 +6,7 @@ import 'package:cyberdindaroloapp/blocs/piggybank_bloc.dart';
 import 'package:cyberdindaroloapp/blocs/user_session_bloc.dart';
 import 'package:cyberdindaroloapp/pages/home_page.dart';
 import 'package:cyberdindaroloapp/pages/login_page.dart';
+import 'package:cyberdindaroloapp/pages/products_page.dart';
 import 'package:cyberdindaroloapp/pages/users_list_page.dart';
 import 'package:flutter/material.dart';
 
@@ -57,7 +58,6 @@ class GlobalBlocs extends StatelessWidget {
 }
 
 // TODO: Products page (delete product + edit (maybe))
-// TODO: Test mail change
 
 class MyApp extends StatelessWidget {
   @override
@@ -70,6 +70,7 @@ class MyApp extends StatelessWidget {
             '/': (BuildContext context) => LoginPage(),
             '/home': (BuildContext context) => HomePage(),
             '/users': (BuildContext context) => UsersListViewPage(),
+            '/products': (BuildContext context) => ProductsPage(),
           },
           theme: ThemeData(
               textTheme: Theme.of(context).textTheme.apply(

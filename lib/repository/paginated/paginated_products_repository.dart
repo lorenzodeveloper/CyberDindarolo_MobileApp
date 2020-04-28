@@ -56,11 +56,38 @@ class PaginatedProductsRepository {
       'name': product_name,
       'description': product_description,
       'valid_for_piggybank': valid_for_piggybank.toString(),
-      'pieces' : pieces.toString(),
+      'pieces': pieces.toString(),
     };
 
     final response =
         await _provider.post("products/", headers: headers, body: body);
+
+    return ProductModel.fromJson(response);
+  }
+
+  Future<bool> deleteProduct({@required int id}) async {
+    final headers = await _getAuthHeader();
+
+    final response = await _provider.delete("products/$id/", headers: headers);
+
+    return response['success'];
+  }
+
+  Future<ProductModel> editProduct(
+      {@required ProductModel oldInstance, @required String newName, @required String newDesc}) async {
+    final headers = await _getAuthHeader();
+
+    var body = {};
+    if (newName != oldInstance.name)
+      body['name'] = newName;
+    if (newDesc != '')
+      body['description'] = newDesc;
+
+    if (body.length == 0)
+      return oldInstance;
+
+    final response =
+    await _provider.patch("products/${oldInstance.id}/", headers: headers, body: body);
 
     return ProductModel.fromJson(response);
   }

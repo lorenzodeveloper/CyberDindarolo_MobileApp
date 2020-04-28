@@ -24,13 +24,13 @@ class _NotificationsWidgetState extends State<NotificationsWidget> {
   PaginatedInvitationsBloc _paginatedInvitationsBloc;
   UserSessionBloc _userSessionBloc;
 
-  int nextPage = 1;
+  int _nextPage = 1;
 
-  bool isLoading = false;
+  bool _isLoading = false;
 
-  List invitations = new List();
+  List _invitations = new List();
 
-  bool dataFetchComplete = false;
+  bool _dataFetchComplete = false;
 
   @override
   void initState() {
@@ -53,18 +53,18 @@ class _NotificationsWidgetState extends State<NotificationsWidget> {
   // Fetch invitations and set state to "loading"
   // while fetching
   Future<void> _getMoreData() async {
-    if (dataFetchComplete) {
+    if (_dataFetchComplete) {
       print("Already fetched all data, exiting.");
       return;
     }
 
     // Set state to loading
-    if (!isLoading) {
+    if (!_isLoading) {
       setState(() {
-        isLoading = true;
+        _isLoading = true;
       });
 
-      _paginatedInvitationsBloc.fetchInvitations(page: nextPage);
+      _paginatedInvitationsBloc.fetchInvitations(page: _nextPage);
     }
   }
 
@@ -79,17 +79,17 @@ class _NotificationsWidgetState extends State<NotificationsWidget> {
 
         case Status.COMPLETED:
           // Add data to piggybanks list
-          invitations.addAll(event.data.results);
+          _invitations.addAll(event.data.results);
           //print(piggybanks[0].pbName);
           // If there is a next page, then set nextPage += 1
           if (event.data.next != null)
-            nextPage++;
+            _nextPage++;
           else
-            dataFetchComplete = true;
+            _dataFetchComplete = true;
 
           // Fetch is now complete
           setState(() {
-            isLoading = false;
+            _isLoading = false;
           });
           break;
 
@@ -109,10 +109,10 @@ class _NotificationsWidgetState extends State<NotificationsWidget> {
 
   // If refresh triggered, fetch data from page 1
   _handleRefresh() async {
-    dataFetchComplete = false;
-    nextPage = 1;
+    _dataFetchComplete = false;
+    _nextPage = 1;
 
-    invitations = new List();
+    _invitations = new List();
 
     // Need await to handle refresh indicator ending callback
     await _getMoreData();
@@ -138,7 +138,7 @@ class _NotificationsWidgetState extends State<NotificationsWidget> {
       padding: const EdgeInsets.all(8.0),
       child: new Center(
         child: new Opacity(
-          opacity: isLoading ? 1.0 : 00,
+          opacity: _isLoading ? 1.0 : 00,
           child: new CircularProgressIndicator(),
         ),
       ),
@@ -297,12 +297,12 @@ class _NotificationsWidgetState extends State<NotificationsWidget> {
         );
       },
       //+1 for progressbar
-      itemCount: invitations.length + 1,
+      itemCount: _invitations.length + 1,
       itemBuilder: (BuildContext context, int index) {
-        if (index == invitations.length) {
+        if (index == _invitations.length) {
           return _buildProgressIndicator();
         } else {
-          return _getInvitationTile(invitations[index]);
+          return _getInvitationTile(_invitations[index]);
         }
       },
       physics: const AlwaysScrollableScrollPhysics(),
@@ -326,7 +326,7 @@ class _NotificationsWidgetState extends State<NotificationsWidget> {
       ),
       Center(
           child: Padding(
-        child: Text(dataFetchComplete
+        child: Text(_dataFetchComplete
             ? "All data is shown"
             : "Scroll down to fetch more data"),
         padding: new EdgeInsets.all(8),
