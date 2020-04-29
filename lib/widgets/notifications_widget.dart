@@ -240,7 +240,9 @@ class _NotificationsWidgetState extends State<NotificationsWidget> {
             if (snapshot.hasData) {
               bool isInviterRes = snapshot.data;
               if (isInviterRes)
-                return Icon(Icons.send,);
+                return Icon(
+                  Icons.send,
+                );
               else
                 return Icon(Icons.notifications_active, color: Colors.green);
             }

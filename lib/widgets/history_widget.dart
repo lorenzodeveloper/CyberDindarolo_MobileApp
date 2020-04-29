@@ -386,7 +386,7 @@ class _HistoryWidgetState extends State<HistoryWidget> {
         question_message: 'Do you really want to delete this movement?');
     if (confirmation != null && confirmation == ConfirmAction.ACCEPT) {
       final response =
-      await _paginatedPurchasesBloc.deletePurchase(id: purchase.id);
+          await _paginatedPurchasesBloc.deletePurchase(id: purchase.id);
       _manageResponse(response);
     }
   }

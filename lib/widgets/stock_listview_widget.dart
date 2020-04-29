@@ -406,8 +406,7 @@ class _StockListViewWidgetState extends State<StockListViewWidget> {
                   minHeight: 200.0,
                   maxHeight: 450.0,
                 ),
-                child: _buildList()
-            ),
+                child: _buildList()),
             onRefresh: () => _handleRefresh(),
           ),
         ),

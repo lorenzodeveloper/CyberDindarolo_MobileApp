@@ -13,10 +13,11 @@ class PiggyBankForm extends StatefulWidget {
   final Function() onFormSuccessfullyValidated;
   final Function() onFormCancel;
 
-  const PiggyBankForm({Key key,
-    this.piggyBankInstance,
-    @required this.onFormSuccessfullyValidated,
-    @required this.onFormCancel})
+  const PiggyBankForm(
+      {Key key,
+      this.piggyBankInstance,
+      @required this.onFormSuccessfullyValidated,
+      @required this.onFormCancel})
       : super(key: key);
 
   @override
@@ -66,7 +67,7 @@ class _PiggyBankFormState extends State<PiggyBankForm> {
                 // The validator receives the text that the user has entered.
                 validator: (value) => gpStringValidator(value, 30),
                 decoration:
-                InputDecoration(labelText: 'Enter PiggyBank\'s name'),
+                    InputDecoration(labelText: 'Enter PiggyBank\'s name'),
                 controller: _pbNameController,
               ),
 

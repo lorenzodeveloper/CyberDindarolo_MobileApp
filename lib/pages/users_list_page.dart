@@ -76,13 +76,13 @@ class _UsersListViewWidgetState extends State<UsersListViewWidget> {
   TextEditingController _searchPatternController;
 
   // State vars
-  int nextPage = 1;
+  int _nextPage = 1;
 
-  bool isLoading = false;
+  bool _isLoading = false;
 
-  List usersList;
+  List _usersList;
 
-  bool dataFetchComplete = false;
+  bool _dataFetchComplete = false;
 
   @override
   void initState() {
@@ -90,10 +90,9 @@ class _UsersListViewWidgetState extends State<UsersListViewWidget> {
         BlocProvider.of<PaginatedParticipantsBloc>(context);
     _paginatedUsersBloc = BlocProvider.of<PaginatedUsersBloc>(context);
 
-    _userSessionBloc =
-        BlocProvider.of<UserSessionBloc>(context);
+    _userSessionBloc = BlocProvider.of<UserSessionBloc>(context);
 
-    usersList = new List();
+    _usersList = new List();
 
     _listenStream();
     _getMoreData();
@@ -129,16 +128,16 @@ class _UsersListViewWidgetState extends State<UsersListViewWidget> {
 
         case Status.COMPLETED:
           // Add data to users list
-          usersList.addAll(event.data.results);
+          _usersList.addAll(event.data.results);
           // If there is a next page, then set nextPage += 1
           if (event.data.next != null)
-            nextPage++;
+            _nextPage++;
           else
-            dataFetchComplete = true;
+            _dataFetchComplete = true;
 
           // Fetch is now complete
           setState(() {
-            isLoading = false;
+            _isLoading = false;
           });
           break;
 
@@ -163,16 +162,16 @@ class _UsersListViewWidgetState extends State<UsersListViewWidget> {
 
         case Status.COMPLETED:
           // Add data to users list
-          usersList.addAll(event.data.results);
+          _usersList.addAll(event.data.results);
           // If there is a next page, then set nextPage += 1
           if (event.data.next != null)
-            nextPage++;
+            _nextPage++;
           else
-            dataFetchComplete = true;
+            _dataFetchComplete = true;
 
           // Fetch is now complete
           setState(() {
-            isLoading = false;
+            _isLoading = false;
           });
           break;
 
@@ -192,24 +191,24 @@ class _UsersListViewWidgetState extends State<UsersListViewWidget> {
     // participant state or users state
     if (widget.piggybank_id != null && !widget.isInviting) {
       _paginatedParticipantsBloc.fetchParticipants(
-          piggybank: widget.piggybank_id);
+          page: _nextPage, piggybank: widget.piggybank_id);
     } else {
-      _paginatedUsersBloc.fetchUsers(pattern: pattern);
+      _paginatedUsersBloc.fetchUsers(page: _nextPage, pattern: pattern);
     }
   }
 
   // Fetch stock and set state to "loading"
   // while fetching
   Future<void> _getMoreData({String pattern}) async {
-    if (dataFetchComplete) {
+    if (_dataFetchComplete) {
       print("Already fetched all data, exiting.");
       return;
     }
 
     // Set state to loading
-    if (!isLoading) {
+    if (!_isLoading) {
       setState(() {
-        isLoading = true;
+        _isLoading = true;
       });
 
       _fetchData(pattern: pattern);
@@ -218,10 +217,10 @@ class _UsersListViewWidgetState extends State<UsersListViewWidget> {
 
   // If refresh triggered, fetch data from page 1
   _handleRefresh() async {
-    dataFetchComplete = false;
-    nextPage = 1;
+    _dataFetchComplete = false;
+    _nextPage = 1;
 
-    usersList = new List();
+    _usersList = new List();
 
     // Need await to handle refresh indicator ending callback
     await _getMoreData(pattern: _searchPatternController.text);
@@ -247,7 +246,7 @@ class _UsersListViewWidgetState extends State<UsersListViewWidget> {
       padding: const EdgeInsets.all(8.0),
       child: new Center(
         child: new Opacity(
-          opacity: isLoading ? 1.0 : 00,
+          opacity: _isLoading ? 1.0 : 00,
           child: new CircularProgressIndicator(),
         ),
       ),
@@ -294,7 +293,8 @@ class _UsersListViewWidgetState extends State<UsersListViewWidget> {
           if (instance is UserProfileModel) {
             convertedInstance = instance;
           } else if (instance is ParticipantModel) {
-            final response = await _paginatedUsersBloc.getUser(id: instance.auth_user_id);
+            final response =
+                await _paginatedUsersBloc.getUser(id: instance.auth_user_id);
             switch (response.status) {
               case Status.LOADING:
                 // impossible
@@ -311,18 +311,23 @@ class _UsersListViewWidgetState extends State<UsersListViewWidget> {
           }
 
           Response<UserSessionModel> response =
-          await _userSessionBloc.fetchUserSessionWithoutStream();
+              await _userSessionBloc.fetchUserSessionWithoutStream();
 
           switch (response.status) {
             case Status.LOADING:
-            // impossible
+              // impossible
               break;
             case Status.COMPLETED:
-              if (convertedInstance.auth_user_id != response.data.user_data.auth_user_id) {
+              if (convertedInstance.auth_user_id !=
+                  response.data.user_data.auth_user_id) {
                 Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => UserDetailPage(userInstance: convertedInstance,)));
+                    builder: (context) => UserDetailPage(
+                          userInstance: convertedInstance,
+                        )));
               } else {
-                Scaffold.of(context).showSnackBar(SnackBar(content: Text('You'),));
+                Scaffold.of(context).showSnackBar(SnackBar(
+                  content: Text('You'),
+                ));
               }
               break;
             case Status.ERROR:
@@ -344,12 +349,12 @@ class _UsersListViewWidgetState extends State<UsersListViewWidget> {
         );
       },
       //+1 for progressbar
-      itemCount: usersList.length + 1,
+      itemCount: _usersList.length + 1,
       itemBuilder: (BuildContext context, int index) {
-        if (index == usersList.length) {
+        if (index == _usersList.length) {
           return _buildProgressIndicator();
         } else {
-          return _getUserListTile(usersList[index]);
+          return _getUserListTile(_usersList[index]);
         }
       },
       physics: const AlwaysScrollableScrollPhysics(),
@@ -366,9 +371,9 @@ class _UsersListViewWidgetState extends State<UsersListViewWidget> {
             labelText: 'Search user by username or email...',
             hintText: 'e.g. user1 or user1@example.com'),
         onEditingComplete: () {
-          nextPage = 1;
-          usersList = new List();
-          dataFetchComplete = false;
+          _nextPage = 1;
+          _usersList = new List();
+          _dataFetchComplete = false;
           _getMoreData(pattern: _searchPatternController.text);
         },
       ),
@@ -393,7 +398,7 @@ class _UsersListViewWidgetState extends State<UsersListViewWidget> {
       ),
       Center(
           child: Padding(
-        child: Text(dataFetchComplete
+        child: Text(_dataFetchComplete
             ? "All data is shown"
             : "Scroll down to fetch more data"),
         padding: new EdgeInsets.all(8),
