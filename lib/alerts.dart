@@ -5,6 +5,11 @@ import 'package:cyberdindaroloapp/widgets/products_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+/*
+* This file contains alert dialogs
+*
+* */
+
 showAlertDialog(BuildContext context, String title, String message,
     {String redirectRoute}) {
   // set up the button
@@ -38,52 +43,6 @@ showAlertDialog(BuildContext context, String title, String message,
     },
   );
 }
-
-/*showConfirmationDialog(BuildContext context,
-    {@required String title,
-    @required String question_message,
-    @required void Function() onConfirmation,
-    String redirectRoute}) {
-  // set up the buttons
-  Widget cancelButton = FlatButton(
-    child: Text("No"),
-    onPressed: () {
-      Navigator.of(context).pop();
-      if (redirectRoute != null) {
-        Navigator.of(context).pushReplacementNamed(redirectRoute);
-      }
-    },
-  );
-  Widget continueButton = FlatButton(
-    child: Text("Yes"),
-    onPressed: () {
-      onConfirmation();
-      Navigator.of(context).pop();
-      if (redirectRoute != null) {
-        Navigator.of(context).pushReplacementNamed(redirectRoute);
-      }
-    },
-  );
-
-  // set up the AlertDialog
-  AlertDialog alert = AlertDialog(
-    title: Text(title),
-    content: Text(question_message),
-    actions: [
-      cancelButton,
-      continueButton,
-    ],
-  );
-
-  // show the dialog
-  showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (BuildContext context) {
-      return alert;
-    },
-  );
-}*/
 
 enum ConfirmAction { CANCEL, ACCEPT }
 
@@ -183,28 +142,6 @@ Future<int> showQuantityInputDialog(BuildContext context,
   );
 }
 
-Future<String> showStringInputDialog(BuildContext context,
-    {@required String title,
-    @required String labelText,
-    @required String hintText,
-    @required int maxLength,
-    bool empty: false}) async {
-  return showDialog<String>(
-    context: context,
-    barrierDismissible: false,
-    // dialog is dismissible with a tap on the barrier
-    builder: (BuildContext context) {
-      return StringInputDialog(
-        title: title,
-        labelText: labelText,
-        hintText: hintText,
-        maxLength: maxLength,
-        empty: empty,
-      );
-    },
-  );
-}
-
 enum ThreeConfirmAction { CANCEL, ACCEPT, DECLINE }
 
 Future<ThreeConfirmAction> asyncThreeConfirmDialog(BuildContext context,
@@ -254,14 +191,36 @@ Future<ThreeConfirmAction> asyncThreeConfirmDialog(BuildContext context,
   );
 }
 
-class StringInputDialog extends StatefulWidget {
+Future<String> showStringInputDialog(BuildContext context,
+    {@required String title,
+      @required String labelText,
+      @required String hintText,
+      @required int maxLength,
+      bool empty: false}) async {
+  return showDialog<String>(
+    context: context,
+    barrierDismissible: false,
+    // dialog is dismissible with a tap on the barrier
+    builder: (BuildContext context) {
+      return StringInputDialogWidget(
+        title: title,
+        labelText: labelText,
+        hintText: hintText,
+        maxLength: maxLength,
+        empty: empty,
+      );
+    },
+  );
+}
+
+class StringInputDialogWidget extends StatefulWidget {
   final String title;
   final String labelText;
   final String hintText;
   final int maxLength;
   final bool empty;
 
-  const StringInputDialog({
+  const StringInputDialogWidget({
     Key key,
     @required this.title,
     @required this.labelText,
@@ -271,12 +230,12 @@ class StringInputDialog extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _StringInputDialogState createState() {
-    return _StringInputDialogState();
+  _StringInputDialogWidgetState createState() {
+    return _StringInputDialogWidgetState();
   }
 }
 
-class _StringInputDialogState extends State<StringInputDialog> {
+class _StringInputDialogWidgetState extends State<StringInputDialogWidget> {
   String choice = '';
 
   final _formKey = GlobalKey<FormState>();

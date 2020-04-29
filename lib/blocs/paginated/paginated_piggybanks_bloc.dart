@@ -21,16 +21,17 @@ class PaginatedPiggyBanksBloc extends BlocBase {
   bool get isClosed => _piggybankListController.isClosed;
 
   PaginatedPiggyBanksBloc() {
-    _piggybankListController = StreamController<Response<PaginatedPiggyBanksModel>>.broadcast();
+    _piggybankListController =
+        StreamController<Response<PaginatedPiggyBanksModel>>.broadcast();
     _piggybankRepository = PaginatedPiggyBanksRepository();
     _lastValidData = null;
   }
 
-  fetchPiggyBanks({int page: 1}) async {
+  fetchPiggyBanks({int page: 1, String pattern: ''}) async {
     pbListSink.add(Response.loading('Getting piggybanks.'));
     try {
-      PaginatedPiggyBanksModel paginatedPB =
-      await _piggybankRepository.fetchPiggyBanksData(page: page);
+      PaginatedPiggyBanksModel paginatedPB = await _piggybankRepository
+          .fetchPiggyBanksData(page: page, pattern: pattern);
       pbListSink.add(Response.completed(paginatedPB));
       _lastValidData = paginatedPB;
     } catch (e) {

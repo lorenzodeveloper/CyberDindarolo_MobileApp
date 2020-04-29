@@ -90,8 +90,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                               // impossible
                               break;
                             case Status.COMPLETED:
-                              showAlertDialog(context, 'Warning',
-                                  'Procedure succesfully completed. Check your email.',
+                              showAlertDialog(
+                                  context,
+                                  'Warning',
+                                  'Procedure succesfully completed. '
+                                      'Check your email.',
                                   redirectRoute: '/');
                               break;
                             case Status.ERROR:

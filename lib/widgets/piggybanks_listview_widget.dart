@@ -21,19 +21,21 @@ class _PiggyBanksListViewWidgetState extends State<PiggyBanksListViewWidget> {
 
   PaginatedPiggyBanksBloc _paginatedPiggyBanksBloc;
 
-  int nextPage = 1;
+  int _nextPage = 1;
 
-  bool isLoading = false;
+  bool _isLoading = false;
 
-  List piggybanks = new List();
+  List _piggybanks = new List();
 
-  bool dataFetchComplete = false;
+  bool _dataFetchComplete = false;
+
+  TextEditingController _searchFieldController;
 
   @override
   void initState() {
     _paginatedPiggyBanksBloc =
         BlocProvider.of<PaginatedPiggyBanksBloc>(context);
-    //if (_piggyBankBloc.isClosed) _piggyBankBloc = new PaginatedPiggyBanksBloc();
+    _searchFieldController = new TextEditingController();
     _listen();
     _getMoreData();
     super.initState();
@@ -42,25 +44,26 @@ class _PiggyBanksListViewWidgetState extends State<PiggyBanksListViewWidget> {
   @override
   void dispose() {
     _dataStreamSubscription?.cancel();
-    //_piggyBankBloc.dispose();
+    _searchFieldController.dispose();
     super.dispose();
   }
 
   // Fetch piggybanks and set state to "loading"
   // while fetching
   Future<void> _getMoreData() async {
-    if (dataFetchComplete) {
+    if (_dataFetchComplete) {
       print("Already fetched all data, exiting.");
       return;
     }
 
     // Set state to loading
-    if (!isLoading) {
+    if (!_isLoading) {
       setState(() {
-        isLoading = true;
+        _isLoading = true;
       });
 
-      _paginatedPiggyBanksBloc.fetchPiggyBanks(page: nextPage);
+      _paginatedPiggyBanksBloc.fetchPiggyBanks(
+          page: _nextPage, pattern: _searchFieldController.text);
     }
   }
 
@@ -75,17 +78,17 @@ class _PiggyBanksListViewWidgetState extends State<PiggyBanksListViewWidget> {
 
         case Status.COMPLETED:
           // Add data to piggybanks list
-          piggybanks.addAll(event.data.results);
+          _piggybanks.addAll(event.data.results);
           //print(piggybanks[0].pbName);
           // If there is a next page, then set nextPage += 1
           if (event.data.next != null)
-            nextPage++;
+            _nextPage++;
           else
-            dataFetchComplete = true;
+            _dataFetchComplete = true;
 
           // Fetch is now complete
           setState(() {
-            isLoading = false;
+            _isLoading = false;
           });
           break;
 
@@ -105,13 +108,35 @@ class _PiggyBanksListViewWidgetState extends State<PiggyBanksListViewWidget> {
 
   // If refresh triggered, fetch data from page 1
   _handleRefresh() async {
-    dataFetchComplete = false;
-    nextPage = 1;
+    _dataFetchComplete = false;
+    _nextPage = 1;
 
-    piggybanks = new List();
+    _piggybanks = new List();
 
     // Need await to handle refresh indicator ending callback
     await _getMoreData();
+  }
+
+  Row _buildSearchTextField() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: <Widget>[
+        // Search textField
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _searchFieldController,
+              decoration: InputDecoration(
+                  labelText: 'Search for a piggybank (e.g. \'My PiggyBank\')'),
+              onEditingComplete: () {
+                _handleRefresh();
+              },
+            ),
+          ),
+        )
+      ],
+    );
   }
 
   // Callback of scrollNotification listener
@@ -134,7 +159,7 @@ class _PiggyBanksListViewWidgetState extends State<PiggyBanksListViewWidget> {
       padding: const EdgeInsets.all(8.0),
       child: new Center(
         child: new Opacity(
-          opacity: isLoading ? 1.0 : 00,
+          opacity: _isLoading ? 1.0 : 00,
           child: new CircularProgressIndicator(),
         ),
       ),
@@ -151,12 +176,12 @@ class _PiggyBanksListViewWidgetState extends State<PiggyBanksListViewWidget> {
         );
       },
       //+1 for progressbar
-      itemCount: piggybanks.length + 1,
+      itemCount: _piggybanks.length + 1,
       itemBuilder: (BuildContext context, int index) {
-        if (index == piggybanks.length) {
+        if (index == _piggybanks.length) {
           return _buildProgressIndicator();
         } else {
-          return PiggyBankTile(piggybanks: piggybanks, index: index);
+          return PiggyBankTile(piggybanks: _piggybanks, index: index);
         }
       },
       physics: const AlwaysScrollableScrollPhysics(),
@@ -169,6 +194,7 @@ class _PiggyBanksListViewWidgetState extends State<PiggyBanksListViewWidget> {
   Widget build(BuildContext context) {
     return Container(
         child: Column(children: [
+      _buildSearchTextField(),
       NotificationListener<ScrollNotification>(
         onNotification: (scrollNotification) =>
             _onEndScroll(scrollNotification),
@@ -180,7 +206,7 @@ class _PiggyBanksListViewWidgetState extends State<PiggyBanksListViewWidget> {
       ),
       Center(
           child: Padding(
-        child: Text(dataFetchComplete
+        child: Text(_dataFetchComplete
             ? "All data is shown"
             : "Scroll down to fetch more data"),
         padding: new EdgeInsets.all(8),
@@ -227,8 +253,7 @@ class PiggyBankTile extends StatelessWidget {
       ),
       onTap: () async {
         Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => PiggyBankDetailPage(
-                piggybanks[index].id)));
+            builder: (context) => PiggyBankDetailPage(piggybanks[index].id)));
       },
     );
   }

@@ -2,6 +2,11 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+/*
+* This file contains useful classes/methods
+*
+* */
+
 //Future<File> getImageFileFromAssets(String path) async {
 //  final byteData = await rootBundle.load('$path');
 //
@@ -41,11 +46,6 @@ import 'package:flutter/material.dart';
               stops: [0.0, 1.0],
               tileMode: TileMode.clamp))
   * */
-
-/*
-* This fil contains useful classes/methods
-*
-* */
 
 class UniqueColorGenerator {
   static Random random = new Random();

@@ -147,6 +147,8 @@ class _ProductFormState extends State<ProductForm> {
 
   @override
   void dispose() {
+    _pNameController.dispose();
+    _pDescController.dispose();
     super.dispose();
   }
 

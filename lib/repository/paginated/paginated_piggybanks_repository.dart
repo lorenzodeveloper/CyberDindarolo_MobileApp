@@ -14,11 +14,19 @@ class PaginatedPiggyBanksRepository {
     return {'Authorization': 'Token $stored_token'};
   }
 
-  Future<PaginatedPiggyBanksModel> fetchPiggyBanksData({int page: 1}) async {
+  Future<PaginatedPiggyBanksModel> fetchPiggyBanksData(
+      {int page: 1, String pattern: ''}) async {
     final headers = await _getAuthHeader();
 
-    final response =
-        await _provider.get("piggybanks/?page=$page", headers: headers);
+    var response;
+
+    if (pattern.isEmpty) {
+      response = await _provider.get("piggybanks/?page=$page", headers: headers);
+    } else {
+      response = await _provider.get("piggybanks/search/$pattern/?page=$page",
+          headers: headers);
+    }
+
     return PaginatedPiggyBanksModel.fromJson(response);
   }
 
