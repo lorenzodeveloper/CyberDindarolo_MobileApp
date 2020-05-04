@@ -10,12 +10,15 @@ This is only the frontend of the project.
 For more information about how this project works, please see the CyberDindarolo API repo.
 
 # Screenshots
- 
+
+ <img src="Screenshots/login.jpg" width="200"> 
  <img src="Screenshots/drawer.jpg" width="200"> 
  <img src="Screenshots/pg_list.jpg" width="200">
  <img src="Screenshots/pg_detail.jpg" width="200">
  <img src="Screenshots/pg_detail_with_desc.jpg" width="200"> 
  <img src="Screenshots/invitations.jpg" width="200">
+ <img src="Screenshots/entries.jpg" width="200">
+ <img src="Screenshots/purchases.jpg" width="200">
  <img src="Screenshots/users.jpg" width="200">
  <img src="Screenshots/user_detail.jpg" width="200">
  <img src="Screenshots/products.jpg" width="200">
