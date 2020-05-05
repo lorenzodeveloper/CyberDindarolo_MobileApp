@@ -1,4 +1,3 @@
-
 import 'package:cyberdindaroloapp/blocs/paginated/paginated_products_bloc.dart';
 import 'package:cyberdindaroloapp/models/product_model.dart';
 import 'package:cyberdindaroloapp/networking/Repsonse.dart';
@@ -17,7 +16,6 @@ import '../bloc_provider.dart';
 * view or form view
 * ...
 * */
-
 
 class ProductDetailPage extends StatefulWidget {
   final ProductModel productInstance;
@@ -80,7 +78,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     id: widget.productInstance.id);
                 switch (response.status) {
                   case Status.LOADING:
-                  // impossible
+                    // impossible
                     break;
                   case Status.COMPLETED:
                     Navigator.of(context).pushReplacement(MaterialPageRoute(
@@ -138,9 +136,9 @@ class _ProductFormState extends State<ProductForm> {
   void initState() {
     _paginatedProductsBloc = BlocProvider.of<PaginatedProductsBloc>(context);
     _pNameController =
-    new TextEditingController(text: widget.productInstance.name);
+        new TextEditingController(text: widget.productInstance.name);
     _pDescController =
-    new TextEditingController(text: widget.productInstance.description);
+        new TextEditingController(text: widget.productInstance.description);
 
     super.initState();
   }
@@ -185,36 +183,36 @@ class _ProductFormState extends State<ProductForm> {
               onPressed: !widget.edit
                   ? null
                   : () async {
-                if (_formKey.currentState.validate()) {
-                  final response =
-                  await _paginatedProductsBloc.editProduct(
-                      oldInstance: widget.productInstance,
-                      newName: _pNameController.text,
-                      newDesc: _pDescController.text);
-                  switch (response.status) {
-                    case Status.LOADING:
-                    // impossible
-                      break;
-                    case Status.COMPLETED:
-                      Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(
-                              builder: (context) => ProductsPage()));
-                      break;
-                    case Status.ERROR:
-                      if (response.message
-                          .toLowerCase()
-                          .contains('token')) {
-                        showAlertDialog(
-                            context, 'Error', response.message,
-                            redirectRoute: '/');
-                      } else {
-                        showAlertDialog(
-                            context, 'Error', response.message);
+                      if (_formKey.currentState.validate()) {
+                        final response =
+                            await _paginatedProductsBloc.editProduct(
+                                oldInstance: widget.productInstance,
+                                newName: _pNameController.text,
+                                newDesc: _pDescController.text);
+                        switch (response.status) {
+                          case Status.LOADING:
+                            // impossible
+                            break;
+                          case Status.COMPLETED:
+                            Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                    builder: (context) => ProductsPage()));
+                            break;
+                          case Status.ERROR:
+                            if (response.message
+                                .toLowerCase()
+                                .contains('token')) {
+                              showAlertDialog(
+                                  context, 'Error', response.message,
+                                  redirectRoute: '/');
+                            } else {
+                              showAlertDialog(
+                                  context, 'Error', response.message);
+                            }
+                            break;
+                        }
                       }
-                      break;
-                  }
-                }
-              },
+                    },
             )
           ],
         ),

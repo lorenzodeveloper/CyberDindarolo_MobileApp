@@ -63,7 +63,8 @@ class ComposedFloatingButtonState extends State<ComposedFloatingButton>
               backgroundColor: backgroundColor,
               mini: true,
               child: new Icon(widget.icons[index], color: foregroundColor),
-              onPressed: () => widget.functions[index](widget.parameters[index]),
+              onPressed: () =>
+                  widget.functions[index](widget.parameters[index]),
             ),
           ),
         );

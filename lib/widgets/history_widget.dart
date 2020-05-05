@@ -13,6 +13,11 @@ import 'package:flutter/widgets.dart';
 import '../alerts.dart';
 import '../bloc_provider.dart';
 
+/*
+* This class is the one responsible for viewing and managing
+* entries and purchases history
+* */
+
 enum MovementType { ENTRIES, PURCHASES }
 
 class HistoryWidget extends StatefulWidget {
@@ -94,9 +99,9 @@ class _HistoryWidgetState extends State<HistoryWidget> {
           break;
 
         case Status.COMPLETED:
-          // Add data to piggybanks list
+          // Add data to movements list
           _movements.addAll(event.data.results);
-          //print(piggybanks[0].pbName);
+
           // If there is a next page, then set nextPage += 1
           if (event.data.next != null)
             _nextPage++;

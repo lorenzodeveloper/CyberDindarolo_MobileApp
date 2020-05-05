@@ -6,6 +6,10 @@ import 'package:flutter/material.dart';
 
 import '../bloc_provider.dart';
 
+/*
+* This class is the one responsible for password reset
+* */
+
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({
     Key key,

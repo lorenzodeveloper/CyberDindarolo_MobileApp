@@ -11,6 +11,11 @@ import 'package:flutter/widgets.dart';
 import '../alerts.dart';
 import '../bloc_provider.dart';
 
+/*
+* This class is the one responsible for viewing
+* and managing invitations
+* */
+
 class NotificationsWidget extends StatefulWidget {
   const NotificationsWidget({Key key}) : super(key: key);
 
@@ -78,9 +83,8 @@ class _NotificationsWidgetState extends State<NotificationsWidget> {
           break;
 
         case Status.COMPLETED:
-          // Add data to piggybanks list
+          // Add data to invitations list
           _invitations.addAll(event.data.results);
-          //print(piggybanks[0].pbName);
           // If there is a next page, then set nextPage += 1
           if (event.data.next != null)
             _nextPage++;

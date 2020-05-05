@@ -47,6 +47,9 @@ class _EntryFormPageState extends State<EntryFormPage> {
   // Blocs
   PaginatedEntriesBloc _paginatedEntriesBloc;
 
+  // RegEx for amount:
+  // - Unlimited digits after 'point'
+  // - 2 digits after 'point'
   final _amountValidator = RegExInputFormatter.withRegex(
       '^\$|^(0|([1-9][0-9]{0,}))(\\.[0-9]{0,})?\$');
   final _amountValidator2Digits =
@@ -55,7 +58,6 @@ class _EntryFormPageState extends State<EntryFormPage> {
   @override
   void initState() {
     _paginatedEntriesBloc = BlocProvider.of<PaginatedEntriesBloc>(context);
-    //_paginatedProductsBloc = BlocProvider.of<PaginatedProductsBloc>(context);
 
     _quantityFieldController = TextEditingController(text: '1');
     _setPriceController = TextEditingController();
@@ -160,17 +162,17 @@ class _EntryFormPageState extends State<EntryFormPage> {
                   child: Column(children: <Widget>[
                     // PB Name field
                     TextFormField(
-                      inputFormatters: [
-                        WhitelistingTextInputFormatter.digitsOnly
-                      ],
-                      keyboardType: TextInputType.numberWithOptions(
-                        signed: false,
-                      ),
-                      decoration: InputDecoration(
-                          labelText: 'Enter Product\'s set quantity (e.g. 2)'),
-                      controller: _quantityFieldController,
-                      validator: (value) => gpStringValidator(value, 6)
-                    ),
+                        inputFormatters: [
+                          WhitelistingTextInputFormatter.digitsOnly
+                        ],
+                        keyboardType: TextInputType.numberWithOptions(
+                          signed: false,
+                        ),
+                        decoration: InputDecoration(
+                            labelText:
+                                'Enter Product\'s set quantity (e.g. 2)'),
+                        controller: _quantityFieldController,
+                        validator: (value) => gpStringValidator(value, 6)),
 
                     // PB Description field
                     TextFormField(
@@ -233,7 +235,6 @@ class _EntryFormPageState extends State<EntryFormPage> {
                     RaisedButton(
                       onPressed: () async {
                         if (widget.onFormCancel != null) widget.onFormCancel();
-
                       },
                       child: Text('Cancel'),
                     ),
@@ -244,6 +245,7 @@ class _EntryFormPageState extends State<EntryFormPage> {
   }
 }
 
+// RegEx as input formatter
 class RegExInputFormatter implements TextInputFormatter {
   final RegExp _regExp;
 

@@ -2,6 +2,11 @@ import 'package:cyberdindaroloapp/widgets/products_listview_widget.dart';
 import 'package:cyberdindaroloapp/widgets/universal_drawer_widget.dart';
 import 'package:flutter/material.dart';
 
+/*
+* This class is the one responsible for preparing the products list view page
+* */
+
+
 class ProductsPage extends StatefulWidget {
   const ProductsPage({
     Key key,

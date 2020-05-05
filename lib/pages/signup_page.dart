@@ -1,6 +1,10 @@
 import 'package:cyberdindaroloapp/widgets/user_form.dart';
 import 'package:flutter/material.dart';
 
+/*
+* This class is the one responsible for signing up new users
+* */
+
 class SignUpPage extends StatefulWidget {
   const SignUpPage({
     Key key,

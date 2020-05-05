@@ -9,6 +9,7 @@ class CyberDindaroloAPIv1Provider {
   // 10.0.2.2 on emulator
   // 192.168.1.15 on physical device
   static const String _baseUrl = "http://192.168.1.15:8000/api/v1/";
+
   // static const String _baseUrl = "http://10.0.2.2:8000/api/v1/";
 
   Future<dynamic> get(String url, {Map headers}) async {
@@ -22,13 +23,15 @@ class CyberDindaroloAPIv1Provider {
     return responseJson;
   }
 
-  Future<dynamic> post(String url, {Map headers, Map body, encoding, int seconds : 5}) async {
+  Future<dynamic> post(String url,
+      {Map headers, Map body, encoding, int seconds: 5}) async {
     if (seconds != null && seconds < 5)
       throw Exception('5 seconds waiting at least');
     var responseJson;
     try {
       final response = await http
-          .post(_baseUrl + url, body: body, headers: headers, encoding: encoding)
+          .post(_baseUrl + url,
+              body: body, headers: headers, encoding: encoding)
           .timeout(Duration(seconds: seconds));
       responseJson = _response(response);
     } on SocketException {
@@ -41,7 +44,8 @@ class CyberDindaroloAPIv1Provider {
     var responseJson;
     try {
       final response = await http
-          .patch(_baseUrl + url, body: body, headers: headers, encoding: encoding)
+          .patch(_baseUrl + url,
+              body: body, headers: headers, encoding: encoding)
           .timeout(const Duration(seconds: 5));
       responseJson = _response(response);
     } on SocketException {
@@ -72,7 +76,7 @@ class CyberDindaroloAPIv1Provider {
         print(responseJson);
         return responseJson;
       case 204:
-        return { 'success' : true };
+        return {'success': true};
       case 400:
         throw BadRequestException(response.body.toString());
       case 401:

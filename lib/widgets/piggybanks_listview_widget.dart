@@ -79,7 +79,6 @@ class _PiggyBanksListViewWidgetState extends State<PiggyBanksListViewWidget> {
         case Status.COMPLETED:
           // Add data to piggybanks list
           _piggybanks.addAll(event.data.results);
-          //print(piggybanks[0].pbName);
           // If there is a next page, then set nextPage += 1
           if (event.data.next != null)
             _nextPage++;

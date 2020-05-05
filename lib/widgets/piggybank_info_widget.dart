@@ -24,7 +24,7 @@ import 'package:flutter/widgets.dart';
 import '../alerts.dart';
 
 /*
-* This class show piggybank info:
+* This class shows piggybank info:
 *   - Name, Description and status (opened / closed)
 *   - Stock
 *
@@ -173,6 +173,7 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
 
     // Add entry in piggybank
     onAddEntry = (int piggybank_id) async {
+      //region onAddEntry
       Response<ProductModel> selectedProductResponse =
           await showProductOptionDialog(context);
 
@@ -240,6 +241,7 @@ class _PiggyBankInfoWidgetState extends State<PiggyBankInfoWidget> {
 
       // If operation not canceled and selectedProduct exists and not error
       // redirect to entry form
+      //endregion
     };
 
     // Composed Floating Button functions and params

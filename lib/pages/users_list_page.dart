@@ -18,7 +18,7 @@ import '../alerts.dart';
 
 class UsersListViewPage extends StatelessWidget {
   final PiggyBankModel piggybankInstance;
-
+  // If user is inviting someone to join PG
   final bool isInviting;
 
   const UsersListViewPage(
@@ -339,7 +339,7 @@ class _UsersListViewWidgetState extends State<UsersListViewWidget> {
     );
   }
 
-  // ListView builder of piggybanks
+  // ListView builder of users
   Widget _buildList() {
     return ListView.separated(
       separatorBuilder: (context, index) {
@@ -380,8 +380,6 @@ class _UsersListViewWidgetState extends State<UsersListViewWidget> {
     );
   }
 
-  // Build widget:
-  // LIST AND INFO LABEL
   @override
   Widget build(BuildContext context) {
     return Container(

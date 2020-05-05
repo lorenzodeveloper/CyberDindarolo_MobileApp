@@ -11,6 +11,10 @@ import '../alerts.dart';
 import '../bloc_provider.dart';
 import 'forgot_password_page.dart';
 
+/*
+* This class is the one responsible for loggin in the user
+* */
+
 class LoginPage extends StatelessWidget {
   final bool autoLogin;
 
@@ -29,6 +33,7 @@ class LoginPage extends StatelessWidget {
 
 // Define a custom Form widget.
 class LoginForm extends StatefulWidget {
+  // if true: try login with stored credentials
   final bool autoLogin;
 
   LoginForm({this.autoLogin: true});
@@ -52,9 +57,10 @@ class LoginFormState extends State<LoginForm> {
   void initState() {
     _userSessionbloc = BlocProvider.of<UserSessionBloc>(context);
 
-    _unameController = TextEditingController(); //text: "lorenzo_lamas123");
-    _pwdController = TextEditingController(); //text: "prova1234");
+    _unameController = TextEditingController();
+    _pwdController = TextEditingController();
 
+    // listen for user session events (e.g. login success or error)
     _listen();
 
     // Try login with stored credential (if stored)

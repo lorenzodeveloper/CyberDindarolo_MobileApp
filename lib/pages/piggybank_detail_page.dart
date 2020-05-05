@@ -80,7 +80,6 @@ class _PiggyBankDetailPageState extends State<PiggyBankDetailPage> {
 
   @override
   void dispose() {
-    //_piggyBankBloc.dispose();
     super.dispose();
   }
 }

@@ -11,6 +11,11 @@ import 'package:flutter/material.dart';
 import '../alerts.dart';
 import '../bloc_provider.dart';
 
+/*
+* This class is the one responsible for viewing and/or editing the user profile
+* */
+
+
 class UserDetailPage extends StatefulWidget {
   final UserProfileModel userInstance;
   final bool canEdit;
@@ -36,6 +41,41 @@ class _UserDetailPageState extends State<UserDetailPage> {
     _operation = Operation.INFO_VIEW;
     _userSessionBloc = BlocProvider.of<UserSessionBloc>(context);
     super.initState();
+  }
+
+  _deleteUser() async {
+    final ConfirmAction confirmation = await asyncConfirmDialog(context,
+        title: "Do you really want to delete your account?",
+        question_message: "You won't be able to rollback once you "
+            "decide to delete your account. "
+            "All the piggybanks you have created won't be deleted/closed.");
+    switch (confirmation) {
+      case ConfirmAction.CANCEL:
+        break;
+      case ConfirmAction.ACCEPT:
+      // Close request
+        final response = await _userSessionBloc.deleteAccount(
+            id: widget.userInstance.auth_user_id);
+
+        // Handle response
+        if (response.status == Status.COMPLETED) {
+          // redirect and refresh piggybanks list
+          Navigator.of(context).pop();
+          Navigator.of(context).pushReplacement(MaterialPageRoute(
+              builder: (context) => LoginPage(
+                autoLogin: false,
+              )));
+        } else if (response.status == Status.ERROR) {
+          // Show error message
+          if (response.message.toLowerCase().contains('token')) {
+            showAlertDialog(context, 'Error', response.message,
+                redirectRoute: '/');
+          } else {
+            showAlertDialog(context, 'Error', response.message);
+          }
+        }
+        break;
+    }
   }
 
   Widget _getImageHeader() {
@@ -134,40 +174,5 @@ class _UserDetailPageState extends State<UserDetailPage> {
         ),
       ),
     );
-  }
-
-  _deleteUser() async {
-    final ConfirmAction confirmation = await asyncConfirmDialog(context,
-        title: "Do you really want to delete your account?",
-        question_message: "You won't be able to rollback once you "
-            "decide to delete your account. "
-            "All the piggybanks you have created won't be deleted/closed.");
-    switch (confirmation) {
-      case ConfirmAction.CANCEL:
-        break;
-      case ConfirmAction.ACCEPT:
-        // Close request
-        final response = await _userSessionBloc
-            .deleteAccount(id: widget.userInstance.auth_user_id);
-
-        // Handle response
-        if (response.status == Status.COMPLETED) {
-          // redirect and refresh piggybanks list
-          Navigator.of(context).pop();
-          Navigator.of(context).pushReplacement(MaterialPageRoute(
-              builder: (context) => LoginPage(
-                    autoLogin: false,
-                  )));
-        } else if (response.status == Status.ERROR) {
-          // Show error message
-          if (response.message.toLowerCase().contains('token')) {
-            showAlertDialog(context, 'Error', response.message,
-                redirectRoute: '/');
-          } else {
-            showAlertDialog(context, 'Error', response.message);
-          }
-        }
-        break;
-    }
   }
 }
